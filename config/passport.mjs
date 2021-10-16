@@ -1,15 +1,23 @@
-import dotenv from "dotenv";
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import mongoose from "mongoose";
-import User from "../models/User.mjs";
+import { config } from 'dotenv';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import mongoose from 'mongoose';
+import User from '../models/User.mjs';
 
-dotenv.config();
+config();
 
 // Convert base64 .pem public key
-const PUBLIC_KEY = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('ascii');
+const PUBLIC_KEY = Buffer.from(process.env.ACCESS_TOKEN_PUBLIC_KEY_BASE64, 'base64').toString('ascii');
+
+const cookieExtractor = (req) => {
+    let token = null;
+    if (req && req.cookies) {
+        token = req.cookies['access_token'];
+    }
+    return token;
+};
 
 const opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = PUBLIC_KEY;
 
 export default passport => {

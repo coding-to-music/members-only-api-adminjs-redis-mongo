@@ -1,17 +1,17 @@
-import express from "express";
-import cookieParser from "cookie-parser";
-import createHttpError from "http-errors";
-import logger from "morgan";
-import passport from "passport";
-import cors from "cors"
-import helmet from "helmet";
-import compression from "compression";
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import createHttpError from 'http-errors';
+import morgan from 'morgan';
+import passport from 'passport';
+import cors from 'cors'
+import helmet from 'helmet';
+import compression from 'compression';
 
 
-import initDB from "./config/database.mjs";
-import authConfig from "./config/passport.mjs";
-import apiRouter from "./routes/api/api.mjs";
-import indexRouter from "./routes/index.mjs";
+import initDB from './config/database.mjs';
+import authConfig from './config/passport.mjs';
+import apiRouter from './routes/api/api.mjs';
+import indexRouter from './routes/index.mjs';
 
 // Initialize DB
 initDB();
@@ -21,7 +21,7 @@ authConfig(passport)
 
 const app = express();
 
-app.use(logger('dev'));
+app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
 
@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-    res.status(err.status || 500).json(err)
+    res.status(err.status || 500).json({ error: err.message || err.toString() })
 })
 
 export default app
