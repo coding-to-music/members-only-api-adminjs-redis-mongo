@@ -1,6 +1,7 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
 
-const ProfileSchema = new mongoose.Schema({
+const ProfileSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     bio: { type: String },
     address: { type: String, required: true },
