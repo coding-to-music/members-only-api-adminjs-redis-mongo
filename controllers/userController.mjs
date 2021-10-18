@@ -9,22 +9,23 @@ export const post_createUser = [
     body('password').isLength({ min: 6 }),
 
     (req, res, next) => {
-
+        const { name, email, password, img } = req.body
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json(errors.array());
         } else {
-            User.findOne({ email: req.body.email })
+            User.findOne({ email: email })
                 .exec((err, found_user) => {
                     if (err) return next(err);
                     if (found_user) {
                         return res.status(409).json({ msg: 'User already exists' })
                     } else {
-                        const avatar = gravatar.url(req.body.email, { s: '100', r: 'pg', d: 'retro' }, true);
+                        const avatar = gravatar.url(email, { s: '100', r: 'pg', d: 'retro' }, true);
                         const user = new User({
-                            name: req.body.name,
-                            email: req.body.email,
-                            password: req.body.password
+                            name: name,
+                            email: email,
+                            password: password,
+                            avatar: avatar || img || ''
                         });
                         user.save((err, theuser) => {
                             if (err) return next(err);

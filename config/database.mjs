@@ -1,8 +1,8 @@
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 import mongoose from 'mongoose';
 
 const initDB = () => {
-    dotenv.config();
+    config();
     const mongoDB = process.env.DB_URL
     mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
     const db = mongoose.connection;

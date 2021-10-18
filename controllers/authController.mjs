@@ -43,7 +43,7 @@ export const post_loginUser = [
                 const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: process.env.REFRESH_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '7d' });
                 
                 const { password, ...data } = user._doc;
-                return res.cookie("access_token", token, { httpOnly: true }).cookie('refresh_token', refresh_token, { httpOnly: true }).json({ message: 'Login successful', user: data });
+                return res.cookie('access_token', token, { exprires: new Date(Date.now() + 3600000), httpOnly: true, signed: true }).cookie('refresh_token', refresh_token, { exprires: new Date(Date.now() + 604800000), httpOnly: true, signed: true }).json({ message: 'Login successful', user: data });
 
             } catch (err) {
                 return next(err)
@@ -56,7 +56,7 @@ export const get_logoutUser = (req, res) => {
 }
 
 export const post_refreshToken = async (req, res, next) => {
-    const { refresh_token } = req.cookies;
+    const { refresh_token } = req.signedCookies;
     if (!refresh_token) return res.status(404).json({ msg: 'Refresh Token not found' });
     try {
         // Verify refresh token in request
@@ -74,7 +74,7 @@ export const post_refreshToken = async (req, res, next) => {
         const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(process.env.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
         jwt.sign(rest, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: process.env.ACCESS_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '1h' }, (err, token) => {
             if (err) return next(err)
-            res.cookie('access_token', token, { httpOnly: true }).json({ msg: 'Token refresh successful!!', user: data })
+            res.cookie('access_token', token, { exprires: new Date(Date.now() + 3600000), httpOnly: true, signed: true }).json({ msg: 'Token refresh successful!!', user: data })
         });
     } catch (err) {
         return next(err);
