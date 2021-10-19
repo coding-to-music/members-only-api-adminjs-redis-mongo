@@ -30,11 +30,11 @@ const genKeyPair = () => {
 // const KEY = fs.readFileSync(new URL('PATH-TO-KEY', import.meta.url)).toString('base64');
 // console.log(KEY)
 
-const genSecret = () => {
-    randomBytes(256, (err, buf) => {
-        if (err) throw err;
-        console.log(`${buf.length} bytes of random data: ${buf.toString('hex')}`);
-    })
+export const generateRandomCode = async (length) => {
+    try {
+        const code = await randomBytes(length).toString('hex').toUpperCase();
+        return code;
+    } catch (error) {
+        console.log(error)
+    }
 }
-
-genKeyPair()

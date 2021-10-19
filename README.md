@@ -1,1 +1,5 @@
-# members-only
+# members-only-api
+
+### Contributors
+
+* Lekan Adetunmbi

@@ -1,12 +1,23 @@
-import User from "../models/User.mjs";
-import { body, validationResult } from "express-validator";
-import gravatar from "gravatar";
+import User from '../models/User.mjs';
+import { body, validationResult } from 'express-validator';
+import gravatar from 'gravatar';
 
-export const post_createUser = [
+export const get_get_user = async (req, res, next) => {
+    try {
+        const user = await User.findOne({ email: req.user.email }).exec();
+        if (!user) return res.status(404).json({ msg: 'User not found' });
+        const { password, resetPassword, ...data } = user._doc;
+        res.json(data);
+    } catch (err) {
+        return next(err);
+    }
+}
+
+export const post_create_user = [
 
     body('name', 'What is your name???').trim().isLength({ min: 1 }).escape(),
-    body('email').isEmail(),
-    body('password').isLength({ min: 6 }),
+    body('email').notEmpty().isEmail(),
+    body('password').notEmpty().isLength({ min: 6 }),
 
     (req, res, next) => {
         const { name, email, password, img } = req.body
@@ -29,7 +40,7 @@ export const post_createUser = [
                         });
                         user.save((err, theuser) => {
                             if (err) return next(err);
-                            const { password, ...data } = theuser._doc;
+                            const { password, resetPassword, ...data } = theuser._doc;
                             res.json(data);
                         })
                     }
@@ -38,13 +49,12 @@ export const post_createUser = [
     }
 ];
 
-export const get_getUser = async (req, res, next) => {
-    try {
-        const user = await User.findOne({ email: req.user.email }).exec();
-        if (!user) return res.status(404).json({ msg: 'User not found' });
-        const { password, ...data } = user._doc;
-        res.json(data);
-    } catch (err) {
-        return next(err);
+export const put_update_user = [
+    async (req, res, next) => {
+        res.send('Not yet implemented')
     }
+]
+
+export const delete_delete_user = async (req, res, next) => {
+    res.send('Not yet implemented')
 }

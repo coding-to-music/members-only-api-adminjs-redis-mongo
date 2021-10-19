@@ -11,6 +11,7 @@
     "serverstart": "DEBUG=members-only:* npm run devstart"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.5.0",
     "async": "^3.2.1",
     "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
@@ -24,7 +25,7 @@
     "helmet": "^4.6.0",
     "http-errors": "^1.8.0",
     "luxon": "^2.0.2",
-    "mongoose": "^6.0.5",
+    "mongoose": "^6.0.11",
     "morgan": "^1.10.0",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0"
