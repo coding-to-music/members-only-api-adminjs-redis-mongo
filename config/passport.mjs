@@ -10,8 +10,13 @@ const PUBLIC_KEY = Buffer.from(process.env.ACCESS_TOKEN_PUBLIC_KEY_BASE64, 'base
 
 const cookieExtractor = (req) => {
     let token = null;
+<<<<<<< HEAD
     if (req && req.cookies) {
         token = req.cookies['access_token'];
+=======
+    if (req && req.signedCookies) {
+        token = req.signedCookies['access_token'];
+>>>>>>> ff6a1666365bcc879a57fb07a3744d2ada9b7492
     }
     return token;
 };

@@ -2,6 +2,10 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
 import morgan from 'morgan';
+<<<<<<< HEAD
+=======
+import { config } from 'dotenv';
+>>>>>>> ff6a1666365bcc879a57fb07a3744d2ada9b7492
 import passport from 'passport';
 import cors from 'cors'
 import helmet from 'helmet';
@@ -12,6 +16,11 @@ import initDB from './config/database.mjs';
 import authConfig from './config/passport.mjs';
 import apiRouter from './routes/api/api.mjs';
 import indexRouter from './routes/index.mjs';
+<<<<<<< HEAD
+=======
+
+config();
+>>>>>>> ff6a1666365bcc879a57fb07a3744d2ada9b7492
 
 // Initialize DB
 initDB();
@@ -26,7 +35,7 @@ app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
 
 app.use(passport.initialize());
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET || 'top-secret'));
 app.use(cors());
 app.use(helmet());
 app.use(compression());
