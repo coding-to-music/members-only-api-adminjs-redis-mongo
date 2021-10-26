@@ -43,7 +43,7 @@ export const post_login_user = [
                 const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: process.env.REFRESH_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '7d' });
                 
                 const { password, resetPassword, ...data } = user._doc;
-                return res.cookie('access_token', token, { httpOnly: true, maxAge: 3600000, signed: true }).cookie('refresh_token', refresh_token, { httpOnly: true, maxAge: 604800000, signed: true }).json({ message: 'Login successful', user: data });
+                return res.cookie('access_token', token, { httpOnly: true, maxAge: 3600000, signed: true, sameSite: 'none', secure: true }).cookie('refresh_token', refresh_token, { httpOnly: true, maxAge: 604800000, signed: true, sameSite: 'none', secure: true }).json({ message: 'Login successful', user: data });
 
             } catch (err) {
                 return next(err)
@@ -74,7 +74,7 @@ export const post_refresh_token = async (req, res, next) => {
         const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(process.env.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
         jwt.sign(rest, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: process.env.ACCESS_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '1h' }, (err, token) => {
             if (err) return next(err)
-            res.cookie('access_token', token, { httpOnly: true, maxAge: 3600000, signed: true }).json({ msg: 'Token refresh successful!!', user: data })
+            res.cookie('access_token', token, { httpOnly: true, maxAge: 3600000, signed: true, sameSite: 'none', secure: true }).json({ msg: 'Token refresh successful!!', user: data })
         });
     } catch (err) {
         return next(err);

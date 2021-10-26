@@ -30,7 +30,7 @@ app.use(express.urlencoded({ limit: '16mb', extended: true }));
 
 app.use(passport.initialize());
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(cors());
+app.use(cors({ credentials: true, origin: 'https://localhost:3000' }));
 app.use(helmet());
 app.use(compression());
 
