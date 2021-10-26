@@ -42,7 +42,7 @@ export const post_login_user = [
                 const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(process.env.REFRESH_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
                 const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: process.env.REFRESH_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '7d' });
                 
-                const { password, ...data } = user._doc;
+                const { password, resetPassword, ...data } = user._doc;
                 return res.cookie('access_token', token, { httpOnly: true, maxAge: 3600000, signed: true }).cookie('refresh_token', refresh_token, { httpOnly: true, maxAge: 604800000, signed: true }).json({ message: 'Login successful', user: data });
 
             } catch (err) {
