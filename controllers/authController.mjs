@@ -41,7 +41,7 @@ export const post_login_user = [
                 // Process Refresh token
                 const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(process.env.REFRESH_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
                 const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: process.env.REFRESH_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '7d' });
-                
+
                 const { password, resetPassword, ...data } = user._doc;
                 return res.cookie('access_token', token, { httpOnly: true, maxAge: 3600000, signed: true, sameSite: 'none', secure: true }).cookie('refresh_token', refresh_token, { httpOnly: true, maxAge: 604800000, signed: true, sameSite: 'none', secure: true }).json({ message: 'Login successful', user: data });
 
@@ -52,7 +52,7 @@ export const post_login_user = [
     }]
 
 export const get_logout_user = (req, res) => {
-    return res.clearCookie('access_token').json({ message: 'Logout successful' });
+    return res.clearCookie('access_token', { httpOnly: true, signed: true, sameSite: 'none', secure: true }).json({ message: 'Logout successful' });
 }
 
 export const post_refresh_token = async (req, res, next) => {
@@ -66,7 +66,7 @@ export const post_refresh_token = async (req, res, next) => {
         // Check if user exists in DB
         const user = await User.findOne({ id: decoded.sub });
         if (!user) return res.status(404).json({ msg: 'User not found' });
-        
+
         const { password, ...data } = user._doc;
         const { exp, ...rest } = decoded
 
