@@ -17,7 +17,8 @@ const cookieExtractor = (req) => {
 };
 
 const opts = {};
-opts.jwtFromRequest = cookieExtractor;
+// opts.jwtFromRequest = cookieExtractor;
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = PUBLIC_KEY;
 
 export default passport => {
