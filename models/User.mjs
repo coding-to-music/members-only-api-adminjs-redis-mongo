@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import { generateRandomCode } from '../utils/generateKey.mjs'
+import { generateRandomCode, tokenGenerator } from '../utils/generateData.mjs';
+import jwt from 'jsonwebtoken';
 
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -12,7 +13,11 @@ const UserSchema = new mongoose.Schema({
     isMember: { type: Boolean, default: false },
     resetPassword: {
         code: { type: String, default: '' },
-        expiresIn: { type: Date, default: '' }
+        expiresBy: { type: Date, default: '' }
+    },
+    refreshToken: {
+        token: { type: String, default: '' },
+        expiresBy: { type: Date, default: '' }
     }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
@@ -26,20 +31,34 @@ UserSchema.pre('save', async function (next) {
 UserSchema.pre('findOne', async function (next) {
     await this.model.findOneAndUpdate(this.getFilter().email, { '$set': { 'lastLogin': Date.now() } }, { new: true });
     next();
-})
+});
 
 UserSchema.methods.generateCode = async function () {
     const code = await generateRandomCode(3);
     this.resetPassword.code = await bcrypt.hash(code, 10);
-    this.resetPassword.expiresIn = Date.now() + 300000;
+    this.resetPassword.expiresBy = Date.now() + 300000;
     this.save();
-    return code
-}
+    return code;
+};
 
 UserSchema.methods.verifyCode = async function (code) {
     const validCode = await bcrypt.compare(code, this.resetPassword.code);
-    const codeNotExpired = (Date.now() - new Date(this.resetPassword.expiresIn)) < 300000;
+    const codeNotExpired = (Date.now() - new Date(this.resetPassword.expiresBy)) < 300000;
     return { validCode, codeNotExpired };
+};
+
+UserSchema.methods.generateTokens = async function (usr) {
+    const { token, refresh_token } = await tokenGenerator(usr);
+    this.refreshToken.token = refresh_token;
+    this.refreshToken.expiresBy = new Date(jwt.decode(refresh_token).exp * 1000);
+    this.save();
+    return { token, refresh_token };
+}
+
+UserSchema.methods.validateRefreshToken = async function (token) {
+    const validToken = this.refreshToken.token === token;
+    const refreshTokenNotExpired = (new Date(this.resetPassword.expiresBy) - Date.now()) < 604800000;
+    return { validToken, refreshTokenNotExpired };
 }
 
 export default mongoose.model('User', UserSchema);

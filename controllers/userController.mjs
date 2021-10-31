@@ -2,15 +2,9 @@ import User from '../models/User.mjs';
 import { body, validationResult } from 'express-validator';
 import gravatar from 'gravatar';
 
-export const get_get_user = async (req, res, next) => {
-    try {
-        const user = await User.findOne({ email: req.user.email }).exec();
-        if (!user) return res.status(404).json({ msg: 'User not found' });
-        const { password, resetPassword, ...data } = user._doc;
-        res.json(data);
-    } catch (err) {
-        return next(err);
-    }
+export const get_get_user = async (req, res) => {
+    const { password, resetPassword, refreshToken, ...data } = req.user._doc;
+    res.json(data)
 }
 
 export const post_create_user = [
@@ -40,7 +34,7 @@ export const post_create_user = [
                         });
                         user.save((err, theuser) => {
                             if (err) return next(err);
-                            const { password, resetPassword, ...data } = theuser._doc;
+                            const { password, resetPassword, refreshToken, ...data } = theuser._doc;
                             res.json(data);
                         })
                     }

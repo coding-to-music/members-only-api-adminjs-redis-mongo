@@ -16,8 +16,8 @@ export const get_verification_code = [
                 const user = await User.findOne({ email: email }).exec();
                 if (!user) throw new Error(`User with email ${email} not found`);
                 const code = await user.generateCode();
-                await sendMail(email, code)
-                res.json({ msg: 'Verification Code sent!!!' })
+                await sendMail(email, code);
+                res.json({ msg: "Verification Code sent!!!" });
             } catch (err) {
                 return next(err)
             }
@@ -28,7 +28,7 @@ export const get_verification_code = [
 export const put_reset_password = [
 
     body('email').notEmpty().isEmail(),
-    body('code').notEmpty().isLength({ min: 6 }).withMessage('must be at least 5 chars long'),
+    body('code').notEmpty().isLength({ min: 6 }).withMessage('must be at least 6 chars long'),
     body('new_password').notEmpty().isLength({ min: 6 }),
 
     async (req, res, next) => {
@@ -45,7 +45,7 @@ export const put_reset_password = [
                 if (!validCode || !codeNotExpired) return res.status(403).json({ msg: 'Verification code is invalid or it has expired.' });
                 user.password = new_password;
                 await user.save();
-                const { password, resetPassword, ...data } = user._doc;
+                const { password, resetPassword, refreshToken, ...data } = user._doc;
                 res.json({ msg: 'password reset successful', data })
             } catch (err) {
                 return next(err);
