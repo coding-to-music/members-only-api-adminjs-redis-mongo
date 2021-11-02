@@ -31,10 +31,11 @@ export const post_login_user = [
                 const { token, refresh_token } = await user.generateTokens(user);
                 return res
                     .cookie('jit', refresh_token, {
+                        domain: 'herokuapp.com',
                         httpOnly: true,
                         maxAge: 604800000,
                         signed: true,
-                        sameSite: "none",
+                        sameSite: 'lax',
                         secure: true,
                     })
                     .json({ message: "Login successful", authToken: token });
@@ -63,16 +64,18 @@ export const post_refresh_token = async (req, res, next) => {
 
         // Check if refresh token is valid
         const { validToken, refreshTokenNotExpired } = await user.validateRefreshToken(jit);
-        if (!validToken || !refreshTokenNotExpired) return res.status(403).json({ msg: 'Invalid refresh token or it has expired.' });
+        if (!validToken) return res.status(403).json({ msg: 'Invalid Refresh token' });
+        if (!refreshTokenNotExpired) return res.status(403).json({ msg: 'Refresh token has expired, please initiate a new sign in request.' });
 
         // Generate new tokens
         const { token, refresh_token } = await user.generateTokens(user);
         return res
             .cookie('jit', refresh_token, {
+                domain: 'herokuapp.com',
                 httpOnly: true,
                 maxAge: 604800000,
                 signed: true,
-                sameSite: "none",
+                sameSite: 'lax',
                 secure: true,
             })
             .json({ message: "Token Refresh Successful!!!", authToken: token });

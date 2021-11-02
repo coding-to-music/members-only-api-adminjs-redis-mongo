@@ -42,8 +42,8 @@ export const generateRandomCode = async (length) => {
 
 export const tokenGenerator = async (user) => {
     const payload = {
-        aud: "http://localhost",
-        iss: "http://localhost",
+        aud: "https://pollaroid.net",
+        iss: "https://pollaroid.net",
         sub: user?._id,
         name: user?.name,
         email: user?.email,
@@ -54,7 +54,7 @@ export const tokenGenerator = async (user) => {
     };
     // Process Access token
     const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(process.env.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
-    const token = jwt.sign(payload, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: process.env.ACCESS_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '1h' });
+    const token = jwt.sign(payload, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: process.env.ACCESS_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '15m' });
 
     // Process Refresh token
     const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(process.env.REFRESH_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');

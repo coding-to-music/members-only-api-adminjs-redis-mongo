@@ -51,7 +51,7 @@ UserSchema.methods.generateTokens = async function (usr) {
     const { token, refresh_token } = await tokenGenerator(usr);
     this.refreshToken.token = refresh_token;
     this.refreshToken.expiresBy = new Date(jwt.decode(refresh_token).exp * 1000);
-    this.save();
+    await this.save();
     return { token, refresh_token };
 }
 
