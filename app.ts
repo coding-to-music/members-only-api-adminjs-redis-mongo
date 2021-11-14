@@ -1,18 +1,18 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
 import morgan from 'morgan';
 import { config } from 'dotenv';
 import passport from 'passport';
-import cors from 'cors'
+import cors, { CorsOptions, CorsOptionsDelegate } from 'cors'
 import helmet from 'helmet';
 import compression from 'compression';
 
-
-import initDB from './config/database.mjs';
-import authConfig from './config/passport.mjs';
-import apiRouter from './routes/api/api.mjs';
-import indexRouter from './routes/index.mjs';
+import initDB from '@configs/database';
+import authConfig from '@configs/passport';
+import apiRouter from '@routes/api/api';
+import indexRouter from '@routes/index';
+import { CustomCorsOptions } from '@global';
 
 config();
 
@@ -24,11 +24,11 @@ authConfig(passport)
 
 const app = express();
 const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://mem-ber.herokuapp.com'];
-const corsOptions = {
+const corsOptions: CustomCorsOptions = {
     credentials: true,
     methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT'],
-    origin: (origin, callback) => {
-        if (whitelist.indexOf(origin) !== -1 || !origin) {
+    origin: (requestOrigin: string, callback) => {
+        if (whitelist.indexOf(requestOrigin) !== -1 || !requestOrigin) {
             callback(null, true)
         } else {
             callback(new Error('Not allowed by CORS'))
@@ -50,12 +50,12 @@ app.use('/', indexRouter);
 app.use('/api', apiRouter);
 
 // Handle 404 errors
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next) => {
     next(createHttpError(404, 'The requested resource was not found on this server!!!'))
 });
 
 // Error handler
-app.use((err, req, res, next) => {
+app.use((err: { status: number; message: any; toString: () => any; }, req: Request, res: Response, next: NextFunction) => {
     res.status(err.status || 500).json({ error: err.message || err.toString() })
 })
 

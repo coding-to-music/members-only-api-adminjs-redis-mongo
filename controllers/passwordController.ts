@@ -1,11 +1,12 @@
-import User from '../models/User.mjs';
+import User from '@models/User';
 import { body, validationResult } from 'express-validator';
-import { sendMail } from '../utils/sendMail.mjs';
+import { sendMail } from '@utils/sendMail';
+import { Request, Response, NextFunction } from 'express';
 
 export const get_verification_code = [
     body('email').notEmpty().isEmail(),
 
-    async (req, res, next) => {
+    async (req: Request, res: Response, next: NextFunction) => {
         const { email } = req.body;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -31,7 +32,7 @@ export const put_reset_password = [
     body('code').notEmpty().isLength({ min: 6 }).withMessage('must be at least 6 chars long'),
     body('new_password').notEmpty().isLength({ min: 6 }),
 
-    async (req, res, next) => {
+    async (req: Request, res: Response, next: NextFunction) => {
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

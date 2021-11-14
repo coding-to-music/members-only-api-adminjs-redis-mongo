@@ -1,8 +1,10 @@
-import User from '../models/User.mjs';
+import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { config } from 'dotenv';
+import { Request, Response, NextFunction } from 'express';
+import { RequestWithUser } from '@interfaces/users.interface';
 
 config()
 
@@ -11,7 +13,7 @@ export const post_login_user = [
     body('email').notEmpty().isEmail(),
     body('password').notEmpty().isLength({ min: 6 }),
 
-    async (req, res, next) => {
+    async (req: Request, res: Response, next: NextFunction) => {
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -20,7 +22,7 @@ export const post_login_user = [
             try {
                 const user = await User.findOne({ email: req.body.email }).exec();
                 if (!user) return res.status(404).json({ msg: 'User not found' });
-                const validPassword = await bcrypt.compare(req.body.password, user.password);
+                const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
                 if (!validPassword) return res.status(400).json({ msg: 'Invalid email/password combination' });
 
                 // Use Cookies only
@@ -46,16 +48,16 @@ export const post_login_user = [
         }
     }]
 
-export const get_logout_user = (req, res) => {
+export const get_logout_user = (req: Request, res: Response) => {
     return res.clearCookie('jit', { httpOnly: true, signed: true, sameSite: 'none', secure: true }).json({ message: 'Logout successful' });
 }
 
-export const post_refresh_token = async (req, res, next) => {
+export const post_refresh_token = async (req: Request, res: Response, next: NextFunction) => {
     const { jit } = req.signedCookies;
     if (!jit) return res.status(404).json({ msg: 'Refresh Token not found' });
     try {
         // Verify refresh token in request
-        const REFRESH_TOKEN_PUBLIC_KEY = Buffer.from(process.env.REFRESH_TOKEN_PUBLIC_KEY_BASE64, 'base64').toString('ascii');
+        const REFRESH_TOKEN_PUBLIC_KEY = Buffer.from(process.env.REFRESH_TOKEN_PUBLIC_KEY_BASE64!, 'base64').toString('ascii');
         const decoded = jwt.verify(jit, REFRESH_TOKEN_PUBLIC_KEY);
 
         // Check if user exists in DB
@@ -84,25 +86,30 @@ export const post_refresh_token = async (req, res, next) => {
     }
 }
 
-export const authorizeJWT = (req, res, next) => {
+export const authorizeJWT = (req: Request, res: Response, next: NextFunction) => {
     try {
         const authHeader = req.headers['authorization'];
         const token = (authHeader && authHeader.startsWith('Bearer')) && authHeader.split(' ')[1];
         if (!token) throw new Error('No token provided');
-        const decoded = jwt.decode(token);
+        const decoded: any = jwt.decode(token);
         if (!decoded.isAdmin) throw new Error('User not authorized to access this resource');
         next();
     } catch (err) {
-        return res.status(403).json(err.message);
+        if (err instanceof Error) {
+            return res.status(403).json(err.message);
+        }
+
     }
 }
 
-export const authorize_user = (req, res, next) => {
+export const authorize_user = (req: RequestWithUser, res: Response, next: NextFunction): void | Response => {
     try {
         const { isAdmin } = req.user;
         if (!isAdmin) throw new Error('User not authorized to access this resource');
         next();
     } catch (err) {
-        return res.status(403).json(err.message);
+        if (err instanceof Error) {
+            return res.status(403).json(err.message);
+        }
     }
 }

@@ -2,6 +2,7 @@ import { generateKeyPairSync, randomBytes } from 'crypto';
 import { Buffer } from 'buffer';
 import { config } from 'dotenv';
 import jwt from 'jsonwebtoken';
+import { IUser } from '@interfaces/users.interface';
 
 config();
 
@@ -31,7 +32,7 @@ const genKeyPair = () => {
 // const KEY = fs.readFileSync(new URL('PATH-TO-KEY', import.meta.url)).toString('base64');
 // console.log(KEY)
 
-export const generateRandomCode = async (length) => {
+export const generateRandomCode = async (length: number) => {
     try {
         const code = await randomBytes(length).toString('hex').toUpperCase();
         return code;
@@ -40,7 +41,7 @@ export const generateRandomCode = async (length) => {
     }
 }
 
-export const tokenGenerator = async (user) => {
+export const tokenGenerator = async (user: IUser) => {
     const payload = {
         aud: "https://pollaroid.net",
         iss: "https://pollaroid.net",
@@ -53,12 +54,12 @@ export const tokenGenerator = async (user) => {
         last_login: user?.lastLogin,
     };
     // Process Access token
-    const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(process.env.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
-    const token = jwt.sign(payload, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: process.env.ACCESS_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '15m' });
+    const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(process.env.ACCESS_TOKEN_PRIVATE_KEY_BASE64!, 'base64').toString('ascii');
+    const token = jwt.sign(payload, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: process.env.ACCESS_TOKEN_SECRET! }, { algorithm: 'RS256', expiresIn: '15m' });
 
     // Process Refresh token
-    const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(process.env.REFRESH_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
-    const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: process.env.REFRESH_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '7d' });
+    const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(process.env.REFRESH_TOKEN_PRIVATE_KEY_BASE64!, 'base64').toString('ascii');
+    const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: process.env.REFRESH_TOKEN_SECRET! }, { algorithm: 'RS256', expiresIn: '7d' });
 
     return { token, refresh_token };
 }
