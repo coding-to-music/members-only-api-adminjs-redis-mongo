@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import { generateRandomCode, tokenGenerator } from '../utils/generateData.mjs';
-import jwt from 'jsonwebtoken';
+import { generateRandomCode, tokenGenerator } from '@utils/generateData';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.pre('save', async function (next) {
     if (this.isNew || this.isModified('password')) {
-        this.password = await bcrypt.hash(this.password, 10);
+        this.password = bcrypt.hash(this.password, 10);
     }
     next();
 });
@@ -35,29 +35,30 @@ UserSchema.pre('findOne', async function (next) {
 
 UserSchema.methods.generateCode = async function () {
     const code = await generateRandomCode(3);
-    this.resetPassword.code = await bcrypt.hash(code, 10);
+    this.resetPassword.code = bcrypt.hash(code!, 10);
     this.resetPassword.expiresBy = Date.now() + 300000;
     this.save();
     return code;
 };
 
 UserSchema.methods.verifyCode = async function (code) {
-    const validCode = await bcrypt.compare(code, this.resetPassword.code);
-    const codeNotExpired = (Date.now() - new Date(this.resetPassword.expiresBy)) < 300000;
+    const validCode = bcrypt.compare(code, this.resetPassword.code);
+    const codeNotExpired = (Date.now() - new Date(this.resetPassword.expiresBy).getTime()) < 300000;
     return { validCode, codeNotExpired };
 };
 
 UserSchema.methods.generateTokens = async function (usr) {
     const { token, refresh_token } = await tokenGenerator(usr);
     this.refreshToken.token = refresh_token;
-    this.refreshToken.expiresBy = new Date(jwt.decode(refresh_token).exp * 1000);
+    const decodedJwt: JwtPayload = jwt.decode(refresh_token) as JwtPayload;
+    this.refreshToken.expiresBy = new Date(decodedJwt.exp! * 1000);
     await this.save();
     return { token, refresh_token };
 }
 
 UserSchema.methods.validateRefreshToken = async function (token) {
     const validToken = this.refreshToken.token === token;
-    const refreshTokenNotExpired = (new Date(this.resetPassword.expiresBy) - Date.now()) < 604800000;
+    const refreshTokenNotExpired = (new Date(this.resetPassword.expiresBy).getTime() - Date.now()) < 604800000;
     return { validToken, refreshTokenNotExpired };
 }
 

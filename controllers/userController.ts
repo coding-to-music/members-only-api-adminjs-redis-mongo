@@ -1,8 +1,10 @@
-import User from '../models/User.mjs';
+import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import gravatar from 'gravatar';
+import { Request, Response, NextFunction } from 'express';
+import { RequestWithUser, IUser } from '@/interfaces/users.interface';
 
-export const get_get_user = async (req, res) => {
+export const get_get_user = async (req: RequestWithUser, res: Response) => {
     const { password, resetPassword, refreshToken, ...data } = req.user._doc;
     res.json(data)
 }
@@ -13,7 +15,7 @@ export const post_create_user = [
     body('email').notEmpty().isEmail(),
     body('password').notEmpty().isLength({ min: 6 }),
 
-    (req, res, next) => {
+    (req: Request, res: Response, next: NextFunction) => {
         const { name, email, password, img } = req.body
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -32,7 +34,7 @@ export const post_create_user = [
                             password: password,
                             avatar: avatar || img || ''
                         });
-                        user.save((err, theuser) => {
+                        user.save((err: Error, theuser: IUser) => {
                             if (err) return next(err);
                             const { password, resetPassword, refreshToken, ...data } = theuser._doc;
                             res.json(data);
@@ -44,11 +46,11 @@ export const post_create_user = [
 ];
 
 export const put_update_user = [
-    async (req, res, next) => {
+    async (req: Request, res: Response, next: NextFunction) => {
         res.send('Not yet implemented')
     }
 ]
 
-export const delete_delete_user = async (req, res, next) => {
+export const delete_delete_user = async (req: Request, res: Response, next: NextFunction) => {
     res.send('Not yet implemented')
 }

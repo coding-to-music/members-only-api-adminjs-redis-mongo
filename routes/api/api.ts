@@ -1,11 +1,12 @@
 import express from 'express';
-import { authorizeJWT, authorize_user, get_logout_user, post_login_user, post_refresh_token,  } from '../../controllers/authController.mjs';
-import { get_get_user, post_create_user } from '../../controllers/userController.mjs';
-import { get_verification_code, put_reset_password } from '../../controllers/passwordController.mjs'
-import * as profile from '../../controllers/profileController.mjs';
+import { authorize_user, get_logout_user, post_login_user, post_refresh_token, } from '@controllers/authController';
+import { get_get_user, post_create_user } from '@controllers/userController';
+import { get_verification_code, put_reset_password } from '@controllers/passwordController'
+import * as profile from '@controllers/profileController';
 import passport from 'passport';
+import { CustomIRouter } from '@/interfaces/routes.interface';
 
-const router = express.Router()
+const router: CustomIRouter = express.Router()
 
 router.get('/', (req, res) => { res.json({ msg: 'Not yet implemented!!!' }) });
 
