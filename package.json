@@ -6,8 +6,8 @@
   },
   "private": true,
   "scripts": {
-    "start": "node ./bin/www.mjs",
-    "devstart": "nodemon ./bin/www.mjs",
+    "start": "tsc && node dist/bin/www.ts",
+    "devstart": "tsc && nodemon dist/bin/www.ts",
     "serverstart": "DEBUG=members-only:* npm run devstart"
   },
   "dependencies": {
