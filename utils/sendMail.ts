@@ -1,14 +1,13 @@
-import { config } from 'dotenv';
+import { ENV } from '@/utils/validateEnv';
 import sgMail, { ResponseError } from '@sendgrid/mail';
 import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
 
 export const sendMail = async (email: string, code: number) => {
 
-    config();
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+    sgMail.setApiKey(ENV.SENDGRID_API_KEY);
     const msg: MailDataRequired = {
         to: email,
-        from: process.env.SENDER_IDENTITY!,
+        from: ENV.SENDER_IDENTITY,
         subject: 'Email Verification code',
         text: `Your email verification code is ${code}`,
         html: `<p>Please use this code: <strong style='color: red'>${code}</strong> to continue your password reset</p>`,

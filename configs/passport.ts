@@ -1,13 +1,11 @@
-import { config } from 'dotenv';
+import { ENV } from '@/utils/validateEnv';
 import { Request } from 'express';
 import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
 import mongoose from 'mongoose';
 import User from '@models/User';
 
-config();
-
 // Convert base64 .pem public key
-const PUBLIC_KEY = Buffer.from(process.env.ACCESS_TOKEN_PUBLIC_KEY_BASE64 as string, 'base64').toString('ascii');
+const PUBLIC_KEY = Buffer.from(ENV.ACCESS_TOKEN_PUBLIC_KEY_BASE64, 'base64').toString('ascii');
 
 const cookieExtractor = (req: Request) => {
     let token = null;
@@ -21,9 +19,6 @@ const opts: StrategyOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: PUBLIC_KEY
 };
-// opts.jwtFromRequest = cookieExtractor;
-// opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-// opts.secretOrKey = PUBLIC_KEY;
 
 export default (passport: { use: (arg0: JwtStrategy) => void; }) => {
     passport.use(new JwtStrategy(opts, (jwt_payload, done) => {

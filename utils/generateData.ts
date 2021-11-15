@@ -1,10 +1,9 @@
 import { generateKeyPairSync, randomBytes } from 'crypto';
 import { Buffer } from 'buffer';
-import { config } from 'dotenv';
+import { ENV } from '@/utils/validateEnv';
 import jwt from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
-
-config();
+import { Response } from 'express';
 
 const genKeyPair = () => {
     const { publicKey, privateKey, } = generateKeyPairSync('rsa', {
@@ -17,7 +16,7 @@ const genKeyPair = () => {
             type: 'pkcs8',
             format: 'pem',
             cipher: 'aes-256-cbc',
-            passphrase: process.env.REFRESH_TOKEN_SECRET
+            passphrase: ENV.REFRESH_TOKEN_SECRET
         }
     });
 
@@ -54,12 +53,25 @@ export const tokenGenerator = async (user: IUser) => {
         last_login: user?.lastLogin,
     };
     // Process Access token
-    const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(process.env.ACCESS_TOKEN_PRIVATE_KEY_BASE64!, 'base64').toString('ascii');
-    const token = jwt.sign(payload, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: process.env.ACCESS_TOKEN_SECRET! }, { algorithm: 'RS256', expiresIn: '15m' });
+    const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(ENV.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
+    const token = jwt.sign(payload, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: ENV.ACCESS_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '15m' });
 
     // Process Refresh token
-    const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(process.env.REFRESH_TOKEN_PRIVATE_KEY_BASE64!, 'base64').toString('ascii');
-    const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: process.env.REFRESH_TOKEN_SECRET! }, { algorithm: 'RS256', expiresIn: '7d' });
+    const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(ENV.REFRESH_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
+    const refresh_token = jwt.sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: ENV.REFRESH_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '7d' });
 
     return { token, refresh_token };
+}
+
+export const sendTokens = (res: Response, refresh_token: string, msg_txt: string, token: string) => {
+    return res
+        .cookie('jit', refresh_token, {
+            path: '/api/auth/refresh_token',
+            httpOnly: true,
+            maxAge: 604800000,
+            signed: true,
+            sameSite: 'none',
+            secure: true,
+        })
+        .json({ message: msg_txt, authToken: token });
 }

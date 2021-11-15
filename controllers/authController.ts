@@ -2,11 +2,10 @@ import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { config } from 'dotenv';
+import { ENV } from '@/utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-
-config()
+import { sendTokens } from '@/utils/generateData';
 
 export const post_login_user = [
 
@@ -29,19 +28,9 @@ export const post_login_user = [
                 // const { password, resetPassword, ...data } = user._doc;
                 // return res.cookie('access_token', token, { httpOnly: true, maxAge: 3600000, signed: true, sameSite: 'none', secure: true }).cookie('refresh_token', refresh_token, { httpOnly: true, maxAge: 604800000, signed: true, sameSite: 'none', secure: true }).json({ message: 'Login successful', user: data });
 
-                // Use JWT and cookies
+                // Generate new Tokens and send them to the client
                 const { token, refresh_token } = await user.generateTokens(user);
-                return res
-                    .cookie('jit', refresh_token, {
-                        domain: 'herokuapp.com',
-                        httpOnly: true,
-                        maxAge: 604800000,
-                        signed: true,
-                        sameSite: 'lax',
-                        secure: true,
-                    })
-                    .json({ message: "Login successful", authToken: token });
-
+                sendTokens(res, refresh_token, 'Login Successful', token);
             } catch (err) {
                 return next(err)
             }
@@ -57,7 +46,7 @@ export const post_refresh_token = async (req: Request, res: Response, next: Next
     if (!jit) return res.status(404).json({ msg: 'Refresh Token not found' });
     try {
         // Verify refresh token in request
-        const REFRESH_TOKEN_PUBLIC_KEY = Buffer.from(process.env.REFRESH_TOKEN_PUBLIC_KEY_BASE64!, 'base64').toString('ascii');
+        const REFRESH_TOKEN_PUBLIC_KEY = Buffer.from(ENV.REFRESH_TOKEN_PUBLIC_KEY_BASE64, 'base64').toString('ascii');
         const decoded = jwt.verify(jit, REFRESH_TOKEN_PUBLIC_KEY);
 
         // Check if user exists in DB
@@ -69,18 +58,9 @@ export const post_refresh_token = async (req: Request, res: Response, next: Next
         if (!validToken) return res.status(403).json({ msg: 'Invalid Refresh token' });
         if (!refreshTokenNotExpired) return res.status(403).json({ msg: 'Refresh token has expired, please initiate a new sign in request.' });
 
-        // Generate new tokens
+        // Generate new Tokens and send them to the client
         const { token, refresh_token } = await user.generateTokens(user);
-        return res
-            .cookie('jit', refresh_token, {
-                domain: 'herokuapp.com',
-                httpOnly: true,
-                maxAge: 604800000,
-                signed: true,
-                sameSite: 'lax',
-                secure: true,
-            })
-            .json({ message: "Token Refresh Successful!!!", authToken: token });
+        sendTokens(res, refresh_token, 'Token Refresh Successful!!!', token);
     } catch (err) {
         return next(err);
     }

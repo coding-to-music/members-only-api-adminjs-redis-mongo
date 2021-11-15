@@ -1,21 +1,38 @@
 {
-  "name": "members-only",
+  "name": "members-only-api",
   "version": "0.0.0",
   "engines": {
     "node": "14.17.3"
   },
   "private": true,
   "scripts": {
-    "start": "tsc && node dist/bin/www.ts",
-    "devstart": "tsc && nodemon dist/bin/www.ts",
-    "serverstart": "DEBUG=members-only:* npm run devstart"
+    "start": "npm run build && node dist/bin/www.js",
+    "build": "tsc && tsc-alias",
+    "devstart": "npm run build && nodemon dist/bin/www.js",
+    "serverstart": "DEBUG=members-only:*npm run devstart"
   },
   "dependencies": {
-    "@sendgrid/mail": "^7.5.0",
     "@tsconfig/node16": "^1.0.2",
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/async": "^3.2.9",
     "@types/bcrypt": "^5.0.0",
+    "@types/compression": "^1.7.2",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.12",
+    "@types/debug": "^4.1.7",
+    "@types/express": "^4.17.13",
+    "@types/gravatar": "^1.8.3",
+    "@types/http-errors": "^1.8.1",
     "@types/jsonwebtoken": "^8.5.5",
+    "@types/luxon": "^2.0.7",
+    "@types/morgan": "^1.9.3",
     "@types/node": "^16.11.7",
+    "@types/passport": "^1.0.7",
+    "@types/passport-jwt": "^3.0.6",
+    "nodemon": "^2.0.15",
+    "tsc-alias": "^1.4.1",
+    "tsconfig-paths": "^3.11.0",
+    "@sendgrid/mail": "^7.5.0",
     "async": "^3.2.1",
     "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
@@ -30,24 +47,12 @@
     "helmet": "^4.6.0",
     "http-errors": "^1.8.0",
     "luxon": "^2.0.2",
+    "module-alias": "^2.2.2",
     "mongoose": "^6.0.11",
     "morgan": "^1.10.0",
     "passport": "^0.5.0",
-    "passport-jwt": "^4.0.0"
-  },
-  "devDependencies": {
-    "@tsconfig/recommended": "^1.0.1",
-    "@types/async": "^3.2.9",
-    "@types/compression": "^1.7.2",
-    "@types/cookie-parser": "^1.4.2",
-    "@types/cors": "^2.8.12",
-    "@types/debug": "^4.1.7",
-    "@types/express": "^4.17.13",
-    "@types/gravatar": "^1.8.3",
-    "@types/http-errors": "^1.8.1",
-    "@types/luxon": "^2.0.7",
-    "@types/morgan": "^1.9.3",
-    "@types/passport": "^1.0.7",
-    "@types/passport-jwt": "^3.0.6"
+    "passport-jwt": "^4.0.0",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.4.4"
   }
 }

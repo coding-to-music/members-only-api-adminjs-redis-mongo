@@ -16,7 +16,7 @@ router.get('/auth/logout', get_logout_user);
 
 router.post('/auth/login', post_login_user);
 
-router.post('/auth/token_renewal', post_refresh_token);
+router.post('/auth/refresh_token', post_refresh_token);
 
 // User Routes
 
@@ -26,7 +26,7 @@ router.post('/user/register', post_create_user);
 
 // Password reset routes
 
-router.get('/user/verify_code', get_verification_code);
+router.get('/user/verification_code', get_verification_code);
 
 router.put('/user/reset_password', put_reset_password);
 
