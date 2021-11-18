@@ -32,5 +32,5 @@ jobs:
       with:
         app-name: 'auth-svr'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_8a83eddc06744a5ab63ff9669d895a43 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile }}
         package: .
