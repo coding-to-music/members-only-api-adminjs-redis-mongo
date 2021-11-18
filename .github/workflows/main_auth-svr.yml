@@ -30,7 +30,7 @@ jobs:
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'auth-svr'
+        app-name: 'wauth-svr'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile }}
         package: .

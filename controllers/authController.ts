@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import { ENV } from '@/utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { sendTokens } from '@/utils/generateData';
+import { sendTokens, cookieOptions } from '@/utils/generateData';
 
 export const post_login_user = [
 
@@ -38,7 +38,9 @@ export const post_login_user = [
     }]
 
 export const get_logout_user = (req: Request, res: Response) => {
-    return res.clearCookie('jit', { httpOnly: true, signed: true, sameSite: 'none', secure: true }).json({ message: 'Logout successful' });
+    return res
+        .clearCookie("jit", cookieOptions)
+        .json({ message: "Logout successful" });
 }
 
 export const post_refresh_token = async (req: Request, res: Response, next: NextFunction) => {

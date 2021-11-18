@@ -2,7 +2,7 @@
   "name": "members-only-api",
   "version": "0.0.0",
   "engines": {
-    "node": "14.17.3"
+    "node": "14.18.1"
   },
   "private": true,
   "scripts": {
