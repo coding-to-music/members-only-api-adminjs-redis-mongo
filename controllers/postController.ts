@@ -1,21 +1,21 @@
 import Post from '@models/Post';
 import { body, validationResult } from 'express-validator';
 import { Response, NextFunction, Request } from 'express';
-import { RequestWithUser } from '@/interfaces/users.interface';
+import { RequestWithUser } from '@interfaces/users.interface';
+import { formatPostComment } from '@utils/services';
 
 export const post_create_post = [
+    (req: Request, res: Response, next: NextFunction) => formatPostComment(req, res, next),
 
-    body('twit').not().isEmpty().withMessage('Twit is required'),
+    body('postContent').not().isEmpty().withMessage('Post content cannot be empty'),
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
+        if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
         try {
             const post = new Post({
                 user: req.user._id,
-                twit: req.body.twit
+                post_content: req.body.postContent
             });
             await post.save();
             res.status(201).json({
@@ -32,22 +32,7 @@ export const post_create_post = [
 ];
 
 export const put_update_post = [
-    (req: Request, res: Response, next: NextFunction) => {
-        switch (true) {
-            case !req.body.comments:
-                req.body.comments = []
-                break;
-            case !(req.body.comments instanceof Array):
-                req.body.comments = new Array(req.body.comments);
-                break;
-            case !req.body.likes:
-                req.body.likes = []
-                break;
-            case !(req.body.likes instanceof Array):
-                req.body.likes = new Array(req.body.likes);
-        }
-        next()
-    },
+    (req: Request, res: Response, next: NextFunction) => formatPostComment(req, res, next),
 
     body('comments.*').escape(),
     body('likes.*').escape(),

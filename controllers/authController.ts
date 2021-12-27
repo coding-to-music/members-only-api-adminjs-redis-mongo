@@ -2,10 +2,10 @@ import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { ENV } from '@/utils/validateEnv';
+import { ENV } from '@utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { sendTokens, cookieOptions } from '@/utils/generateData';
+import { sendTokens, cookieOptions } from '@utils/services';
 
 export const post_login_user = [
 

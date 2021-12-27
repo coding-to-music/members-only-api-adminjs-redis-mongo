@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const PostSchema = new mongoose.Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
-  twit: { type: String, required: true },
+  post_content: { type: String, required: true },
   date_posted: { type: Date, default: Date.now },
   comments: [
     {
