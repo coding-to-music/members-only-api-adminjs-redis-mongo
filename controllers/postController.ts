@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { Response, NextFunction, Request } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { formatPostComment, Comment } from '@utils/lib';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 export const post_create_post = [
     (req: Request, res: Response, next: NextFunction) => formatPostComment(req, res, next),
@@ -44,19 +44,20 @@ export const put_add_comments = [
             const post = await Post.findById(req.params.id).exec();
             if (!post) return res.status(404).json({ msg: 'Post not found' });
 
-            const userId = new mongoose.Types.ObjectId(req.user._id);
+            const userId = new Types.ObjectId(req.user._id);
             switch (true) {
-                case !post.comments.length:
+                case !post.comments.length || !post.comments.find(comment => comment.comment_user.equals(userId)):
                     const comments = new Comment(userId, [{ comment: req.body.comment, comment_date: new Date(Date.now()) }]);
                     post.comments = [...post.comments, comments];
                     await post.save();
                     break;
-                case post.comments.some(comment => comment.comment_user === userId):
-                    post.comments.filter(comment => comment.comment_user === userId)[0].comment_list.push({ comment: req.body.comment, comment_date: new Date(Date.now()) });
+                case post.comments.some(comment => comment.comment_user.equals(userId)):
+                    const commentIndex: number = post.comments.findIndex(comment => comment.comment_user.equals(userId));
+                    post.comments[commentIndex].comment_list = [...post.comments[commentIndex].comment_list, { comment: req.body.comment, comment_date: new Date(Date.now()) }];
                     await post.save();
                     break;
             }
-            
+
             res.status(200).json({ message: 'Comment added successfully', post });
 
         } catch (error) {
