@@ -2,7 +2,7 @@ import { ENV } from '@/utils/validateEnv';
 import sgMail, { ResponseError } from '@sendgrid/mail';
 import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
 
-export const sendMail = async (email: string, code: number) => {
+export const sendMail = async (email: string, code: string): Promise<void> => {
 
     sgMail.setApiKey(ENV.SENDGRID_API_KEY);
     const msg: MailDataRequired = {

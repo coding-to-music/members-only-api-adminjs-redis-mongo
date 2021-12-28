@@ -5,7 +5,7 @@ import { get_verification_code, put_reset_password } from '@controllers/password
 import * as profile from '@controllers/profileController';
 import passport from 'passport';
 import { CustomIRouter } from '@/interfaces/routes.interface';
-import { post_create_post } from '@/controllers/postController';
+import { post_create_post, put_add_comments, put_add_likes } from '@/controllers/postController';
 
 const router: CustomIRouter = express.Router()
 
@@ -39,6 +39,8 @@ router.get('/profile', passport.authenticate('jwt', { session: false }), profile
 
 router.post('/posts/create_post', passport.authenticate('jwt', { session: false }), post_create_post);
 
-// router.put('/posts/:id/update_post', passport.authenticate('jwt', { session: false }), put_update_post);
+router.put('/posts/:id/add_comment', passport.authenticate('jwt', { session: false }), put_add_comments);
+
+// router.put('/posts/:id/add_like', passport.authenticate('jwt', { session: false }), put_add_likes);
 
 export default router

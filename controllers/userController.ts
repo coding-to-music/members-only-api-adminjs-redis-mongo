@@ -13,34 +13,28 @@ export const post_create_user = [
 
     body('name', 'What is your name???').trim().isLength({ min: 1 }).escape(),
     body('email').notEmpty().isEmail(),
-    body('password').notEmpty().isLength({ min: 6 }),
+    body('new_password').notEmpty().isLength({ min: 6 }),
 
-    (req: Request, res: Response, next: NextFunction) => {
-        const { name, email, password, img } = req.body
+    async (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors.array());
-        } else {
-            User.findOne({ email: email })
-                .exec((err, found_user) => {
-                    if (err) return next(err);
-                    if (found_user) {
-                        return res.status(409).json({ msg: 'User already exists' })
-                    } else {
-                        const avatar = gravatar.url(email, { s: '100', r: 'pg', d: 'retro' }, true);
-                        const user = new User({
-                            name: name,
-                            email: email,
-                            password: password,
-                            avatar: avatar || img || ''
-                        });
-                        user.save((err: Error, theuser: IUser) => {
-                            if (err) return next(err);
-                            const { password, resetPassword, refreshToken, ...data } = theuser._doc;
-                            res.json(data);
-                        })
-                    }
-                })
+        if (!errors.isEmpty()) return res.status(422).json(errors.array());
+
+        try {
+            const { name, email, new_password, img } = req.body;
+            const found_user = await User.findOne({ email: email }).exec();
+            if (found_user) return res.status(409).json({ msg: 'User already exists' });
+            const avatar = gravatar.url(email, { s: '100', r: 'pg', d: 'retro' }, true);
+            const user = new User({
+                name: name,
+                email: email,
+                password: new_password,
+                avatar: avatar || img || ''
+            });
+            await user.save();
+            const { password, resetPassword, refreshToken, ...data } = user._doc;
+            res.json(data);
+        } catch (error) {
+            next(error)
         }
     }
 ];

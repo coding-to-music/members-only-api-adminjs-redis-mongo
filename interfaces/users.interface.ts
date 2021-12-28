@@ -1,4 +1,6 @@
 import { Request } from 'express';
+import { Document } from 'mongoose';
+import { ITokens, IValidate, IVerify } from '@interfaces/auth.interface';
 
 interface ResetPassword {
   code: string;
@@ -10,9 +12,8 @@ interface RefreshToken {
   expiresBy: Date;
 }
 
-export interface IUser {
+export interface IUser extends Document {
   _doc?: any;
-  _id: string;
   name: string;
   email: string;
   password: string;
@@ -22,6 +23,10 @@ export interface IUser {
   resetPassword: ResetPassword;
   refreshToken: RefreshToken;
   lastLogin?: Date;
+  generateCode: () => Promise<string>;
+  generateTokens(usr: IUser): Promise<ITokens>;
+  validateRefreshToken(req: Request): Promise<IValidate>;
+  verifyCode: (code: string) => Promise<IVerify>;
 }
 
 export interface RequestWithUser extends Request {

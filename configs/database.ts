@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
-import { ENV } from '@/utils/validateEnv';
+import { connect, connection } from 'mongoose';
+import { ENV } from '@utils/validateEnv';
 
 const initDB = () => {
-    
+
     const options = {
         autoIndex: false, // Don't build indexes
         maxPoolSize: 10, // Maintain up to 10 socket connections
@@ -13,11 +13,10 @@ const initDB = () => {
     };
 
     const mongoDB = ENV.DB_URL;
-    mongoose.connect(mongoDB, options);
-    const db = mongoose.connection;
-    db.on('connected', () => console.log('Mongoose connected to DB cluster'));
-    db.on('error', () => console.error.bind(console, 'MongoDB connection error:'));
-    db.on('disconnected', () => console.log('Mongoose disconnected'));
+    connect(mongoDB, options);
+    connection.on('connected', () => console.log('Mongoose connected to DB cluster'));
+    connection.on('error', () => console.error.bind(console, 'MongoDB connection error:'));
+    connection.on('disconnected', () => console.log('Mongoose disconnected'));
 }
 
 export default initDB

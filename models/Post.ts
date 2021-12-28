@@ -1,20 +1,27 @@
-import mongoose, { Schema } from 'mongoose';
+import { IPost } from '@interfaces/posts.interface';
+import { Schema, model } from 'mongoose';
 
-const PostSchema = new mongoose.Schema({
+const PostSchema = new Schema<IPost>({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
   post_content: { type: String, required: true },
-  date_posted: { type: Date, default: Date.now },
+  date_posted: { type: Date, default: new Date(Date.now()) },
   comments: [
     {
-      by_user: { type: Schema.Types.ObjectId, ref: 'User' },
-      comment: { type: String, min: 1 },
+      comment_user: { type: Schema.Types.ObjectId, ref: 'User' },
+      comment_list: [
+        {
+          comment: { type: String },
+          comment_date: { type: Date, default: Date.now },
+        }
+      ],
     }
   ],
   likes: [
     {
-      by_user: { type: Schema.Types.ObjectId, ref: 'User' }
+      like_user: { type: Schema.Types.ObjectId, ref: 'User' },
+      date_liked: { type: Date, default: Date.now },
     }
   ]
 });
 
-export default mongoose.model('Post', PostSchema);
+export default model('Post', PostSchema);

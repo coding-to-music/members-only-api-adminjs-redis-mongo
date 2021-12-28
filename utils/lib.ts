@@ -1,4 +1,6 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express';
+import { IComment, ICommentEntry } from '@interfaces/posts.interface';
+import mongoose from 'mongoose';
 
 export const cookieOptions: CookieOptions = {
     domain: 'polldevs.com',
@@ -16,7 +18,7 @@ export const sendTokens = (res: Response, refresh_token: string, msg_txt: string
         .json({ message: msg_txt, authToken: token });
 };
 
-export const formatPostComment = (req: Request, res: Response, next: NextFunction) => {
+export const formatPostComment = (req: Request, res: Response, next: NextFunction): void => {
     switch (true) {
         case !req.body.comments:
             req.body.comments = []
@@ -32,3 +34,17 @@ export const formatPostComment = (req: Request, res: Response, next: NextFunctio
     }
     next();
 };
+
+export class Comment implements IComment {
+    comment_user: mongoose.Types.ObjectId;
+    comment_list: ICommentEntry[];
+
+    constructor(commentUser: mongoose.Types.ObjectId, commentList: ICommentEntry[]) {
+        this.comment_user = commentUser;
+        this.comment_list = commentList
+    };
+
+    addComment(newComment: ICommentEntry): void {
+        this.comment_list = [...this.comment_list, newComment]
+    };
+}
