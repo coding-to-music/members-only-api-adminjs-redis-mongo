@@ -1,6 +1,7 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express';
-import { IComment, ICommentEntry } from '@interfaces/posts.interface';
+import { IComment, ICommentEntry, ILike } from '@interfaces/posts.interface';
 import { Types } from 'mongoose';
+import { validationResult } from 'express-validator';
 
 export const cookieOptions: CookieOptions = {
     domain: 'polldevs.com',
@@ -18,7 +19,7 @@ export const sendTokens = (res: Response, refresh_token: string, msg_txt: string
         .json({ message: msg_txt, authToken: token });
 };
 
-export const formatPostComment = (req: Request, res: Response, next: NextFunction): void => {
+export const formatPostCommentsAndLikes = (req: Request, res: Response, next: NextFunction): void => {
     switch (true) {
         case !req.body.comments:
             req.body.comments = []
@@ -43,4 +44,19 @@ export class Comment implements IComment {
         this.comment_user = commentUser;
         this.comment_list = commentList
     };
+};
+
+export class Like implements ILike {
+    like_user: Types.ObjectId;
+    date_liked: Date;
+
+    constructor(likeUser: Types.ObjectId, dateLiked: Date) {
+        this.like_user = likeUser;
+        this.date_liked = dateLiked
+    };
 }
+
+export const handleValidationErrors = (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    return !errors.isEmpty() && res.status(422).json({ errors: errors.array() });
+};

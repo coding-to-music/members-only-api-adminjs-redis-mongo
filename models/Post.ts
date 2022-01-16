@@ -11,7 +11,7 @@ const PostSchema = new Schema<IPost>({
       comment_list: [
         {
           comment: { type: String },
-          comment_date: { type: Date, default: Date.now },
+          comment_date: { type: Date, default: new Date(Date.now()) },
         }
       ],
     }
@@ -19,7 +19,7 @@ const PostSchema = new Schema<IPost>({
   likes: [
     {
       like_user: { type: Schema.Types.ObjectId, ref: 'User' },
-      date_liked: { type: Date, default: Date.now },
+      date_liked: { type: Date, default: new Date(Date.now()) },
     }
   ]
 });

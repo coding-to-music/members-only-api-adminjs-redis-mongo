@@ -1,18 +1,20 @@
 import Post from '@models/Post';
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import { Response, NextFunction, Request } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { formatPostComment, Comment } from '@utils/lib';
+import { formatPostCommentsAndLikes, handleValidationErrors } from '@utils/lib';
+import { Comment, Like } from '@utils/classes';
 import { Types } from 'mongoose';
 
 export const post_create_post = [
-    (req: Request, res: Response, next: NextFunction) => formatPostComment(req, res, next),
+    (req: Request, res: Response, next: NextFunction) => formatPostCommentsAndLikes(req, res, next),
 
     body('postContent').not().isEmpty().withMessage('Post content cannot be empty'),
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
+
+        handleValidationErrors(req, res);
+
         try {
             const post = new Post({
                 user: req.user._id,
@@ -37,8 +39,8 @@ export const put_add_comments = [
     body('comment').not().isEmpty().withMessage('Comment cannot be empty'),
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
+
+        handleValidationErrors(req, res);
 
         try {
             const post = await Post.findById(req.params.id).exec();
@@ -56,24 +58,39 @@ export const put_add_comments = [
                     post.comments[commentIndex].comment_list = [...post.comments[commentIndex].comment_list, { comment: req.body.comment, comment_date: new Date(Date.now()) }];
                     await post.save();
                     break;
-            }
+            };
 
             res.status(200).json({ message: 'Comment added successfully', post });
 
         } catch (error) {
             console.error(error);
             return next(error);
+        };
+    }
+];
+
+export const put_add_likes = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+
+    try {
+        const post = await Post.findById(req.params.id).exec();
+        if (!post) return res.status(404).json({ msg: 'Post not found' });
+
+        const userId = new Types.ObjectId(req.user._id);
+        switch (true) {
+            case !post.likes.length || !post.likes.some(like => like.like_user.equals(userId)):
+                const newLike = new Like(userId, new Date(Date.now()));
+                post.likes = [...post.likes, newLike];
+                await post.save();
+                break;
+            case post.likes.some(like => like.like_user.equals(userId)):
+                return res.status(403).json({ message: 'You have already liked this post' });
         }
+
+        res.status(200).json({ message: 'Like added successfully', post });
+
+    } catch (error) {
+        console.error(error);
+        return next(error);
     }
-];
+};
 
-export const put_add_likes = [
-    (req: Request, res: Response, next: NextFunction) => formatPostComment(req, res, next),
-
-    body('comments.*').escape(),
-    body('likes.*').escape(),
-
-    async (req: RequestWithUser, res: Response, next: NextFunction) => {
-        return res.json({ message: 'Not implemented' });
-    }
-];

@@ -41,6 +41,6 @@ router.post('/posts/create_post', passport.authenticate('jwt', { session: false 
 
 router.put('/posts/:id/add_comment', passport.authenticate('jwt', { session: false }), put_add_comments);
 
-// router.put('/posts/:id/add_like', passport.authenticate('jwt', { session: false }), put_add_likes);
+router.put('/posts/:id/add_like', passport.authenticate('jwt', { session: false }), put_add_likes);
 
 export default router

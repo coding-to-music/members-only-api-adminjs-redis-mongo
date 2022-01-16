@@ -1,7 +1,7 @@
 import { Document, Types } from 'mongoose';
 
-interface ILike {
-    user: Types.ObjectId;
+export interface ILike {
+    like_user: Types.ObjectId;
     date_liked: Date;
 }
 
