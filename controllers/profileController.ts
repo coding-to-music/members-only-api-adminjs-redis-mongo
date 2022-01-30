@@ -17,23 +17,16 @@ export const get_user_profile = async (req: RequestWithUser, res: Response, next
 export const post_create_profile = [
     (req: RequestWithUser, res: Response, next: NextFunction) => formatProifleBody(req, res, next),
 
-    body('bio').not().isEmpty().withMessage('Bio cannot be empty'),
-    body('address').not().isEmpty().withMessage('Address cannot be empty'),
+    body('bio').not().isEmpty().withMessage('Bio cannot be empty').trim().escape(),
+    body('address').not().isEmpty().withMessage('Address cannot be empty').trim().escape(),
     body('phoneNumber').not().isEmpty().withMessage('Phone number cannot be empty'),
-    body('education').not().isEmpty().withMessage('Education cannot be empty'),
-    body('education.school').not().isEmpty().withMessage('School cannot be empty'),
-    body('education.degree').not().isEmpty().withMessage('Degree cannot be empty'),
-    body('education.field').not().isEmpty().withMessage('Field cannot be empty'),
-    body('education.from').not().isEmpty().withMessage('From cannot be empty'),
-    body('education.to').not().isEmpty().withMessage('To cannot be empty'),
-    body('education.current').not().isEmpty().withMessage('Current cannot be empty'),
-    body('experience').not().isEmpty().withMessage('Experience cannot be empty'),
-    body('experience.jobTitle').not().isEmpty().withMessage('Job title cannot be empty'),
-    body('experience.company').not().isEmpty().withMessage('Company cannot be empty'),
-    body('experience.location').not().isEmpty().withMessage('Location cannot be empty'),
-    body('experience.from').not().isEmpty().withMessage('From cannot be empty'),
-    body('experience.to').not().isEmpty().withMessage('To cannot be empty'),
-    body('experience.description').not().isEmpty().withMessage('Current cannot be empty'),
+
+    // Handle validation for array of objects
+    body('education').isArray({ min: 1 }).withMessage('Education must be an array'),
+    body('education[*].*').trim().isLength({ min: 1 }).escape(),
+    body('experience').isArray({ min: 1 }).withMessage('Experience must be an array'),
+    body('experience[*].*').trim().isLength({ min: 1 }).escape(),
+
     body('social').not().isEmpty().withMessage('Social cannot be empty'),
     body('social.github').not().isEmpty().withMessage('Github cannot be empty'),
     body('social.linkedin').not().isEmpty().withMessage('Linkedin cannot be empty'),
@@ -43,7 +36,7 @@ export const post_create_profile = [
         handleValidationErrors(req, res);
 
         try {
-            
+
             const profile = new Profile({
                 user: req.user._id,
                 bio: req.body.bio,
