@@ -2,7 +2,7 @@ import Profile from '@models/Profile';
 import { body } from "express-validator";
 import { Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { convertToDate, formatProifleBody, handleValidationErrors } from '@utils/lib';
+import { formatProifleBody, handleValidationErrors } from '@utils/lib';
 
 export const get_user_profile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
@@ -36,9 +36,6 @@ export const post_create_profile = [
         handleValidationErrors(req, res);
 
         try {
-
-            convertToDate(req.body.education)
-            convertToDate(req.body.experience)
 
             const profile = new Profile({
                 user: req.user._id,

@@ -1,6 +1,5 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { IEducation, IExperience } from '@interfaces/profiles.interface';
 
 export const cookieOptions: CookieOptions = {
     domain: 'polldevs.com',
@@ -64,11 +63,4 @@ export const formatProifleBody = (req: Request, res: Response, next: NextFunctio
 export const handleValidationErrors = (req: Request, res: Response) => {
     const errors = validationResult(req);
     return !errors.isEmpty() && res.status(422).json({ errors: errors.array() });
-};
-
-export const convertToDate = (arr: IEducation[] | IExperience[]): void => {
-    arr.forEach(obj => {
-        obj.from = new Date(obj.from);
-        obj.to = new Date(obj.to)
-    });
 };
