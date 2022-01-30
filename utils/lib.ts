@@ -1,6 +1,4 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express';
-import { IComment, ICommentEntry, ILike } from '@interfaces/posts.interface';
-import { Types } from 'mongoose';
 import { validationResult } from 'express-validator';
 
 export const cookieOptions: CookieOptions = {
@@ -36,24 +34,30 @@ export const formatPostCommentsAndLikes = (req: Request, res: Response, next: Ne
     next();
 };
 
-export class Comment implements IComment {
-    comment_user: Types.ObjectId;
-    comment_list: ICommentEntry[];
-
-    constructor(commentUser: Types.ObjectId, commentList: ICommentEntry[]) {
-        this.comment_user = commentUser;
-        this.comment_list = commentList
-    };
-};
-
-export class Like implements ILike {
-    like_user: Types.ObjectId;
-    date_liked: Date;
-
-    constructor(likeUser: Types.ObjectId, dateLiked: Date) {
-        this.like_user = likeUser;
-        this.date_liked = dateLiked
-    };
+export const formatProifleBody = (req: Request, res: Response, next: NextFunction): void => {
+    switch (true) {
+        case !req.body.education:
+            req.body.education = []
+            break;
+        case !(req.body.education instanceof Array):
+            req.body.education = new Array(req.body.education);
+            break;
+        case !req.body.experience:
+            req.body.experience = []
+            break;
+        case !(req.body.experience instanceof Array):
+            req.body.experience = new Array(req.body.experience);
+            break;
+        case !req.body.social:
+            req.body.social = {};
+            break;
+        case !(req.body.social instanceof Object):
+            req.body.social = { ...req.body.social };
+            break;
+        default:
+            break;
+    }
+    next();
 }
 
 export const handleValidationErrors = (req: Request, res: Response) => {

@@ -28,7 +28,7 @@ export const post_create_post = [
         } catch (err) {
             if (err instanceof Error) {
                 console.error(err);
-                return next(err);
+                next(err);
             }
         }
     }
@@ -64,7 +64,7 @@ export const put_add_comments = [
 
         } catch (error) {
             console.error(error);
-            return next(error);
+            next(error);
         };
     }
 ];
@@ -90,7 +90,7 @@ export const put_add_likes = async (req: RequestWithUser, res: Response, next: N
 
     } catch (error) {
         console.error(error);
-        return next(error);
+        next(error);
     }
 };
 

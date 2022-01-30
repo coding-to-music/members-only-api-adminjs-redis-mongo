@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { IComment, ICommentEntry, ILike } from "@/interfaces/posts.interface";
+import { IComment, ICommentEntry, ILike } from "@interfaces/posts.interface";
 
 export class Comment implements IComment {
     comment_user: Types.ObjectId;
@@ -19,4 +19,4 @@ export class Like implements ILike {
         this.like_user = likeUser;
         this.date_liked = dateLiked
     };
-}
+};

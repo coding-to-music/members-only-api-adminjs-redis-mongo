@@ -2,10 +2,10 @@ import express from 'express';
 import { authorize_user, get_logout_user, post_login_user, post_refresh_token, } from '@controllers/authController';
 import { get_get_user, post_create_user } from '@controllers/userController';
 import { get_verification_code, put_reset_password } from '@controllers/passwordController'
-import * as profile from '@controllers/profileController';
+import { get_user_profile, post_create_profile } from '@controllers/profileController';
 import passport from 'passport';
-import { CustomIRouter } from '@/interfaces/routes.interface';
-import { post_create_post, put_add_comments, put_add_likes } from '@/controllers/postController';
+import { CustomIRouter } from '@interfaces/routes.interface';
+import { post_create_post, put_add_comments, put_add_likes } from '@controllers/postController';
 
 const router: CustomIRouter = express.Router()
 
@@ -33,7 +33,8 @@ router.put('/user/reset_password', put_reset_password);
 
 // Profile Routes
 
-router.get('/profile', passport.authenticate('jwt', { session: false }), profile.get_userProfile);
+router.get('/profile', passport.authenticate('jwt', { session: false }), get_user_profile);
+router.post('/profile/create', passport.authenticate('jwt', { session: false }), post_create_profile);
 
 // Post Routes
 
