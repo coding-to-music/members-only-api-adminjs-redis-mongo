@@ -7,7 +7,7 @@ import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
 import { post_create_post, put_add_comments, put_add_likes } from '@controllers/postController';
 
-const router: CustomIRouter = express.Router()
+const router: CustomIRouter = express.Router();
 
 router.get('/', (req, res) => { res.json({ msg: 'Not yet implemented!!!' }) });
 
@@ -34,6 +34,7 @@ router.put('/user/reset_password', put_reset_password);
 // Profile Routes
 
 router.get('/profile', passport.authenticate('jwt', { session: false }), get_user_profile);
+
 router.post('/profile/create', passport.authenticate('jwt', { session: false }), post_create_profile);
 
 // Post Routes
@@ -44,4 +45,4 @@ router.put('/posts/:id/add_comment', passport.authenticate('jwt', { session: fal
 
 router.put('/posts/:id/add_like', passport.authenticate('jwt', { session: false }), put_add_likes);
 
-export default router
+export default router;

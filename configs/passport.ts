@@ -26,11 +26,11 @@ export default (passport: { use: (arg0: JwtStrategy) => void; }) => {
         User.findById(id).exec((err, found_user) => {
             if (err) return done(err, null);
             if (found_user) {
-                return done(null, found_user)
+                return done(null, found_user);
             } else {
-                return done(null, false)
+                return done(null, false);
                 // or create a new user
             };
-        })
-    }))
+        });
+    }));
 };

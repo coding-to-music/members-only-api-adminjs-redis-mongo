@@ -22,6 +22,7 @@ export interface IUser extends Document {
   isMember: boolean;
   resetPassword: ResetPassword;
   refreshToken: RefreshToken;
+  tokenVersion: number;
   lastLogin?: Date;
   generateCode: () => Promise<string>;
   generateTokens(usr: IUser): Promise<ITokens>;

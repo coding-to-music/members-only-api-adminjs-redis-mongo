@@ -1,9 +1,9 @@
 import { generateKeyPairSync, randomBytes } from 'crypto';
 import { Buffer } from 'buffer';
-import { ENV } from '@/utils/validateEnv';
+import { ENV } from '@utils/validateEnv';
 import { sign } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
-import { ITokens } from '@/interfaces/auth.interface';
+import { ITokens } from '@interfaces/auth.interface';
 
 const genKeyPair = () => {
     const { publicKey, privateKey, } = generateKeyPairSync('rsa', {
@@ -36,7 +36,7 @@ export const generateRandomCode = async (length: number): Promise<string | null>
         const code = randomBytes(length).toString('hex').toUpperCase();
         return code;
     } catch (error) {
-        console.error(error)
+        console.error(error);
         return null;
     }
 }
@@ -45,13 +45,14 @@ export const tokenGenerator = async (user: IUser): Promise<ITokens> => {
     const payload = {
         aud: "https://pollaroid.net",
         iss: "https://pollaroid.net",
-        sub: user?._id,
-        name: user?.name,
-        email: user?.email,
-        avatar: user?.avatar,
-        isAdmin: user?.isAdmin,
-        isMember: user?.isMember,
-        last_login: user?.lastLogin,
+        sub: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        isAdmin: user.isAdmin,
+        isMember: user.isMember,
+        last_login: user.lastLogin,
+        token_version: user.tokenVersion
     };
     // Process Access token
     const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(ENV.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');

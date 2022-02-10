@@ -21,7 +21,8 @@ const UserSchema = new Schema<IUser>({
     refreshToken: {
         token: { type: String, default: '' },
         expiresBy: { type: Date, default: '' }
-    }
+    },
+    tokenVersion: { type: Number, default: 0 }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
 UserSchema.pre('save', async function (next) {
@@ -55,6 +56,7 @@ UserSchema.methods.generateTokens = async function (usr): Promise<ITokens> {
     this.refreshToken.token = refresh_token;
     const decodedJwt: JwtPayload = decode(refresh_token) as JwtPayload;
     this.refreshToken.expiresBy = new Date(decodedJwt.exp! * 1000);
+    this.tokenVersion++;
     await this.save();
     return { token, refresh_token };
 }

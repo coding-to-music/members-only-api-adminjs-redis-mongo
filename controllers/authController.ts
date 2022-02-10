@@ -1,6 +1,6 @@
 import User from '@models/User';
 import { body, validationResult } from 'express-validator';
-import { decode, verify } from 'jsonwebtoken';
+import { decode, JwtPayload, verify } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { ENV } from '@utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
@@ -21,6 +21,7 @@ export const post_login_user = [
             try {
                 const user = await User.findOne({ email: req.body.email }).exec();
                 if (!user) return res.status(404).json({ msg: 'User not found' });
+                
                 const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
                 if (!validPassword) return res.status(400).json({ msg: 'Invalid email/password combination' });
 
@@ -28,7 +29,7 @@ export const post_login_user = [
                 const { token, refresh_token } = await user.generateTokens(user);
                 sendTokens(res, refresh_token, 'Login Successful', token);
             } catch (err) {
-                return next(err)
+                return next(err);
             }
         }
     }]
@@ -37,7 +38,7 @@ export const get_logout_user = (req: Request, res: Response) => {
     return res
         .clearCookie("jit", cookieOptions)
         .json({ message: "Logout successful" });
-}
+};
 
 export const post_refresh_token = async (req: Request, res: Response, next: NextFunction) => {
     const { jit } = req.signedCookies;
@@ -45,11 +46,14 @@ export const post_refresh_token = async (req: Request, res: Response, next: Next
     try {
         // Verify refresh token in request
         const REFRESH_TOKEN_PUBLIC_KEY = Buffer.from(ENV.REFRESH_TOKEN_PUBLIC_KEY_BASE64, 'base64').toString('ascii');
-        const decoded = verify(jit, REFRESH_TOKEN_PUBLIC_KEY);
+        const decoded = verify(jit, REFRESH_TOKEN_PUBLIC_KEY) as JwtPayload;
 
         // Check if user exists in DB
         const user = await User.findOne({ id: decoded.sub });
         if (!user) return res.status(404).json({ msg: 'User not found' });
+
+        // Validate token history
+        if (user.tokenVersion !== decoded.token_version) return res.status(403).json({msg: 'Token Invalid'})
 
         // Check if refresh token is valid
         const { validToken, refreshTokenNotExpired } = await user.validateRefreshToken(jit);
@@ -76,13 +80,12 @@ export const authorizeJWT = (req: Request, res: Response, next: NextFunction) =>
         if (err instanceof Error) {
             return res.status(403).json(err.message);
         };
-
     };
 };
 
 export const authorize_user = (req: RequestWithUser, res: Response, next: NextFunction): void | Response => {
     try {
-        const { isAdmin } = req.user;
+        const { isAdmin, tokenVersion } = req.user;
         if (!isAdmin) throw new Error('User not authorized to access this resource');
         next();
     } catch (err) {
