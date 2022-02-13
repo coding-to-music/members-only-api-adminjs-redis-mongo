@@ -21,7 +21,7 @@ export const post_login_user = [
             try {
                 const user = await User.findOne({ email: req.body.email }).exec();
                 if (!user) return res.status(404).json({ msg: 'User not found' });
-                
+
                 const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
                 if (!validPassword) return res.status(400).json({ msg: 'Invalid email/password combination' });
 
@@ -52,13 +52,11 @@ export const post_refresh_token = async (req: Request, res: Response, next: Next
         const user = await User.findOne({ id: decoded.sub });
         if (!user) return res.status(404).json({ msg: 'User not found' });
 
-        // Validate token history
-        if (user.tokenVersion !== decoded.token_version) return res.status(403).json({msg: 'Token Invalid'})
-
         // Check if refresh token is valid
-        const { validToken, refreshTokenNotExpired } = await user.validateRefreshToken(jit);
+        const { validToken, refreshTokenNotExpired, tokenVersionValid } = await user.validateRefreshToken(jit);
         if (!validToken) return res.status(403).json({ msg: 'Invalid Refresh token' });
         if (!refreshTokenNotExpired) return res.status(403).json({ msg: 'Refresh token has expired, please initiate a new sign in request.' });
+        if (!tokenVersionValid) return res.status(403).json({ msg: 'Token Invalid' });
 
         // Generate new Tokens and send them to the client
         const { token, refresh_token } = await user.generateTokens(user);

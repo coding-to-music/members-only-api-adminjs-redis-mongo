@@ -6,6 +6,7 @@ export interface ITokens {
 export interface IValidate {
     validToken: boolean;
     refreshTokenNotExpired: boolean;
+    tokenVersionValid: boolean;
 }
 
 export interface IVerify {

@@ -64,7 +64,8 @@ UserSchema.methods.generateTokens = async function (usr): Promise<ITokens> {
 UserSchema.methods.validateRefreshToken = async function (token): Promise<IValidate> {
     const validToken = this.refreshToken.token === token;
     const refreshTokenNotExpired = (new Date(this.resetPassword.expiresBy).getTime() - Date.now()) < 604800000;
-    return { validToken, refreshTokenNotExpired };
+    const tokenVersionValid = (this.tokenVersion - token.token_version) === 1;
+    return { validToken, refreshTokenNotExpired, tokenVersionValid };
 }
 
 export default model('User', UserSchema);
