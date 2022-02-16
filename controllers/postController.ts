@@ -6,6 +6,35 @@ import { formatPostCommentsAndLikes, handleValidationErrors } from '@utils/lib';
 import { Comment, Like } from '@utils/classes';
 import { Types } from 'mongoose';
 
+export const get_get_all_posts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const posts = await Post.find({}).exec();
+        res.status(200).json(posts);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const get_get_post_by_id = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const post = await Post.findById(req.params.id).exec();
+        if (!post) return res.status(404).json({ msg: 'Post not found' });
+        res.status(200).json(post);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const get_all_post_by_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const posts = await Post.find({ user: req.user._id }).exec();
+        if (!posts.length) return res.status(404).json({ msg: 'No posts found for this user' });
+        res.status(200).json(posts);
+    } catch (error) {
+        next(error)
+    }
+}
+
 export const post_create_post = [
     (req: Request, res: Response, next: NextFunction) => formatPostCommentsAndLikes(req, res, next),
 
