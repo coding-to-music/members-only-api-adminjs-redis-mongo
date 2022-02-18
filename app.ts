@@ -7,12 +7,12 @@ import passport from 'passport';
 import cors, { CorsOptions } from 'cors'
 import helmet from 'helmet';
 import compression from 'compression';
-import swaggerUi from 'swagger-ui-express';
-import * as swaggerDocument from './swagger.json';
 import initDB from '@configs/database';
 import passportConfig from '@configs/passport';
 import apiRouter from '@routes/api/api';
 import indexRouter from '@routes/index';
+import swaggerUi from 'swagger-ui-express';
+import openapiSpecifications from '@utils/swagger';
 
 config();
 
@@ -55,7 +55,7 @@ app.use(compression());
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecifications));
 
 // Handle 404 errors
 app.use((req: Request, res: Response, next) => {
