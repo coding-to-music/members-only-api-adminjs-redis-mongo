@@ -1,0 +1,18 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Members-Only API",
+        "description": "A sample API mimicking a members only service, it allows members to access only authorized resources",
+        "termsOfService": "",
+        "contact": {
+            "name": "Lekan Adetunmbi",
+            "url": "https://pollaroid.net",
+            "email": "me@pollaroid.net"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    }
+}

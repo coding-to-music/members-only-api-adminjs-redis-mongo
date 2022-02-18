@@ -10,6 +10,7 @@
         "target": "es2021",
         "strict": true,
         "outDir": "dist",
+        "resolveJsonModule": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,

@@ -7,9 +7,10 @@ import passport from 'passport';
 import cors, { CorsOptions } from 'cors'
 import helmet from 'helmet';
 import compression from 'compression';
-
+import swaggerUi from 'swagger-ui-express';
+import * as swaggerDocument from './swagger.json';
 import initDB from '@configs/database';
-import authConfig from '@configs/passport';
+import passportConfig from '@configs/passport';
 import apiRouter from '@routes/api/api';
 import indexRouter from '@routes/index';
 
@@ -19,7 +20,7 @@ config();
 initDB();
 
 // Load Paasport configuration
-authConfig(passport)
+passportConfig(passport)
 
 const app = express();
 const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://mema.azurewebsites.net', 'https://mema.polldevs.com'];
@@ -35,6 +36,13 @@ const corsOptions: CorsOptions = {
     }
 };
 
+const swaggerOptions = {
+    explorer: true,
+    customCssUrl: 'https://fonts.googleapis.com/css?family=Open+Sans:400,700|Roboto:400,700',
+    customSiteTitle: 'Members-Only API Documentation',
+    customSiteDescription: 'Documentation for the Members-Only API',
+}
+
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
@@ -47,6 +55,7 @@ app.use(compression());
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
 // Handle 404 errors
 app.use((req: Request, res: Response, next) => {
