@@ -9,6 +9,8 @@ import helmet from 'helmet';
 import compression from 'compression';
 import initDB from '@configs/database';
 import passportConfig from '@configs/passport';
+
+// Import Routes
 import apiRouter from '@routes/api/api';
 import indexRouter from '@routes/index';
 import swaggerUi from 'swagger-ui-express';
@@ -35,13 +37,6 @@ const corsOptions: CorsOptions = {
         }
     }
 };
-
-const swaggerOptions = {
-    explorer: true,
-    customCssUrl: 'https://fonts.googleapis.com/css?family=Open+Sans:400,700|Roboto:400,700',
-    customSiteTitle: 'Members-Only API Documentation',
-    customSiteDescription: 'Documentation for the Members-Only API',
-}
 
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));

@@ -20,6 +20,10 @@ const options: swaggerJSDoc.Options = {
                 name: "MIT",
                 url: "https://opensource.org/licenses/MIT"
             },
+            server: {
+                url: "https://wauth-svr.azurewebsites.net/api",
+                description: "Production server"
+            }
         },
         components: {
             securitySchemes: {
