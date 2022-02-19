@@ -1,0 +1,52 @@
+openapi: "3.0.0"
+info:
+  title: "Sample API mimicking a members-only service"
+  version: "1.0.0"
+  contact:
+    name: "Lekan Adetunmbi"
+    email: "me@pollaroid.net"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+servers:
+  - url: "https://wauth-svr.azurewebsites.net/api"
+    description: "Main Server hosted on Azure App Service"
+paths:
+  /userinfo:
+    get:
+      summary: "Get user information"
+      description: "Get user information"
+      operationId: "getUserInfo"
+      tags:
+        - "User"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 

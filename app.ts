@@ -7,14 +7,17 @@ import passport from 'passport';
 import cors, { CorsOptions } from 'cors'
 import helmet from 'helmet';
 import compression from 'compression';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+
+// Import Configs
 import initDB from '@configs/database';
 import passportConfig from '@configs/passport';
 
 // Import Routes
 import apiRouter from '@routes/api/api';
 import indexRouter from '@routes/index';
-import swaggerUi from 'swagger-ui-express';
-import openapiSpecifications from '@utils/swagger';
+
 
 config();
 
@@ -38,6 +41,23 @@ const corsOptions: CorsOptions = {
     }
 };
 
+const swaggerOptions = {
+    explorer: true,
+    customCssUrl: 'https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css',
+    customJs: 'https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js',
+    customHeaders: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    },
+    customSiteName: 'Members-Only API Documentation',
+    customDocsPath: '/api-docs',
+    customDocsTitle: 'Members-Only API Documentation',
+    customDocsDescription: 'Members-Only API Documentation',
+    customDocsVersion: '1.0.0',
+}
+
+const swaggerDocument = YAML.load('./swagger.yaml');
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
@@ -50,7 +70,7 @@ app.use(compression());
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecifications));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Handle 404 errors
 app.use((req: Request, res: Response, next) => {

@@ -20,7 +20,7 @@
         ],
         "baseUrl": ".",
         "paths": {
-            "@/*": ["*"],
+            "@*": ["*"],
             "@global": ["global.d.ts"],
             "@configs/*": ["configs/*"],
             "@controllers/*": ["controllers/*"],

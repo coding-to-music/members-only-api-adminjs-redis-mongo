@@ -1,4 +1,4 @@
-import { ENV } from '@/utils/validateEnv';
+import { ENV } from '@utils/validateEnv';
 import { Request } from 'express';
 import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
 import { Types } from 'mongoose';

@@ -2,7 +2,7 @@ import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import gravatar from 'gravatar';
 import { Request, Response, NextFunction } from 'express';
-import { RequestWithUser, IUser } from '@/interfaces/users.interface';
+import { RequestWithUser, IUser } from '@interfaces/users.interface';
 
 export const get_get_user = async (req: RequestWithUser, res: Response) => {
     const { password, resetPassword, refreshToken, ...data } = req.user._doc;

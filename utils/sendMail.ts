@@ -1,4 +1,4 @@
-import { ENV } from '@/utils/validateEnv';
+import { ENV } from '@utils/validateEnv';
 import sgMail, { ResponseError } from '@sendgrid/mail';
 import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
 
