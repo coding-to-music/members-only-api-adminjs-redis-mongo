@@ -9,10 +9,10 @@ const router: Router = Router();
 
 router.get('/', (req, res) => { res.json({ msg: 'HELLO VISITOR, THANKS FOR STOPPING BY AND WELCOME TO MEMBERS-ONLY API' }) });
 
-router.use('/user', userRouter);
 router.use('/auth', authRouter);
 router.use('/password', passwordRouter);
-router.use('/profile', profileRouter);
 router.use('/post', postRouter);
+router.use('/profile', profileRouter);
+router.use('/user', userRouter);
 
 export default router;
