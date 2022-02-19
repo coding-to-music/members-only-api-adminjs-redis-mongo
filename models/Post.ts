@@ -2,12 +2,12 @@ import { IPost } from '@interfaces/posts.interface';
 import { Schema, model } from 'mongoose';
 
 const PostSchema = new Schema<IPost>({
-  user: { type: Schema.Types.ObjectId, ref: 'User' },
+  user: { type: 'ObjectId', ref: 'User' },
   post_content: { type: String, required: true },
   date_posted: { type: Date, default: new Date(Date.now()) },
   comments: [
     {
-      comment_user: { type: Schema.Types.ObjectId, ref: 'User' },
+      comment_user: { type: 'ObjectId', ref: 'User' },
       comment_list: [
         {
           comment: { type: String },
@@ -18,10 +18,10 @@ const PostSchema = new Schema<IPost>({
   ],
   likes: [
     {
-      like_user: { type: Schema.Types.ObjectId, ref: 'User' },
+      like_user: { type: 'ObjectId', ref: 'User' },
       date_liked: { type: Date, default: new Date(Date.now()) },
     }
   ]
 });
 
-export default model('Post', PostSchema);
+export default model<IPost>('Post', PostSchema);

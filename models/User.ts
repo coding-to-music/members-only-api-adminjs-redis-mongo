@@ -45,13 +45,13 @@ UserSchema.methods.generateCode = async function (): Promise<string | null> {
     return code;
 };
 
-UserSchema.methods.verifyCode = async function (code): Promise<IVerify> {
+UserSchema.methods.verifyCode = async function (code: string | Buffer): Promise<IVerify> {
     const validCode = bcrypt.compare(code, this.resetPassword.code);
     const codeNotExpired = (Date.now() - new Date(this.resetPassword.expiresBy).getTime()) < 300000;
     return { validCode, codeNotExpired };
 };
 
-UserSchema.methods.generateTokens = async function (usr): Promise<ITokens> {
+UserSchema.methods.generateTokens = async function (usr: IUser): Promise<ITokens> {
     const { token, refresh_token } = await tokenGenerator(usr);
     this.refreshToken.token = refresh_token;
     const decodedJwt: JwtPayload = decode(refresh_token) as JwtPayload;
@@ -61,11 +61,11 @@ UserSchema.methods.generateTokens = async function (usr): Promise<ITokens> {
     return { token, refresh_token };
 }
 
-UserSchema.methods.validateRefreshToken = async function (token): Promise<IValidate> {
+UserSchema.methods.validateRefreshToken = async function (token: any): Promise<IValidate> {
     const validToken = this.refreshToken.token === token;
     const refreshTokenNotExpired = (new Date(this.resetPassword.expiresBy).getTime() - Date.now()) < 604800000;
     const tokenVersionValid = (this.tokenVersion - token.token_version) === 1;
     return { validToken, refreshTokenNotExpired, tokenVersionValid };
 }
 
-export default model('User', UserSchema);
+export default model<IUser>('User', UserSchema);

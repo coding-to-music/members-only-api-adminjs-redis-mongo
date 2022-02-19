@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import authRouter from '@routes/api/authRouter';
-import userRouter from '@routes/api/userRouter';
-import passwordRouter from '@routes/api/passwordRouter';
-import postRouter from '@routes/api/postRouter';
-import profileRouter from '@routes/api/profileRouter';
+import authRouter from '@/routes/api/AuthRouter';
+import userRouter from '@/routes/api/UserRouter';
+import passwordRouter from '@/routes/api/PasswordRouter';
+import postRouter from '@/routes/api/PostRouter';
+import profileRouter from '@/routes/api/ProfileRouter';
 
 const router: Router = Router();
 

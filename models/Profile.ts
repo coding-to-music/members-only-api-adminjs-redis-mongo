@@ -1,8 +1,8 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 import { IProifle } from "@interfaces/profiles.interface";
 
 const ProfileSchema = new Schema<IProifle>({
-    user: { type: Types.ObjectId, ref: 'User' },
+    user: { type: Schema.Types.ObjectId, ref: 'User' },
     bio: { type: String },
     address: { type: String, required: true },
     phoneNumber: { type: Number, min: 9, required: true },
@@ -33,4 +33,4 @@ const ProfileSchema = new Schema<IProifle>({
     },
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
-export default model('Profile', ProfileSchema);
+export default model<IProifle>('Profile', ProfileSchema);

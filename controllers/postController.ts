@@ -15,19 +15,20 @@ export const get_get_all_posts = async (req: RequestWithUser, res: Response, nex
     }
 };
 
-export const get_all_post_by_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const get_posts_by_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const posts = await Post.find({ user: req.user._id }).exec();
+        if (!posts.length) return res.status(404).json({ msg: 'No posts found' });
         res.status(200).json(posts);
     } catch (error) {
-        next(error);
+        next(error)
     }
 }
 
 export const get_get_post_by_id = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const post = await Post.findById(req.params.id).exec();
-        if (!post) return res.status(404).json({ msg: `No Post matching the request ${req.params.id} found` });
+        if (!post) return res.status(404).json({ message: `Post not found` });
         res.status(200).json(post);
     } catch (error) {
         next(error);
@@ -45,7 +46,7 @@ export const post_create_post = [
 
         try {
             const post = new Post({
-                user: req.user._id,
+                user: new Types.ObjectId(req.user._id),
                 post_content: req.body.postContent
             });
             await post.save();
@@ -121,4 +122,3 @@ export const put_add_likes = async (req: RequestWithUser, res: Response, next: N
         next(error);
     }
 };
-
