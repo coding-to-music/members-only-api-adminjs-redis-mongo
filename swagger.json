@@ -1,0 +1,79 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Members-Only API",
+        "description": "A sample API mimicking a members only service, it allows members to access only authorized resources",
+        "termsOfService": "",
+        "contact": {
+            "name": "Lekan Adetunmbi",
+            "url": "https://pollaroid.net",
+            "email": "me@pollaroid.net"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "x-logo": {
+            "url": "https://img.icons8.com/flat-round/64/000000/bear.png",
+            "backgroundColor": "#f5f5f5",
+            "textColor": "#333333"
+        },
+        "definitions": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "last_login": {
+                        "type": "string"
+                    },
+                    "isAdmin": {
+                        "type": "boolean"
+                    },
+                    "isMember": {
+                        "type": "boolean"
+                    },
+                    "resetPassword": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "expiresBy": {
+                                "type": "date"
+                            }
+                        }
+                    },
+                    "refreshToken": {
+                        "type": "object",
+                        "properties": {
+                            "token": {
+                                "type": "string"
+                            },
+                            "expiresBy": {
+                                "type": "date"
+                            }
+                        }
+                    },
+                    "tokenVersion": {
+                        "type": "integer"
+                    },
+                    "createdAt": {
+                        "type": "date"
+                    },
+                    "updatedAt": {
+                        "type": "date"
+                    }
+                }
+            }
+        }
+    }
+}
