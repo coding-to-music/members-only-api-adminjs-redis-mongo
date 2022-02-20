@@ -41,23 +41,22 @@ const corsOptions: CorsOptions = {
     }
 };
 
-const swaggerOptions = {
+const swaggerConfigOptions = {
     explorer: true,
-    customCssUrl: 'https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css',
-    customJs: 'https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js',
-    customHeaders: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    swaggerOptions: {
+        layout: "StandaloneLayout",
+        docExpansion: "none",
     },
-    customSiteName: 'Members-Only API Documentation',
-    customDocsPath: '/api-docs',
-    customDocsTitle: 'Members-Only API Documentation',
-    customDocsDescription: 'Members-Only API Documentation',
-    customDocsVersion: '1.0.0',
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Members-Only API',
+    // customCssUrl: './docs/swaggerDark.css',
+    customfavIcon: './docs/favico.ico',
+    customFileUpload: true,
+    customEnableCORS: true,
+    customEnablePostman: true
 }
 
-const swaggerDocument = YAML.load('./swagger.yaml');
+const swaggerDocument = YAML.load('./docs/api-docs.yaml');
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
@@ -70,7 +69,7 @@ app.use(compression());
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerConfigOptions));
 
 // Handle 404 errors
 app.use((req: Request, res: Response, next) => {

@@ -57,6 +57,7 @@ UserSchema.methods.generateTokens = async function (usr: IUser): Promise<ITokens
     const decodedJwt: JwtPayload = decode(refresh_token) as JwtPayload;
     this.refreshToken.expiresBy = new Date(decodedJwt.exp! * 1000);
     this.tokenVersion++;
+    this.lastLogin = new Date(Date.now());
     await this.save();
     return { token, refresh_token };
 }
