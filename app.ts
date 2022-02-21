@@ -28,7 +28,7 @@ initDB();
 passportConfig(passport)
 
 const app = express();
-const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://mema.azurewebsites.net', 'https://mema.polldevs.com'];
+const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://mema.azurewebsites.net', 'https://wauth-svr.azurewebsites.net'];
 const corsOptions: CorsOptions = {
     credentials: true,
     methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT'],
