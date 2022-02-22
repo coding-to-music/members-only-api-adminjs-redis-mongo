@@ -1,10 +1,9 @@
 import User from '@models/User';
 import { body, validationResult } from 'express-validator';
-import { decode, JwtPayload, verify } from 'jsonwebtoken';
+import { JwtPayload, verify } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { ENV } from '@utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
-import { RequestWithUser } from '@interfaces/users.interface';
 import { sendTokens, cookieOptions } from '@utils/lib';
 
 export const post_login_user = [
@@ -65,30 +64,3 @@ export const post_refresh_token = async (req: Request, res: Response, next: Next
         return next(err);
     }
 }
-
-export const authorizeJWT = (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const authHeader = req.headers['authorization'];
-        const token = (authHeader && authHeader.startsWith('Bearer')) && authHeader.split(' ')[1];
-        if (!token) throw new Error('No token provided');
-        const decoded: any = decode(token);
-        if (!decoded.isAdmin) throw new Error('User not authorized to access this resource');
-        next();
-    } catch (err) {
-        if (err instanceof Error) {
-            return res.status(403).json(err.message);
-        };
-    };
-};
-
-export const authorize_user = (req: RequestWithUser, res: Response, next: NextFunction): void | Response => {
-    try {
-        const { isAdmin, tokenVersion } = req.user;
-        if (!isAdmin) throw new Error('User not authorized to access this resource');
-        next();
-    } catch (err) {
-        if (err instanceof Error) {
-            return res.status(403).json(err.message);
-        };
-    };
-};

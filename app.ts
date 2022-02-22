@@ -12,7 +12,7 @@ import YAML from 'yamljs';
 
 // Import Configs
 import initDB from '@configs/database';
-import passportConfig from '@configs/passport';
+import passportConfig from '@middlewares/passport';
 
 // Import Routes
 import apiRouter from '@routes/api/api';

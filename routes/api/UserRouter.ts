@@ -2,7 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 import { CustomIRouter } from "@interfaces/routes.interface";
 import { get_get_user, post_create_user } from "@controllers/userController";
-import { authorize_user } from "@controllers/authController";
+import { authorize_user } from "@middlewares/middleware";
 
 const userRouter: CustomIRouter = Router();
 
