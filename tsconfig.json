@@ -24,7 +24,9 @@
             "@global": ["global.d.ts"],
             "@configs/*": ["configs/*"],
             "@controllers/*": ["controllers/*"],
+            "@docs/*": ["docs/*"],
             "@interfaces/*": ["interfaces/*"],
+            "@middlewares/*": ["middlewares/*"],
             "@models/*": ["models/*"],
             "@routes/*": ["routes/*"],
             "@utils/*": ["utils/*"]
