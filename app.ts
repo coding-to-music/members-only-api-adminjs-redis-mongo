@@ -41,18 +41,6 @@ const corsOptions: CorsOptions = {
     }
 };
 
-const swaggerConfigOptions = {
-    explorer: true,
-    swaggerOptions: {
-        layout: "StandaloneLayout",
-        docExpansion: "list",
-    },
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Members-Only API Docs',
-    customfavIcon: '@docs/logo.png',
-}
-
-const swaggerDocument = YAML.load('@docs/api-docs.yaml');
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
@@ -65,7 +53,16 @@ app.use(compression());
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerConfigOptions));
+
+// Swagger UI documentation
+const swaggerUiOptions = {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Members-Only API Docs',
+    customfavIcon: '@docs/logo.png',
+};
+
+const swaggerDocument = YAML.load('./docs/api-docs.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 
 // Handle 404 errors
 app.use((req: Request, res: Response, next) => {
