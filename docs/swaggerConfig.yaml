@@ -1,0 +1,441 @@
+openapi: 3.0.0
+info:
+  title: Members-Only API
+  description: A Sample API mimicking a social media platform, it allows members to access only authorized resources. .
+  version: 1.0.0
+
+  contact:
+    name: Lekan Adetunmbi
+    email: me@pollaroid.net
+    url: https://wwww.pollaroid.net
+
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://mbo.herokuapp.com/api
+    description: Main (production) server
+
+components:
+  schemas:
+    User:
+      type: "object"
+      properties:
+        _id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
+        avatar:
+          type: "string"
+        lastLogin:
+          type: "string"
+          format: "date-time"
+        isAdmin:
+          type: "boolean"
+        isMember:
+          type: "boolean"
+        resetPassword:
+          type: "object"
+          properties:
+            code:
+              type: "string"
+            expiresBy:
+              type: "string"
+              format: "date-time"
+        refreshToken:
+          type: "object"
+          properties:
+            token:
+              type: "string"
+            expiresBy:
+              type: "string"
+              format: "date-time"
+        tokenVersion:
+          type: "integer"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    Profile:
+      type: "object"
+      properties:
+        _id:
+          type: "integer"
+          format: "int64"
+        user:
+          $ref: "#/components/schemas/User"
+        bio:
+          type: "string"
+        address:
+          type: "string"
+        phoneNumber:
+          type: "integer"
+          format: "int64"
+        education:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              school:
+                type: "string"
+              degree:
+                type: "string"
+              field:
+                type: "string"
+              from:
+                type: "string"
+                format: "date-time"
+              to:
+                type: "string"
+                format: "date-time"
+              description:
+                type: "string"
+        social:
+          type: "object"
+          properties:
+            github:
+              type: "string"
+            linkedin:
+              type: "string"
+            twitter:
+              type: "string"
+    Post:
+      type: "object"
+      properties:
+        _id:
+          type: "integer"
+          format: "int64"
+        user:
+          $ref: "#/components/schemas/User"
+        post_content:
+          type: "string"
+        date_posted:
+          type: "string"
+          format: "date-time"
+        comments:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              comment_user:
+                $ref: "#/components/schemas/User"
+              comment_list:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    comment:
+                      type: "string"
+                    comment_date:
+                      type: "string"
+                      format: "date-time"
+  securitySchemes:
+    BearerAuth:
+      type: "http"
+      scheme: "bearer"
+      bearerFormat: "JWT"
+    cookieAuth:
+      type: "apiKey"
+      in: "cookie"
+      name: "jit"
+  responses:
+    400BadRequest:
+      description: Bad request
+    401Unauthorized:
+      description: "Unauthorized"
+    404NotFound:
+      description: "The specified resource was not found"
+    500ServerError:
+      description: "Internal Server Error"
+paths:
+  /auth/logout:
+    get:
+      tags:
+        - Auth
+      summary: User Logout
+      description: Logs out current logged in user session
+      operationId: logoutUser
+      responses:
+        '200':
+          description: "Successfully logged out"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User Login
+      description: Logs in a user with the given credentials
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                password:
+                  type: "string"
+                  format: "password"
+      responses:
+        '200':
+          description: "Successfully logged in"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                  token:
+                    type: "string"
+        '400':
+          description: "Invalid Credentials/Validation Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /auth/refresh_token:
+    post:
+      tags:
+        - Auth
+      summary: Refresh Token
+      description: Refreshes the current user's token
+      operationId: refreshToken
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 'Successfully refreshed token'
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                  token:
+                    type: "string"
+        '403':
+          description: 'Refresh Token Validation Failures'
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /user/register:
+    post:
+      tags:
+        - User
+      summary: Register User
+      description: Registers a new user with the given credentials
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                email:
+                  type: "string"
+                new_password:
+                  type: "string"
+                  format: "password"
+      responses:
+        '200':
+          description: "Success, User Account Created"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                  newUser:
+                    $ref: "#/components/schemas/User"
+        '400':
+          description: "Invalid Credentials/Validation Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /user/userinfo:
+    get:
+      tags:
+        - User
+      summary: User Info
+      description: Returns the current user's information
+      operationId: getUserInfo
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "Success, User Info"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /password/verification_code:
+    post:
+      tags:
+        - Password
+      summary: Send Verification Code
+      description: Sends a verification code to the user's email
+      operationId: sendVerificationCode
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+      responses:
+        '200':
+          description: "Success, Verification Code Sent"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /password/reset_password:
+    put:
+      tags:
+        - Password
+      summary: Reset Password
+      description: Resets the user's password
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                new_password:
+                  type: "string"
+                  format: "password"
+                verification_code:
+                  type: "string"
+      responses:
+        '200':
+          description: "Success, Password Reset"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                  user:
+                    $ref: "#/components/schemas/User"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '403':
+          description: "Verification Code Validation Failures"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /password/change_password:
+    put:
+      tags:
+        - Password
+      summary: Change Password
+      description: Changes the user's password
+      operationId: changePassword
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: "object"
+              properties:
+                old_password:
+                  type: "string"
+                  format: "password"
+                new_password:
+                  type: "string"
+                  format: "password"
+      responses:
+        '200':
+          description: "Success, Password Changed"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                  user:
+                    $ref: "#/components/schemas/User"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500ServerError'

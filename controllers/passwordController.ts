@@ -2,8 +2,10 @@ import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import { sendMail } from '@utils/sendMail';
 import { Request, Response, NextFunction } from 'express';
+import { handleValidationErrors } from '@utils/lib';
+import { RequestWithUser } from '@interfaces/users.interface';
 
-export const get_verification_code = [
+export const post_verification_code = [
     body('email').notEmpty().isEmail(),
 
     async (req: Request, res: Response, next: NextFunction) => {
@@ -29,8 +31,8 @@ export const get_verification_code = [
 export const put_reset_password = [
 
     body('email').notEmpty().isEmail(),
-    body('code').notEmpty().isLength({ min: 6 }).withMessage('must be at least 6 chars long'),
     body('new_password').notEmpty().isLength({ min: 6 }),
+    body('verification_code').notEmpty().isLength({ min: 6 }).withMessage('must be at least 6 chars long'),
 
     async (req: Request, res: Response, next: NextFunction) => {
 
@@ -46,11 +48,37 @@ export const put_reset_password = [
                 if (!validCode || !codeNotExpired) return res.status(403).json({ msg: 'Verification code is invalid or it has expired.' });
                 user.password = new_password;
                 await user.save();
-                const { password, resetPassword, refreshToken, ...data } = user._doc;
+                const { password, resetPassword, refreshToken, tokenVersion, ...data } = user._doc;
                 res.json({ msg: 'password reset successful', data })
             } catch (err) {
                 return next(err);
             }
+        }
+    }
+]
+
+export const put_change_password = [
+    body('old_password').notEmpty().isLength({ min: 6 }),
+    body('new_password').notEmpty().isLength({ min: 6 }),
+
+    async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        handleValidationErrors(req, res);
+        try {
+            const { old_password, new_password } = req.body;
+
+            const user = await User.findById(req.user._id).exec();
+            if (!user) throw new Error(`No user with id: ${req.user._id} found`);
+
+            const validPassword = await user.validatePassword(old_password);
+            if (!validPassword) return res.status(403).json({ msg: 'Old password is invalid' });
+
+            user.password = new_password;
+            await user.save();
+
+            const { password, resetPassword, refreshToken, tokenVersion, ...data } = user._doc;
+            res.json({ msg: 'password changed successful', data })
+        } catch (error) {
+            next(error);
         }
     }
 ]

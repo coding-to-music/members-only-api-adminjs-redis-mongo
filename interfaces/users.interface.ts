@@ -26,6 +26,7 @@ export interface IUser extends Document {
   lastLogin?: Date;
   generateCode: () => Promise<string>;
   generateTokens(usr: IUser): Promise<ITokens>;
+  validatePassword(password: string): Promise<boolean>;
   validateRefreshToken(req: Request): Promise<IValidate>;
   verifyCode: (code: string) => Promise<IVerify>;
 }

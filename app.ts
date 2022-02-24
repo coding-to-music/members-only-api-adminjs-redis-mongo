@@ -54,14 +54,14 @@ app.use(compression());
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
 
-// Swagger UI documentation
+// Swagger UI
 const swaggerUiOptions = {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'Members-Only API Docs',
-    customfavIcon: '@docs/logo.png',
+    customfavIcon: '@docs/favicon.ico',
 };
 
-const swaggerDocument = YAML.load('./docs/api-docs.yaml');
+const swaggerDocument = YAML.load('./docs/swaggerConfig.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 
 // Handle 404 errors

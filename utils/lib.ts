@@ -61,5 +61,5 @@ export const formatProifleBody = (req: Request, res: Response, next: NextFunctio
 
 export const handleValidationErrors = (req: Request, res: Response) => {
     const errors = validationResult(req);
-    return !errors.isEmpty() && res.status(422).json({ errors: errors.array() });
+    return !errors.isEmpty() && res.status(400).json({ errors: errors.array() });
 };

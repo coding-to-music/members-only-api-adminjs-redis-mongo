@@ -69,4 +69,8 @@ UserSchema.methods.validateRefreshToken = async function (token: any): Promise<I
     return { validToken, refreshTokenNotExpired, tokenVersionValid };
 }
 
+UserSchema.methods.validatePassword = async function (password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+};
+
 export default model<IUser>('User', UserSchema);

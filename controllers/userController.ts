@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser, IUser } from '@interfaces/users.interface';
 
 export const get_get_user = async (req: RequestWithUser, res: Response) => {
-    const { password, resetPassword, refreshToken, ...data } = req.user._doc;
+    const { password, resetPassword, refreshToken, tokenVersion, ...data } = req.user._doc;
     res.json(data)
 }
 
@@ -32,7 +32,7 @@ export const post_create_user = [
             });
             await user.save();
             const { password, resetPassword, refreshToken, ...data } = user._doc;
-            res.json(data);
+            res.json({ message: 'Success, User Account Created', newUser: data });
         } catch (error) {
             next(error)
         }
