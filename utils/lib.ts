@@ -2,12 +2,11 @@ import { CookieOptions, Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 
 export const cookieOptions: CookieOptions = {
-    domain: 'polldevs.com',
     path: '/api/auth/refresh_token',
     httpOnly: true,
     maxAge: 604800000,
     signed: true,
-    sameSite: 'strict',
+    sameSite: 'none',
     secure: true,
 };
 

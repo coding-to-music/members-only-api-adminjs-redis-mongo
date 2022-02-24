@@ -9,7 +9,7 @@
         "module": "commonjs",
         "target": "es2021",
         "strict": true,
-        "outDir": "dist",
+        "outDir": "build",
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "skipLibCheck": true,

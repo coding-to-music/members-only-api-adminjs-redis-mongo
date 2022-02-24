@@ -6,9 +6,9 @@
   },
   "private": true,
   "scripts": {
-    "start": "node dist/bin/www.js",
+    "start": "node build/bin/www.js",
     "build": "tsc && tsc-alias",
-    "devstart": "npm run build && nodemon dist/bin/www.js",
+    "devstart": "npm run build && nodemon build/bin/www.js",
     "serverstart": "DEBUG=members-only:* npm run devstart"
   },
   "dependencies": {
