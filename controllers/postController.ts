@@ -98,7 +98,28 @@ export const put_add_comments = [
     }
 ];
 
-export const put_add_likes = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const delete_delete_comment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        
+        const post = await Post.findById(req.params.id).exec();
+        if (!post) return res.status(404).json({ msg: 'Post not found' });
+
+        const commentIndex: number = post.comments.findIndex(comment => comment.comment_user.equals(new Types.ObjectId(req.user._id)));
+        if (commentIndex === -1) return res.status(404).json({ msg: 'User has not commented on this post' });
+        
+        const commentIndexInCommentList: number = post.comments[commentIndex].comment_list.findIndex(comment => comment._id!.equals(new Types.ObjectId(req.params.commentId)));
+        if (commentIndexInCommentList === -1) return res.status(404).json({ msg: 'Comment not found' });
+
+        post.comments[commentIndex].comment_list.splice(commentIndexInCommentList, 1);
+        await post.save();
+        
+        res.status(200).json({ message: 'Comment deleted successfully', post });
+    } catch (error) {
+        next(error);
+    };
+};
+
+export const put_like_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
     try {
         const post = await Post.findById(req.params.id).exec();
@@ -122,3 +143,21 @@ export const put_add_likes = async (req: RequestWithUser, res: Response, next: N
         next(error);
     }
 };
+
+export const delete_unlike_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const post = await Post.findById(req.params.id).exec();
+        if (!post) return res.status(404).json({ msg: 'Post not found' });
+
+        const likeIndex: number = post.likes.findIndex(like => like.like_user.equals(new Types.ObjectId(req.user._id)));
+        if (likeIndex === -1) return res.status(404).json({ msg: 'User has not liked this post' });
+
+        post.likes.splice(likeIndex, 1);
+        await post.save();
+
+        res.status(200).json({ message: 'Like deleted successfully', post });
+
+    } catch (error) {
+        next(error);
+    }
+}

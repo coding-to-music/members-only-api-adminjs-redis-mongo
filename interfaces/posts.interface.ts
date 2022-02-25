@@ -7,12 +7,13 @@ export interface ILike {
 
 export interface ICommentEntry {
     comment: string;
-    comment_date: Date
+    comment_date: Date;
+    _id?: Types.ObjectId;
 };
 
 export interface IComment {
     comment_user: Types.ObjectId;
-    comment_list: ICommentEntry[]
+    comment_list: ICommentEntry[];
 };
 
 export interface IPost extends Document {

@@ -2,7 +2,8 @@ import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import gravatar from 'gravatar';
 import { Request, Response, NextFunction } from 'express';
-import { RequestWithUser, IUser } from '@interfaces/users.interface';
+import { RequestWithUser } from '@interfaces/users.interface';
+import { handleValidationErrors } from '@utils/lib';
 
 export const get_get_user = async (req: RequestWithUser, res: Response) => {
     const { password, resetPassword, refreshToken, tokenVersion, ...data } = req.user._doc;
@@ -16,8 +17,8 @@ export const post_create_user = [
     body('new_password').notEmpty().isLength({ min: 6 }),
 
     async (req: Request, res: Response, next: NextFunction) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json(errors.array());
+        
+        handleValidationErrors(req, res);
 
         try {
             const { name, email, new_password, img } = req.body;

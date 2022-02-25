@@ -23,14 +23,16 @@ components:
       type: "object"
       properties:
         _id:
-          type: "integer"
-          format: "int64"
+          type: "string"
+          format: "uuid"
         name:
           type: "string"
         email:
           type: "string"
+          format: "email"
         password:
           type: "string"
+          format: "password"
         avatar:
           type: "string"
         lastLogin:
@@ -53,11 +55,13 @@ components:
           properties:
             token:
               type: "string"
+              format: "byte"
             expiresBy:
               type: "string"
               format: "date-time"
         tokenVersion:
           type: "integer"
+          format: "int32"
         createdAt:
           type: "string"
           format: "date-time"
@@ -68,10 +72,11 @@ components:
       type: "object"
       properties:
         _id:
-          type: "integer"
-          format: "int64"
+          type: "string"
+          format: "uuid"
         user:
-          $ref: "#/components/schemas/User"
+          type: "string"
+          format: "uuid"
         bio:
           type: "string"
         address:
@@ -111,10 +116,11 @@ components:
       type: "object"
       properties:
         _id:
-          type: "integer"
-          format: "int64"
+          type: "string"
+          format: "uuid"
         user:
-          $ref: "#/components/schemas/User"
+          type: "string"
+          format: "uuid"
         post_content:
           type: "string"
         date_posted:
@@ -126,7 +132,8 @@ components:
             type: "object"
             properties:
               comment_user:
-                $ref: "#/components/schemas/User"
+                type: "string"
+                format: "uuid"
               comment_list:
                 type: "array"
                 items:
@@ -191,6 +198,7 @@ paths:
               properties:
                 email:
                   type: "string"
+                  format: "email"
                 password:
                   type: "string"
                   format: "password"
@@ -206,6 +214,7 @@ paths:
                     type: "string"
                   token:
                     type: "string"
+                    format: "byte"
         '400':
           description: "Invalid Credentials/Validation Error"
           content:
@@ -439,3 +448,234 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
+  /post/all_posts:
+    get:
+      tags:
+        - Post
+      summary: Get All Posts
+      description: Returns all posts
+      operationId: getAllPosts
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "Success, All Posts"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Post"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /post/post_by_user:
+    get:
+      tags:
+        - Post
+      summary: Get Posts By User
+      description: Returns all posts by the given user
+      operationId: getPostsByUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "Success, All Posts"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Post"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /post/{id}:
+    get:
+      tags:
+        - Post
+      summary: Get Post By ID
+      description: Returns the post with the given ID
+      operationId: getPostById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: "string"
+      responses:
+        '200':
+          description: "Success, Post"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /post/create_post:
+    post:
+      tags:
+        - Post
+      summary: Create Post
+      description: Creates a post
+      operationId: createPost
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+      responses:
+        '200':
+          description: "Success, Post Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /post/{id}/add_comment:
+    put:
+      tags:
+        - Post
+      summary: Add Comment
+      description: Adds a comment to the post
+      operationId: addComment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: "object"
+              properties:
+                comment:
+                  type: "string"
+      responses:
+        '200':
+          description: "Success, Comment Added"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /post/{id}/delete_comment/{commentId}:
+    delete:
+      tags:
+        - Post
+      summary: Delete Comment
+      description: Deletes a comment from the post
+      operationId: deleteComment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        '200':
+          description: "Success, Comment Deleted"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /post/{id}/like_post:
+    put:
+      tags:
+        - Post
+      summary: Like Post
+      description: Likes the post
+      operationId: likePost
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        '200':
+          description: "Success, Post Liked"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /post/{id}/unlike_post:
+    delete:
+      tags:
+        - Post
+      summary: Unlike Post
+      description: Unlikes the post
+      operationId: unlikePost
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        '200':
+          description: "Success, Post Unliked"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+    
