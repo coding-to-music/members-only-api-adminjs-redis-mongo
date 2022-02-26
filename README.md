@@ -36,10 +36,12 @@ A sample API mimicking a members only service, it allows members to access only 
 ### User Routes
 * Create User:                                                  POST /api/user/register
 * User Info:                                                    GET /api/user/userinfo
+* Delete User                                                   DELETE /api/user/delete_user
 
 ### Password Reset Routes
 * Request Verification Code:                                    GET /api/user/verification_code
 * Reset Password:                                               PUT /api/user/reset_password
+* Change Password:                                              PUT /api/user/change_password
 
 ### Post Routes
 * Get All Posts:                                                GET /api/posts/all_posts
@@ -47,12 +49,14 @@ A sample API mimicking a members only service, it allows members to access only 
 * Get All Posts By User:                                        GET /api/posts/post_by_user
 * Create Post:                                                  POST /api/posts/create_post
 * Add Comment to post:                                          PUT /api/posts/:id/add_comment
-* Add Like to post:                                             PUT /api/posts/:id/add_like
+* Add Like to post:                                             PUT /api/posts/:id/like_post
+* Delete Comment on Post:                                       DELETE /api/posts/:id/delete_comment/:commentId
+* Unlike Post:                                                  PUT /api/posts/:id/unlike_post
 
 ### Profile Routes
 * Get User Profile:                                             PUT /api/profiles/user_profile
 * Create User Profile:                                          POST /api/profiles/create_profile
 
-### Endpoint 
+## Endpoints 
 
-* View live demo of the application [here](https://wauth-svr.azurewebsites.net/api)
+* API Documentation is available [here](https://mbo.herokuapp.com/api-docs)

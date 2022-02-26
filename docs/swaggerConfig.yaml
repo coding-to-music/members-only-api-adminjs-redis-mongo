@@ -326,6 +326,29 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
+  /user/delete_user:
+    delete:
+      tags:
+        - User
+      summary: Delete User
+      description: Deletes the current user's account
+      operationId: deleteUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "Success, User Account Deleted"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
   /password/verification_code:
     post:
       tags:
@@ -672,6 +695,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Post"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /profile/user_profile:
+    get:
+      tags:
+        - Profile
+      summary: Get User Profile
+      description: Returns the user profile
+      operationId: getUserProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "Success, User Profile"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /profile/create_profile:
+    post:
+      tags:
+        - Profile
+      summary: Create Profile
+      description: Creates a profile
+      operationId: createProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Profile"
+      responses:
+        '200':
+          description: "Success, Profile Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
