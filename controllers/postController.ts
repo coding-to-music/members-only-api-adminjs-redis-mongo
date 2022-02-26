@@ -2,9 +2,10 @@ import Post from '@models/Post';
 import { body } from 'express-validator';
 import { Response, NextFunction, Request } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { formatPostCommentsAndLikes, handleValidationErrors } from '@utils/lib';
+import { formatPostCommentsAndLikes, handleValidationErrors, checkIfPostExists } from '@utils/lib';
 import { Comment, Like } from '@utils/classes';
 import { Types } from 'mongoose';
+import { IPost } from '@interfaces/posts.interface';
 
 export const get_get_all_posts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
@@ -25,10 +26,9 @@ export const get_posts_by_user = async (req: RequestWithUser, res: Response, nex
     }
 }
 
-export const get_get_post_by_id = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const get_get_post_by_id = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const post = await Post.findById(req.params.id).exec();
-        if (!post) return res.status(404).json({ message: `Post not found` });
+        const post = await checkIfPostExists(req, res, next);
         res.status(200).json(post);
     } catch (error) {
         next(error);
@@ -72,8 +72,8 @@ export const put_add_comments = [
         handleValidationErrors(req, res);
 
         try {
-            const post = await Post.findById(req.params.id).exec();
-            if (!post) return res.status(404).json({ msg: 'Post not found' });
+            
+            const post = await checkIfPostExists(req, res, next) as IPost;
 
             const userId = new Types.ObjectId(req.user._id);
             switch (true) {
@@ -101,8 +101,7 @@ export const put_add_comments = [
 export const delete_delete_comment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         
-        const post = await Post.findById(req.params.id).exec();
-        if (!post) return res.status(404).json({ msg: 'Post not found' });
+        const post = await checkIfPostExists(req, res, next) as IPost;
 
         const commentIndex: number = post.comments.findIndex(comment => comment.comment_user.equals(new Types.ObjectId(req.user._id)));
         if (commentIndex === -1) return res.status(404).json({ msg: 'User has not commented on this post' });
@@ -122,8 +121,7 @@ export const delete_delete_comment = async (req: RequestWithUser, res: Response,
 export const put_like_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
     try {
-        const post = await Post.findById(req.params.id).exec();
-        if (!post) return res.status(404).json({ msg: 'Post not found' });
+        const post = await checkIfPostExists(req, res, next) as IPost;
 
         const userId = new Types.ObjectId(req.user._id);
         switch (true) {
@@ -146,8 +144,7 @@ export const put_like_post = async (req: RequestWithUser, res: Response, next: N
 
 export const delete_unlike_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-        const post = await Post.findById(req.params.id).exec();
-        if (!post) return res.status(404).json({ msg: 'Post not found' });
+        const post = await checkIfPostExists(req, res, next) as IPost;
 
         const likeIndex: number = post.likes.findIndex(like => like.like_user.equals(new Types.ObjectId(req.user._id)));
         if (likeIndex === -1) return res.status(404).json({ msg: 'User has not liked this post' });

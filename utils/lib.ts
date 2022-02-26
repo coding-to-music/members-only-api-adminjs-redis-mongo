@@ -1,5 +1,7 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
+import Post from '@models/Post';
+import { IPost } from '@interfaces/posts.interface';
 
 export const cookieOptions: CookieOptions = {
     path: '/api/auth/refresh_token',
@@ -63,3 +65,13 @@ export const handleValidationErrors = (req: Request, res: Response) => {
     const errors = validationResult(req);
     return !errors.isEmpty() && res.status(400).json({ errors: errors.array() });
 };
+
+export const checkIfPostExists = async (req: Request, res: Response, next: NextFunction): Promise<IPost | void | Response> => {
+    try {
+        const document = await Post.findById(req.params.id).exec();
+        if (!document) return res.status(404).json({ message: 'Post not found' });
+        return document;
+    } catch (error) {
+        return next(error);
+    }
+}
