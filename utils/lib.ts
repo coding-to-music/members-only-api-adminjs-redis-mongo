@@ -1,7 +1,47 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
+import { randomBytes } from 'crypto';
+import { ENV } from '@utils/validateEnv';
 import Post from '@models/Post';
 import { IPost } from '@interfaces/posts.interface';
+import { sign } from 'jsonwebtoken';
+import { IUser } from '@interfaces/users.interface';
+import { ITokens } from '@interfaces/auth.interface';
+
+export const generateRandomCode = async (length: number): Promise<string | null> => {
+    try {
+        const code = randomBytes(length).toString('hex').toUpperCase();
+        return code;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+export const tokenGenerator = async (user: IUser): Promise<ITokens> => {
+    const payload = {
+        aud: "https://pollaroid.net",
+        iss: "https://pollaroid.net",
+        sub: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        isAdmin: user.isAdmin,
+        isMember: user.isMember,
+        last_login: user.lastLogin,
+        token_version: user.tokenVersion
+    };
+    // Process Access token
+    const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(ENV.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
+    const token: string = sign(payload, { key: ACCESS_TOKEN_PRIVATE_KEY, passphrase: ENV.ACCESS_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '1h' });
+
+    // Process Refresh token
+    const REFRESH_TOKEN_PRIVATE_KEY = Buffer.from(ENV.REFRESH_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
+    const refresh_token: string = sign(payload, { key: REFRESH_TOKEN_PRIVATE_KEY, passphrase: ENV.REFRESH_TOKEN_SECRET }, { algorithm: 'RS256', expiresIn: '7d' });
+
+    return { token, refresh_token };
+};
+
 
 export const cookieOptions: CookieOptions = {
     path: '/api/auth/refresh_token',

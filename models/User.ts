@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
-import { generateRandomCode, tokenGenerator } from '@utils/generateData';
+import { generateRandomCode, tokenGenerator } from '@utils/lib';
 import { ITokens, IValidate, IVerify } from '@interfaces/auth.interface';
 
 
