@@ -157,4 +157,18 @@ export const delete_unlike_post = async (req: RequestWithUser, res: Response, ne
     } catch (error) {
         next(error);
     }
+};
+
+export const delete_delete_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const post = await checkIfPostExists(req, res, next) as IPost;
+
+        if (!post.user.equals(new Types.ObjectId(req.user._id))) return res.status(403).json({ msg: 'You cannot delete this post' });
+
+        await post.remove();
+        res.status(200).json({ message: 'Post deleted successfully' });
+
+    } catch (error) {
+        next(error);
+    }
 }
