@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-import app from "@app";
+import app from "@src/app";
 import debugLib from "debug";
 import http from "http";
 

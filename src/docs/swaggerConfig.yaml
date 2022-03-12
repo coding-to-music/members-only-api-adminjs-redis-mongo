@@ -14,7 +14,7 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: http://mbo.herokuapp.com/api
+  - url: https://api-mbo.herokuapp.com/v1
     description: Main (production) server
 
 components:

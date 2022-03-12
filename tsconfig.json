@@ -1,36 +1,38 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
     "display": "Node 16",
-    "extends": "@tsconfig/node16/tsconfig.json",
+    "extends": "@tsconfig/esm/tsconfig.json",
     "compilerOptions": {
         "lib": [
             "es2021"
         ],
-        "module": "commonjs",
-        "target": "es2021",
+        "target": "ES3",
+        "module": "es2020",
+        "moduleResolution": "node",
         "strict": true,
         "outDir": "build",
-        "resolveJsonModule": true,
+        "allowJs": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "noEmitOnError": true,
         "typeRoots": [
             "./node_modules/@types",
-            "./global.d.ts"
+            "src/global.d.ts"
         ],
         "baseUrl": ".",
         "paths": {
             "@*": ["*"],
-            "@global": ["global.d.ts"],
-            "@configs/*": ["configs/*"],
-            "@controllers/*": ["controllers/*"],
-            "@docs/*": ["docs/*"],
-            "@interfaces/*": ["interfaces/*"],
-            "@middlewares/*": ["middlewares/*"],
-            "@models/*": ["models/*"],
-            "@routes/*": ["routes/*"],
-            "@utils/*": ["utils/*"]
+            "@global": ["src/global.d.ts"],
+            "@configs/*": ["src/configs/*"],
+            "@controllers/*": ["src/controllers/*"],
+            "@docs/*": ["src/docs/*"],
+            "@interfaces/*": ["src/interfaces/*"],
+            "@middlewares/*": ["src/middlewares/*"],
+            "@models/*": ["src/models/*"],
+            "@routes/*": ["src/routes/*"],
+            "@src/*": ["src/*"],
+            "@utils/*": ["src/utils/*"]
         }
     }
 }

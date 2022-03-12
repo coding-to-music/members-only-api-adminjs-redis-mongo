@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { Document } from 'mongoose';
-import { ITokens, IValidate, IVerify } from '@interfaces/auth.interface';
+import { ITokens, IValidate, IVerify } from '@src/interfaces/auth.interface';
 
 interface ResetPassword {
   code: string;

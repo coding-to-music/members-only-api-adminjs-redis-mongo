@@ -1,6 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
+import { readFileSync } from 'fs';
+import { URL } from 'url';
 import morgan from 'morgan';
 import { config } from 'dotenv';
 import passport from 'passport';
@@ -18,17 +20,16 @@ import passportConfig from '@middlewares/passport';
 import apiRouter from '@routes/api/api';
 import indexRouter from '@routes/index';
 
-
 config();
 
 // Initialize DB
 initDB();
 
 // Load Paasport configuration
-passportConfig(passport)
+passportConfig(passport);
 
 const app = express();
-const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://mbo.herokuapp.com'];
+const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://api-mbo.herokuapp.com'];
 const corsOptions: CorsOptions = {
     credentials: true,
     methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT'],
@@ -46,19 +47,28 @@ app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
 
 app.use(passport.initialize());
-app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser(process.env['COOKIE_SECRET']));
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression());
 
 app.use('/', indexRouter);
-app.use('/api', apiRouter);
+app.use('/v1', apiRouter);
 
 // Swagger UI
+const img = readFileSync(new URL('./docs/favicon.ico', import.meta.url)).toString('base64');
+
+// const image = join(__dirname, '/docs/logo.png');
+// const favicon = readFile(image, 'utf8', (err, data) => {
+//     if (err) {
+//         console.log(err);
+//     }
+//     return data;
+// });
 const swaggerUiOptions = {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'Members-Only API Docs',
-    customfavIcon: '@docs/favicon.ico',
+    customfavIcon: img,
 };
 
 const swaggerDocument = YAML.load('./docs/swaggerConfig.yaml');
@@ -66,12 +76,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUi
 
 // Handle 404 errors
 app.use((req: Request, res: Response, next) => {
-    next(createHttpError(404, 'The requested resource was not found on this server!!!'))
+    next(createHttpError(404, 'The requested resource was not found on this server!!!'));
 });
 
 // Error handler
 app.use((err: { status: number; message: any; toString: () => any; }, req: Request, res: Response, next: NextFunction) => {
-    res.status(err.status || 500).json({ error: err.message || err.toString() })
+    res.status(err.status || 500).json({ error: err.message || err.toString() });
 })
 
-export default app
+export default app;
