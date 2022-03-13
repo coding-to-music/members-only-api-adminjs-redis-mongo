@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
 import { readFileSync } from 'fs';
 import { URL } from 'url';
+import { join } from 'path';
 import morgan from 'morgan';
 import { config } from 'dotenv';
 import passport from 'passport';
@@ -56,22 +57,14 @@ app.use('/', indexRouter);
 app.use('/v1', apiRouter);
 
 // Swagger UI
-const img = readFileSync(new URL('./docs/favicon.ico', import.meta.url)).toString('base64');
-
-// const image = join(__dirname, '/docs/logo.png');
-// const favicon = readFile(image, 'utf8', (err, data) => {
-//     if (err) {
-//         console.log(err);
-//     }
-//     return data;
-// });
+const favicon = readFileSync('./src/docs/favicon.ico', { encoding: 'base64' });
 const swaggerUiOptions = {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'Members-Only API Docs',
-    customfavIcon: img,
+    customfavIcon: favicon,
 };
 
-const swaggerDocument = YAML.load('./docs/swaggerConfig.yaml');
+const swaggerDocument = YAML.load('./src/docs/swaggerConfig.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 
 // Handle 404 errors

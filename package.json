@@ -14,7 +14,6 @@
   "dependencies": {
     "@sendgrid/mail": "^7.6.1",
     "@tsconfig/node16": "^1.0.2",
-    "@tsconfig/recommended": "^1.0.1",
     "@types/bcrypt": "^5.0.0",
     "@types/compression": "^1.7.2",
     "@types/cookie-parser": "^1.4.2",
@@ -59,8 +58,6 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "@tsconfig/esm": "^1.0.0",
-    "@tsconfig/node16-strictest-esm": "^1.0.0",
     "@types/yamljs": "^0.2.31"
   }
 }
