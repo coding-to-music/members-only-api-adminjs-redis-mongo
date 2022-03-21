@@ -2,8 +2,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
 import { readFileSync } from 'fs';
-import { URL } from 'url';
-import { join } from 'path';
 import morgan from 'morgan';
 import { config } from 'dotenv';
 import passport from 'passport';
