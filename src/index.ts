@@ -8,7 +8,7 @@ import app from "@src/app";
 import debugLib from "debug";
 import http from "http";
 
-const debug = debugLib('members-only:server');
+const debug = debugLib('members-only-api:server');
 /**
  * Get port from environment and store in Express.
  */

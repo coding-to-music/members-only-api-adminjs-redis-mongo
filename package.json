@@ -23,6 +23,7 @@
     "@types/passport-jwt": "^3.0.6",
     "@types/swagger-jsdoc": "^6.0.1",
     "@types/swagger-ui-express": "^4.1.3",
+    "@types/yamljs": "^0.2.31",
     "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
@@ -39,30 +40,31 @@
     "module-alias": "^2.2.2",
     "mongoose": "^6.2.2",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.15",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "swagger-ui-express": "^4.3.0",
     "ts-node": "^10.5.0",
     "tsc-alias": "^1.6.1",
-    "tsconfig-paths": "^3.12.0",
+    "tsconfig-paths": "^3.14.1",
     "typescript": "^4.6.2",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
     "@types/supertest": "^2.0.11",
-    "@types/yamljs": "^0.2.31",
     "jest": "^27.5.1",
     "mongodb-memory-server": "^8.4.0",
+    "nodemon": "^2.0.15",
     "supertest": "^6.2.2",
-    "ts-jest": "^27.1.3"
+    "ts-jest": "^27.1.3",
+    "ts-node-dev": "^1.1.8"
   },
   "scripts": {
-    "start": "node dist/src/index.js",
-    "build": "tsc && tsc-alias",
-    "test": "jest --coverage",
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "test": "jest",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev-ts": "ts-node-dev -r tsconfig-paths/register src/index.ts",
     "devstart": "npm run build && nodemon dist/src/index.js",
-    "serverstart": "DEBUG=members-only:* npm run devstart"
+    "serverstart": "DEBUG=members-only-api:* npm run devstart"
   }
 }
