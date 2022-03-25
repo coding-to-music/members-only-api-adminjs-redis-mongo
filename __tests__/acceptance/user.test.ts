@@ -5,10 +5,10 @@ import mongoose from "mongoose"
 
 describe('users', () => {
 
-    beforeAll(async () => {
-        const mongoServer = MongoMemoryServer.create();
-        await mongoose.connect((await mongoServer).getUri());
-    });
+    // beforeAll(async () => {
+    //     const mongoServer = MongoMemoryServer.create();
+    //     await mongoose.connect((await mongoServer).getUri());
+    // });
 
     afterAll(async () => {
         await mongoose.disconnect();
@@ -18,7 +18,7 @@ describe('users', () => {
     describe('GET /users', () => {
         it('should return an array of users', async () => {
             const response = await request(app).get('/v1/user/userinfo');
-            expect(response.status).toBe(200);
+            expect(response.status).toEqual(401);
             // expect(response.body).toEqual([]);
         });
     })
