@@ -6,6 +6,7 @@ export default async (): Promise<Config.InitialOptions> => {
         moduleNameMapper: {
             "@configs/(.*)": "<rootDir>/src/configs/$1",
             "@controllers/(.*)": "<rootDir>/src/controllers/$1",
+            "@errors/(.*)": "<rootDir>/src/errors/$1",
             "@global/(.*)": "<rootDir>/src/$1",
             "interfaces/(.*)": "<rootDir>/src/interfaces/$1",
             "@middlewares/(.*)": "<rootDir>/src/middlewares/$1",

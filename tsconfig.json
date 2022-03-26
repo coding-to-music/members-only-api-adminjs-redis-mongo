@@ -23,10 +23,11 @@
         "baseUrl": ".",
         "paths": {
             "@*": ["*"],
-            "@global": ["src/global.d.ts"],
             "@configs/*": ["src/configs/*"],
             "@controllers/*": ["src/controllers/*"],
             "@docs/*": ["src/docs/*"],
+            "@errors/*": ["src/errors/*"],
+            "@global": ["src/global.d.ts"],
             "@interfaces/*": ["src/interfaces/*"],
             "@middlewares/*": ["src/middlewares/*"],
             "@models/*": ["src/models/*"],

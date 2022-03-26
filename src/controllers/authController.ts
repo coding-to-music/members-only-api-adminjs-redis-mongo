@@ -22,7 +22,7 @@ export const post_login_user = [
                 if (!user) return res.status(404).json({ msg: 'User not found' });
 
                 const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
-                if (!validPassword) return res.status(400).json({ msg: 'Invalid email/password combination' });
+                if (!validPassword) return res.status(401).json({ msg: 'Invalid email/password combination' });
 
                 // Generate new Tokens and send them to the client
                 const { token, refresh_token } = await user.generateTokens(user);
