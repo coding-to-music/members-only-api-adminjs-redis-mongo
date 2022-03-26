@@ -25,38 +25,41 @@ A sample API mimicking a members only service, it allows members to access only 
 * Mongoose
 * Passport-Jwt
 * JsonWebToken
+* Jest
+* Supertest
+
+
+## Endpoints 
+
+* API Documentation is available [here](https://api-mbo.herokuapp.com/api-docs)
 
 ## Available Routes:
 
 ### Authentication Routes
-* User Login:                                                   POST /api/auth/login
-* User Logout:                                                  GET /api/auth/logout
-* Refresh Token:                                                POST /api/auth/refresh_token 
+* User Login:                                                   POST /v1/auth/login
+* User Logout:                                                  GET /v1/auth/logout
+* Refresh Token:                                                POST /v1/auth/refresh_token 
 
 ### User Routes
-* Create User:                                                  POST /api/user/register
-* User Info:                                                    GET /api/user/userinfo
-* Delete User                                                   DELETE /api/user/delete_user
+* Create User:                                                  POST /v1/user/register
+* User Info:                                                    GET /v1/user/userinfo
+* Delete User                                                   DELETE /v1/user/delete_user
 
 ### Password Reset Routes
-* Request Verification Code:                                    GET /api/user/verification_code
-* Reset Password:                                               PUT /api/user/reset_password
-* Change Password:                                              PUT /api/user/change_password
+* Request Verification Code:                                    GET /v1/user/verification_code
+* Reset Password:                                               PUT /v1/user/reset_password
+* Change Password:                                              PUT /v1/user/change_password
 
 ### Post Routes
-* Get All Posts:                                                GET /api/posts/all_posts
-* Get Post By Id:                                               GET /api/posts/post/:id
-* Get All Posts By User:                                        GET /api/posts/post_by_user
-* Create Post:                                                  POST /api/posts/create_post
-* Add Comment to post:                                          PUT /api/posts/:id/add_comment
-* Add Like to post:                                             PUT /api/posts/:id/like_post
-* Delete Comment on Post:                                       DELETE /api/posts/:id/delete_comment/:commentId
-* Unlike Post:                                                  PUT /api/posts/:id/unlike_post
+* Get All Posts:                                                GET /v1/posts/all_posts
+* Get Post By Id:                                               GET /v1/posts/post/:id
+* Get All Posts By User:                                        GET /v1/posts/post_by_user
+* Create Post:                                                  POST /v1/posts/create_post
+* Add Comment to post:                                          PUT /v1/posts/:id/add_comment
+* Add Like to post:                                             PUT /v1/posts/:id/like_post
+* Delete Comment on Post:                                       DELETE /v1/posts/:id/delete_comment/:commentId
+* Unlike Post:                                                  PUT /v1/posts/:id/unlike_post
 
 ### Profile Routes
-* Get User Profile:                                             PUT /api/profiles/user_profile
-* Create User Profile:                                          POST /api/profiles/create_profile
-
-## Endpoints 
-
-* API Documentation is available [here](https://mbo.herokuapp.com/api-docs)
+* Get User Profile:                                             PUT /v1/profiles/user_profile
+* Create User Profile:                                          POST /v1/profiles/create_profile
