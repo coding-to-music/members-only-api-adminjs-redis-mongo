@@ -8,8 +8,8 @@ import { sendTokens, cookieOptions } from '@utils/lib';
 
 export const post_login_user = [
 
-    body('email').notEmpty().isEmail(),
-    body('password').notEmpty().isLength({ min: 6 }),
+    body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email'),
+    body('password').notEmpty().isLength({ min: 6 }).withMessage('Password is required and must be at least 6 characters long'),
 
     async (req: Request, res: Response, next: NextFunction) => {
 

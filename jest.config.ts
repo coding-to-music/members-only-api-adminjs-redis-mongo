@@ -17,5 +17,6 @@ export default async (): Promise<Config.InitialOptions> => {
         transform: {
             ".(ts)": "ts-jest",
         },
+        testTimeout: 30000,
     };
 };
