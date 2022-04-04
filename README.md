@@ -17,7 +17,7 @@ A sample API mimicking a members only service, it allows members to access only 
     * A member can only like a post once.
     * Some operations are restricted to admin users only.
 
-## Stack
+## Tech Stack
 
 * TypeScript
 * Express
