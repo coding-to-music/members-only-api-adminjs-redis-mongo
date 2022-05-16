@@ -103,7 +103,7 @@ export const formatProifleBody = (req: Request, res: Response, next: NextFunctio
 
 export const handleValidationErrors = (req: Request, res: Response) => {
     const errors = validationResult(req);
-    return !errors.isEmpty() && res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 };
 
 export const checkIfPostExists = async (req: Request, res: Response, next: NextFunction): Promise<IPost | void | Response> => {

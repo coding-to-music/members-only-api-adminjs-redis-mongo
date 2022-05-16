@@ -26,6 +26,7 @@ export const post_verification_code = [
             await sendMail(...mailOptions);
             res.json({ msg: "Verification Code sent!!!" });
         } catch (err) {
+            console.error(err);
             return next(err)
         }
     }

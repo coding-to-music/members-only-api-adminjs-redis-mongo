@@ -4,7 +4,7 @@ import { JwtPayload, verify } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { ENV } from '@utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
-import { sendTokens, cookieOptions } from '@utils/lib';
+import { sendTokens, cookieOptions, handleValidationErrors } from '@utils/lib';
 
 export const post_login_user = [
 
@@ -13,25 +13,23 @@ export const post_login_user = [
 
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors.array());
-        } else {
-            try {
-                const user = await User.findOne({ email: req.body.email }).exec();
-                if (!user) return res.status(404).json({ msg: 'User not found' });
+        handleValidationErrors(req, res);
 
-                const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
-                if (!validPassword) return res.status(401).json({ msg: 'Invalid email/password combination' });
+        try {
+            const user = await User.findOne({ email: req.body.email }).exec();
+            if (!user) return res.status(404).json({ msg: 'User not found' });
 
-                // Generate new Tokens and send them to the client
-                const { token, refresh_token } = await user.generateTokens(user);
-                sendTokens(res, refresh_token, 'Login Successful', token);
-            } catch (err) {
-                return next(err);
-            }
+            const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
+            if (!validPassword) return res.status(401).json({ msg: 'Invalid email/password combination' });
+
+            // Generate new Tokens and send them to the client
+            const { token, refresh_token } = await user.generateTokens(user);
+            sendTokens(res, refresh_token, 'Login Successful', token);
+        } catch (err) {
+            return next(err);
         }
-    }]
+    }
+]
 
 export const get_logout_user = (req: Request, res: Response) => {
     return res
