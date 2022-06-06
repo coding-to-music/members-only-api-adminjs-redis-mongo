@@ -10,6 +10,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
+import rateLimit from 'express-rate-limit'
 
 // Import Configs
 import initDB from '@configs/database';
@@ -41,6 +42,16 @@ const corsOptions: CorsOptions = {
     }
 };
 
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Too many requests, please try again later.',
+    skipSuccessfulRequests: true,
+    skip: (req, res) => whitelist.includes(req.headers.origin as string)
+})
+
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
@@ -50,6 +61,7 @@ app.use(cookieParser(process.env['COOKIE_SECRET']));
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression());
+app.use(apiLimiter);
 
 app.use('/', indexRouter);
 app.use('/v1', apiRouter);

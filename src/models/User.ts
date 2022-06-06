@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
-import { generateRandomCode, tokenGenerator } from '@utils/lib';
+import { generateRandomCode, createTokens } from '@utils/lib';
 import { ITokens, IValidate, IVerify } from '@interfaces/auth.interface';
 
 
@@ -52,7 +52,7 @@ UserSchema.methods.verifyCode = async function (code: string | Buffer): Promise<
 };
 
 UserSchema.methods.generateTokens = async function (usr: IUser): Promise<ITokens> {
-    const { token, refresh_token } = await tokenGenerator(usr);
+    const { token, refresh_token } = await createTokens(usr);
     this.refreshToken.token = refresh_token;
     const decodedJwt: JwtPayload = decode(refresh_token) as JwtPayload;
     this.refreshToken.expiresBy = new Date(decodedJwt.exp! * 1000);

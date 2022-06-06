@@ -18,7 +18,7 @@ export const generateRandomCode = async (length: number): Promise<string | null>
     }
 }
 
-export const tokenGenerator = async (user: IUser): Promise<ITokens> => {
+export const createTokens = async (user: IUser): Promise<ITokens> => {
     const payload = {
         aud: "https://pollaroid.net",
         iss: "https://pollaroid.net",
