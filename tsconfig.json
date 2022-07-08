@@ -23,6 +23,7 @@
         "baseUrl": ".",
         "paths": {
             "@*": ["*"],
+            "@admin/*": ["src/admin/*"],
             "@configs/*": ["src/configs/*"],
             "@controllers/*": ["src/controllers/*"],
             "@docs/*": ["src/docs/*"],

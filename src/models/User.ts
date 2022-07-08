@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { decode, JwtPayload } from 'jsonwebtoken';
-import { IUser } from '@interfaces/users.interface';
+import { IUser, Role } from '@interfaces/users.interface';
 import { generateRandomCode, createTokens } from '@utils/lib';
 import { ITokens, IValidate, IVerify } from '@interfaces/auth.interface';
 
@@ -12,8 +12,7 @@ const UserSchema = new Schema<IUser>({
     password: { type: String, required: true },
     avatar: { type: String, default: '' },
     lastLogin: { type: Date, default: Date.now },
-    isAdmin: { type: Boolean, default: false },
-    isMember: { type: Boolean, default: false },
+    roles: { type: [String], default: [Role.GUEST] },
     resetPassword: {
         code: { type: String, default: '' },
         expiresBy: { type: Date, default: '' }

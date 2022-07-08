@@ -12,14 +12,20 @@ interface RefreshToken {
   expiresBy: Date;
 }
 
+export enum Role {
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER',
+  GUEST = 'GUEST',
+  RESTRICTED = 'RESTRICTED'
+}
+
 export interface IUser extends Document {
   _doc?: any;
   name: string;
   email: string;
   password: string;
   avatar: string;
-  isAdmin: boolean;
-  isMember: boolean;
+  roles: Role[];
   resetPassword: ResetPassword;
   refreshToken: RefreshToken;
   tokenVersion: number;

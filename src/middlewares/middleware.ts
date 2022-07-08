@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { decode } from 'jsonwebtoken';
+import { Role } from '@interfaces/users.interface';
 
 export const authorizeJWT = (req: Request, res: Response, next: NextFunction): void | Response => {
     try {
@@ -19,8 +20,8 @@ export const authorizeJWT = (req: Request, res: Response, next: NextFunction): v
 
 export const authorize_user = (req: RequestWithUser, res: Response, next: NextFunction): void | Response => {
     try {
-        const { isAdmin, tokenVersion } = req.user;
-        if (!isAdmin) throw new Error('User not authorized to access this resource');
+        const { roles, tokenVersion } = req.user;
+        if (roles.indexOf(Role.ADMIN) === -1) throw new Error('User not authorized to access this resource');
         next();
     } catch (err) {
         if (err instanceof Error) {

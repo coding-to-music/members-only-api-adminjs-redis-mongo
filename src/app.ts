@@ -15,6 +15,7 @@ import rateLimit from 'express-rate-limit'
 // Import Configs
 import initDB from '@configs/database';
 import passportConfig from '@middlewares/passport';
+import { adminJs, adminJSRouter } from '@admin/adminjs';
 
 // Import Routes
 import apiRouter from '@routes/api/api';
@@ -32,7 +33,7 @@ const app = express();
 const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://api-mbo.herokuapp.com'];
 const corsOptions: CorsOptions = {
     credentials: true,
-    methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT'],
+    methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT', 'PATCH'],
     origin: (requestOrigin: string | undefined, callback) => {
         if (whitelist.indexOf(requestOrigin as string) !== -1 || !requestOrigin) {
             callback(null, true)
@@ -52,6 +53,8 @@ const apiLimiter = rateLimit({
     skip: (req, res) => whitelist.includes(req.headers.origin as string)
 })
 
+// AdminJS moved to the top to fix cors and bodyParser issues
+app.use(adminJs.options.rootPath, adminJSRouter);
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));

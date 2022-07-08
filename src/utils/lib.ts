@@ -26,8 +26,7 @@ export const createTokens = async (user: IUser): Promise<ITokens> => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
-        isAdmin: user.isAdmin,
-        isMember: user.isMember,
+        roles: user.roles,
         last_login: user.lastLogin,
         token_version: user.tokenVersion
     };
