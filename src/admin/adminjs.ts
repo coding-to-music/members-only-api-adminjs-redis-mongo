@@ -6,6 +6,22 @@ import { ENV } from '@utils/validateEnv';
 import User from '@models/User';
 import Post from '@models/Post';
 import Profile from '@models/Profile';
+import { IUser, Role } from '@interfaces/users.interface'
+
+const getActions = () => {
+    return {
+        edit: {
+            isAccessible: ({ currentAdmin }: { currentAdmin: IUser }) => currentAdmin && currentAdmin.roles.indexOf(Role.ADMIN) !== -1,
+        },
+        delete: {
+            isAccessible: ({ currentAdmin }: { currentAdmin: IUser }) => currentAdmin && currentAdmin.roles.indexOf(Role.ADMIN) !== -1,
+        },
+        new: {
+            isAccessible: ({ currentAdmin }: { currentAdmin: IUser }) => currentAdmin && currentAdmin.roles.indexOf(Role.ADMIN) !== -1,
+        }
+    }
+}
+
 
 const adminJsOptions: AdminJSOptions = {
     rootPath: '/admin',
@@ -16,9 +32,24 @@ const adminJsOptions: AdminJSOptions = {
     loginPath: '/admin/login',
     logoutPath: '/admin/logout',
     resources: [
-        { resource: User },
-        { resource: Post },
-        { resource: Profile }
+        {
+            resource: User,
+            options: {
+                actions: getActions()
+            }
+        },
+        {
+            resource: Post,
+            options: {
+                actions: getActions()
+            }
+        },
+        {
+            resource: Profile,
+            options: {
+                actions: getActions()
+            }
+        }
     ]
 }
 
