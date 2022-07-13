@@ -1,16 +1,20 @@
 import Post from '@models/Post';
-import { body } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import { Response, NextFunction, Request } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { formatPostCommentsAndLikes, handleValidationErrors, checkIfPostExists } from '@utils/lib';
+import { formatPostCommentsAndLikes, checkIfPostExists } from '@utils/lib';
 import { Comment, Like } from '@utils/classes';
 import { Types } from 'mongoose';
 import { IPost } from '@interfaces/posts.interface';
+import { getCacheKey, setCacheKey } from '@config/cache';
 
 export const get_get_all_posts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
+        const value = await getCacheKey('all_posts')
+        if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
         const posts = await Post.find({}).exec();
-        res.status(200).json(posts);
+        await setCacheKey('all_posts', posts);
+        res.status(200).json({ fromCache: false, data: posts });
     } catch (error) {
         next(error);
     }
@@ -18,9 +22,13 @@ export const get_get_all_posts = async (req: RequestWithUser, res: Response, nex
 
 export const get_posts_by_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-        const posts = await Post.find({ user: req.user._id }).exec();
+        const { _id } = req.user;
+        const value = await getCacheKey(`posts/${_id}`);
+        if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
+        const posts = await Post.find({ user: _id }).exec();
         if (!posts.length) return res.status(404).json({ msg: 'No posts found' });
-        res.status(200).json(posts);
+        await setCacheKey(`posts/${_id}`, posts);
+        res.status(200).json({ fromCache: false, data: posts });
     } catch (error) {
         next(error)
     }
@@ -28,8 +36,12 @@ export const get_posts_by_user = async (req: RequestWithUser, res: Response, nex
 
 export const get_get_post_by_id = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const { id } = req.params;
+        const value = await getCacheKey(`posts/${id}`)
+        if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
         const post = await checkIfPostExists(req, res, next);
-        res.status(200).json(post);
+        await setCacheKey(`posts/${id}`, post);
+        res.status(200).json({ fromCache: false, data: post });
     } catch (error) {
         next(error);
     }
@@ -42,7 +54,8 @@ export const post_create_post = [
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
-        handleValidationErrors(req, res);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
             const post = new Post({
@@ -69,10 +82,11 @@ export const put_add_comments = [
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
-        handleValidationErrors(req, res);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
-            
+
             const post = await checkIfPostExists(req, res, next) as IPost;
 
             const userId = new Types.ObjectId(req.user._id);
@@ -100,18 +114,18 @@ export const put_add_comments = [
 
 export const delete_delete_comment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-        
+
         const post = await checkIfPostExists(req, res, next) as IPost;
 
         const commentIndex: number = post.comments.findIndex(comment => comment.comment_user.equals(new Types.ObjectId(req.user._id)));
         if (commentIndex === -1) return res.status(404).json({ msg: 'User has not commented on this post' });
-        
+
         const commentIndexInCommentList: number = post.comments[commentIndex].comment_list.findIndex(comment => comment._id!.equals(new Types.ObjectId(req.params.commentId)));
         if (commentIndexInCommentList === -1) return res.status(404).json({ msg: 'Comment not found' });
 
         post.comments[commentIndex].comment_list.splice(commentIndexInCommentList, 1);
         await post.save();
-        
+
         res.status(200).json({ message: 'Comment deleted successfully', post });
     } catch (error) {
         next(error);

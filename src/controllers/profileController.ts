@@ -1,8 +1,8 @@
 import Profile from '@models/Profile';
-import { body } from "express-validator";
+import { body, validationResult } from "express-validator";
 import { Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { formatProifleBody, handleValidationErrors } from '@utils/lib';
+import { formatProifleBody } from '@utils/lib';
 
 export const get_user_profile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
@@ -33,7 +33,9 @@ export const post_create_profile = [
     body('social.twitter').not().isEmpty().withMessage('Twitter cannot be empty'),
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
-        handleValidationErrors(req, res);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
 

@@ -13,9 +13,9 @@ import YAML from 'yamljs';
 import rateLimit from 'express-rate-limit'
 
 // Import Configs
-import initDB from '@configs/database';
+import initDB from '@config/database';
 import passportConfig from '@middlewares/passport';
-import { adminJs, adminJSRouter } from '@admin/adminjs';
+import { adminJs, adminJSRouter } from '@config/adminjs';
 
 // Import Routes
 import apiRouter from '@routes/api/api';

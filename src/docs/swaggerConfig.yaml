@@ -471,7 +471,7 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/all_posts:
+  /posts/all_posts:
     get:
       tags:
         - Post
@@ -493,7 +493,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/post_by_user:
+  /posts/post_by_user:
     get:
       tags:
         - Post
@@ -515,7 +515,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/{id}:
+  /posts/{id}:
     get:
       tags:
         - Post
@@ -543,7 +543,7 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/create_post:
+  /posts/create_post:
     post:
       tags:
         - Post
@@ -571,7 +571,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/{id}/add_comment:
+  /posts/{id}/add_comment:
     put:
       tags:
         - Post
@@ -608,7 +608,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/{id}/delete_comment/{commentId}:
+  /posts/{id}/delete_comment/{commentId}:
     delete:
       tags:
         - Post
@@ -643,7 +643,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/{id}/like_post:
+  /posts/{id}/like_post:
     put:
       tags:
         - Post
@@ -672,7 +672,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/{id}/unlike_post:
+  /posts/{id}/unlike_post:
     delete:
       tags:
         - Post
@@ -701,7 +701,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /post/{id}/delete_post:
+  /posts/{id}/delete_post:
     delete:
       tags:
         - Post

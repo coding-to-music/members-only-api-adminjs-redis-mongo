@@ -11,7 +11,7 @@ router.get('/', (req, res) => { res.json({ msg: 'HELLO VISITOR, THANKS FOR STOPP
 
 router.use('/auth', authRouter);
 router.use('/password', passwordRouter);
-router.use('/post', postRouter);
+router.use('/posts', postRouter);
 router.use('/profile', profileRouter);
 router.use('/user', userRouter);
 

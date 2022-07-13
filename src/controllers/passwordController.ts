@@ -1,8 +1,7 @@
 import User from '@models/User';
-import { body } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import { sendMail } from '@utils/sendMail';
 import { Request, Response, NextFunction } from 'express';
-import { handleValidationErrors } from '@utils/lib';
 import { RequestWithUser } from '@interfaces/users.interface';
 
 export const post_verification_code = [
@@ -10,7 +9,8 @@ export const post_verification_code = [
 
     async (req: Request, res: Response, next: NextFunction) => {
 
-        handleValidationErrors(req, res);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
             const { email } = req.body;
@@ -40,7 +40,8 @@ export const put_reset_password = [
 
     async (req: Request, res: Response, next: NextFunction) => {
 
-        handleValidationErrors(req, res);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
             const { email, new_password, code } = req.body;
@@ -64,7 +65,8 @@ export const put_change_password = [
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
-        handleValidationErrors(req, res);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
             const { old_password, new_password } = req.body;

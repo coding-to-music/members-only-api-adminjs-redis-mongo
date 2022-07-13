@@ -14,4 +14,7 @@ export const ENV = cleanEnv(process.env, {
     REFRESH_TOKEN_SECRET: str(),
     SENDER_IDENTITY: str(),
     SENDGRID_API_KEY: str(),
+    REDIS_HOST: str(),
+    REDIS_USERNAME: str(),
+    REDIS_PASSWORD: str()
 });

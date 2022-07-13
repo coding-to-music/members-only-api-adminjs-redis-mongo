@@ -1,5 +1,4 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express';
-import { validationResult } from 'express-validator';
 import { randomBytes } from 'crypto';
 import { ENV } from '@utils/validateEnv';
 import Post from '@models/Post';
@@ -99,11 +98,6 @@ export const formatProifleBody = (req: Request, res: Response, next: NextFunctio
     }
     next();
 }
-
-export const handleValidationErrors = (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-};
 
 export const checkIfPostExists = async (req: Request, res: Response, next: NextFunction): Promise<IPost | void | Response> => {
     try {

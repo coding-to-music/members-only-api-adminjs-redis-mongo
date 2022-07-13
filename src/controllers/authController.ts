@@ -4,7 +4,7 @@ import { JwtPayload, verify } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { ENV } from '@utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
-import { sendTokens, cookieOptions, handleValidationErrors } from '@utils/lib';
+import { sendTokens, cookieOptions } from '@utils/lib';
 
 export const post_login_user = [
 
@@ -13,7 +13,8 @@ export const post_login_user = [
 
     async (req: Request, res: Response, next: NextFunction) => {
 
-        handleValidationErrors(req, res);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
             const user = await User.findOne({ email: req.body.email }).exec();
