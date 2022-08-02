@@ -30,7 +30,7 @@ initDB();
 passportConfig(passport);
 
 const app = express();
-const whitelist = ['https://localhost:3000', 'https://www.pollaroid.net', 'https://api-mbo.herokuapp.com'];
+const whitelist = ['https://localhost:3000', 'http://localhost:3000', 'https://api-mbo.herokuapp.com'];
 const corsOptions: CorsOptions = {
     credentials: true,
     methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT', 'PATCH'],
