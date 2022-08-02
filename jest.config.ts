@@ -4,11 +4,11 @@ export default async (): Promise<Config.InitialOptions> => {
     return {
         verbose: true,
         moduleNameMapper: {
-            "@configs/(.*)": "<rootDir>/src/configs/$1",
+            "@config/(.*)": "<rootDir>/src/config/$1",
             "@controllers/(.*)": "<rootDir>/src/controllers/$1",
             "@errors/(.*)": "<rootDir>/src/errors/$1",
             "@global/(.*)": "<rootDir>/src/$1",
-            "interfaces/(.*)": "<rootDir>/src/interfaces/$1",
+            "@interfaces/(.*)": "<rootDir>/src/interfaces/$1",
             "@middlewares/(.*)": "<rootDir>/src/middlewares/$1",
             "@models/(.*)": "<rootDir>/src/models/$1",
             "@routes/(.*)": "<rootDir>/src/routes/$1",
@@ -18,6 +18,6 @@ export default async (): Promise<Config.InitialOptions> => {
         transform: {
             ".(ts)": "ts-jest",
         },
-        testTimeout: 30000,
+        testTimeout: 90000,
     };
 };

@@ -2,12 +2,12 @@ import app from "../../src/app";
 import request from "supertest";
 import mongoose from "mongoose"
 
-describe('authentication routes', () => {
+afterAll(async () => {
+    await mongoose.disconnect();
+    await mongoose.connection.close();
+})
 
-    afterAll(async () => {
-        await mongoose.disconnect();
-        await mongoose.connection.close();
-    })
+describe('authentication routes', () => {
 
     describe('POST /auth/login', () => {
 
@@ -23,20 +23,24 @@ describe('authentication routes', () => {
             const response = await request(app).post('/v1/auth/login').send({ password: 'password123' }).retry(2);
 
             expect(response.status).toEqual(400);
-            expect(response.body).toEqual([
-                { "location": "body", "msg": "Invalid value", "param": "email" },
-                { "location": "body", "msg": "Email is required and must be a valid email", "param": "email" }
-            ]);
+            expect(response.body).toEqual({
+                errors: [
+                    { "location": "body", "msg": "Invalid value", "param": "email" },
+                    { "location": "body", "msg": "Email is required and must be a valid email", "param": "email" }
+                ]
+            });
         });
 
         it('should return an error if the password is not provided', async () => {
             const response = await request(app).post('/v1/auth/login').send({ email: 'labeight@affecting.org' }).retry(2);
 
             expect(response.status).toEqual(400);
-            expect(response.body).toEqual([
-                { "location": "body", "msg": "Invalid value", "param": "password" },
-                { "location": "body", "msg": "Password is required and must be at least 6 characters long", "param": "password" }
-            ]);
+            expect(response.body).toEqual({
+                errors: [
+                    { "location": "body", "msg": "Invalid value", "param": "password" },
+                    { "location": "body", "msg": "Password is required and must be at least 6 characters long", "param": "password" }
+                ]
+            });
         });
 
         it('should return an error if the email is not registered', async () => {
