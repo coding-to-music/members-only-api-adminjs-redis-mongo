@@ -13,6 +13,6 @@ router.use('/auth', authRouter);
 router.use('/password', passwordRouter);
 router.use('/posts', postRouter);
 router.use('/profile', profileRouter);
-router.use('/user', userRouter);
+router.use('/users', userRouter);
 
 export default router;

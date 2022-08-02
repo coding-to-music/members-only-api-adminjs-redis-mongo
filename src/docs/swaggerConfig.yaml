@@ -158,6 +158,8 @@ components:
       description: Bad request
     401Unauthorized:
       description: "Unauthorized"
+    403Forbidden:
+      description: "Forbidden"
     404NotFound:
       description: "The specified resource was not found"
     500ServerError:
@@ -262,7 +264,7 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /user/register:
+  /users/register:
     post:
       tags:
         - User
@@ -306,7 +308,29 @@ paths:
                     type: "string"
         '500':
           $ref: '#/components/responses/500ServerError'
-  /user/userinfo:
+  /users/all_users:
+    get:
+      tags:
+        - User
+      summary: User Info
+      description: Returns the current user's information
+      operationId: getUserInfo
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "Success, User Info"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /users/userinfo:
     get:
       tags:
         - User
@@ -326,7 +350,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /user/delete_user:
+  /users/delete_user:
     delete:
       tags:
         - User
