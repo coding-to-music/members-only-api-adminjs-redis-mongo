@@ -2,9 +2,10 @@
   "name": "members-only-api",
   "version": "0.0.0",
   "engines": {
-    "node": "16.15.1"
+    "node": ">=16.15.1"
   },
   "private": true,
+  "license": "MIT",
   "dependencies": {
     "@adminjs/express": "^4.1.3",
     "@adminjs/mongoose": "^2.0.4",
