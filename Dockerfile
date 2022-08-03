@@ -1,3 +1,5 @@
+# syntax = docker/dockerfile:1.4.1
+
 FROM node:16-alpine
 WORKDIR /app
 COPY package.json yarn.lock ./
