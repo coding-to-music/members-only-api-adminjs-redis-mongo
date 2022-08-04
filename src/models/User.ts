@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { IUser, Role } from '@interfaces/users.interface';
-import { generateRandomCode, createTokens } from '@utils/lib';
+import { generateRandomCode, createLoginTokens } from '@utils/lib';
 import { ITokens, IValidate, IVerify } from '@interfaces/auth.interface';
 
 
@@ -51,7 +51,7 @@ UserSchema.methods.verifyCode = async function (code: string | Buffer): Promise<
 };
 
 UserSchema.methods.generateTokens = async function (usr: IUser): Promise<ITokens> {
-    const { token, refresh_token } = await createTokens(usr);
+    const { token, refresh_token } = await createLoginTokens(usr);
     this.refreshToken.token = refresh_token;
     const decodedJwt: JwtPayload = decode(refresh_token) as JwtPayload;
     this.refreshToken.expiresBy = new Date(decodedJwt.exp! * 1000);
@@ -61,10 +61,10 @@ UserSchema.methods.generateTokens = async function (usr: IUser): Promise<ITokens
     return { token, refresh_token };
 }
 
-UserSchema.methods.validateRefreshToken = async function (token: any): Promise<IValidate> {
-    const validToken = this.refreshToken.token === token;
+UserSchema.methods.validateRefreshToken = async function (refreshToken: string, tokenVersion: number): Promise<IValidate> {
+    const validToken = this.refreshToken.token === refreshToken;
     const refreshTokenNotExpired = (new Date(this.resetPassword.expiresBy).getTime() - Date.now()) < 604800000;
-    const tokenVersionValid = (this.tokenVersion - token.token_version) === 1;
+    const tokenVersionValid = (this.tokenVersion - tokenVersion) === 1;
     return { validToken, refreshTokenNotExpired, tokenVersionValid };
 }
 

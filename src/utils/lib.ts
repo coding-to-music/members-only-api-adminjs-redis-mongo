@@ -17,7 +17,7 @@ export const generateRandomCode = async (length: number): Promise<string | null>
     }
 }
 
-export const createTokens = async (user: IUser): Promise<ITokens> => {
+export const createLoginTokens = async (user: IUser): Promise<ITokens> => {
     const payload = {
         aud: "https://pollaroid.net",
         iss: "https://pollaroid.net",
@@ -26,8 +26,8 @@ export const createTokens = async (user: IUser): Promise<ITokens> => {
         email: user.email,
         avatar: user.avatar,
         roles: user.roles,
-        last_login: user.lastLogin,
-        token_version: user.tokenVersion
+        lastLogin: user.lastLogin,
+        tokenVersion: user.tokenVersion
     };
     // Process Access token
     const ACCESS_TOKEN_PRIVATE_KEY = Buffer.from(ENV.ACCESS_TOKEN_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
@@ -40,7 +40,6 @@ export const createTokens = async (user: IUser): Promise<ITokens> => {
     return { token, refresh_token };
 };
 
-
 export const cookieOptions: CookieOptions = {
     path: '/v1/auth/refresh-token',
     httpOnly: true,
@@ -50,10 +49,10 @@ export const cookieOptions: CookieOptions = {
     secure: true,
 };
 
-export const sendTokens = (res: Response, refresh_token: string, msg_txt: string, token: string) => {
+export const sendTokens = (res: Response, refreshToken: string, statusText: string, accessToken: string) => {
     return res
-        .cookie('jit', refresh_token, cookieOptions)
-        .json({ message: msg_txt, authToken: token });
+        .cookie('jit', refreshToken, cookieOptions)
+        .json({ message: statusText, authToken: accessToken });
 };
 
 export const formatPostCommentsAndLikes = (req: Request, res: Response, next: NextFunction): void => {

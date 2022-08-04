@@ -20,9 +20,13 @@ export const get_all_users = async (req: RequestWithUser, res: Response, next: N
     }
 };
 
-export const get_user = async (req: RequestWithUser, res: Response) => {
-    const { password, resetPassword, refreshToken, tokenVersion, ...data } = req.user._doc;
-    res.json(data)
+export const get_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const { password, resetPassword, refreshToken, tokenVersion, ...data } = req.user._doc;
+        res.json(data)
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const post_create_user = [

@@ -7,6 +7,7 @@ import { Comment, Like } from '@utils/classes';
 import { Types } from 'mongoose';
 import { IPost } from '@interfaces/posts.interface';
 import { getCacheKey, setCacheKey } from '@config/cache';
+import { AppError } from '@src/errors/AppError';
 
 export const get_get_all_posts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
@@ -50,7 +51,8 @@ export const get_get_post_by_id = async (req: Request, res: Response, next: Next
 export const post_create_post = [
     (req: Request, res: Response, next: NextFunction) => formatPostCommentsAndLikes(req, res, next),
 
-    body('postContent').not().isEmpty().withMessage('Post content cannot be empty'),
+    body('postTitle').not().isEmpty().withMessage('Post Title cannot be empty').isLength({ min: 3, max: 30 }).withMessage('Post Title be between 3 to 30 characters '),
+    body('postContent').not().isEmpty().withMessage('Post content cannot be empty').isLength({ min: 10 }).withMessage('Post Content must contain at least 10 characters'),
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
@@ -58,9 +60,18 @@ export const post_create_post = [
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         try {
+
+            const { _id } = req.user;
+            const { postContent, postTitle } = req.body
+            
+            // Check if the user has an existing post with the same title
+            const isPostExists = await Post.find({ user: _id, postTitle })
+            if (isPostExists) throw new AppError('User has an existing post with the same title', 409)
+
             const post = new Post({
-                user: new Types.ObjectId(req.user._id),
-                post_content: req.body.postContent
+                user: new Types.ObjectId(_id),
+                postTitle,
+                postContent
             });
             await post.save();
             res.status(201).json({
@@ -68,10 +79,7 @@ export const post_create_post = [
                 post
             });
         } catch (err) {
-            if (err instanceof Error) {
-                console.error(err);
-                next(err);
-            }
+            next(err);
         }
     }
 ];

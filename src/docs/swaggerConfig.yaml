@@ -121,9 +121,11 @@ components:
         user:
           type: "string"
           format: "uuid"
-        post_content:
+        postTitle:
           type: "string"
-        date_posted:
+        postContent:
+          type: "string"
+        datePosted:
           type: "string"
           format: "date-time"
         comments:
@@ -162,6 +164,8 @@ components:
       description: "Forbidden"
     404NotFound:
       description: "The specified resource was not found"
+    409ConflictError:
+      description: "There is a conflict with the state of the requested operation"
     500ServerError:
       description: "Internal Server Error"
 paths:
@@ -308,9 +312,11 @@ paths:
                 properties:
                   message:
                     type: "string"
+        '409':
+          $ref: '#/components/responses/409ConflictError'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /users/all_users:
+  /users/all-users:
     get:
       tags:
         - User
@@ -352,7 +358,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /users/delete_user:
+  /users/delete-user:
     delete:
       tags:
         - User
@@ -375,8 +381,8 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /password/verification_code:
-    post:
+  /password/get-verification-code:
+    put:
       tags:
         - Password
       summary: Send Verification Code
@@ -407,7 +413,7 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /password/reset_password:
+  /password/reset-password:
     put:
       tags:
         - Password
@@ -455,7 +461,7 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /password/change_password:
+  /password/change-password:
     put:
       tags:
         - Password
@@ -497,7 +503,7 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/all_posts:
+  /posts/all-posts:
     get:
       tags:
         - Post
@@ -519,7 +525,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/post_by_user:
+  /posts/post-by-user:
     get:
       tags:
         - Post
@@ -569,7 +575,7 @@ paths:
           $ref: '#/components/responses/404NotFound'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/create_post:
+  /posts/create-post:
     post:
       tags:
         - Post
@@ -595,9 +601,11 @@ paths:
           $ref: '#/components/responses/400BadRequest'
         '401':
           $ref: '#/components/responses/401Unauthorized'
+        '409':
+          $ref: '#/components/responses/409ConflictError'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/{id}/add_comment:
+  /posts/{id}/add-comment:
     put:
       tags:
         - Post
@@ -634,7 +642,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/{id}/delete_comment/{commentId}:
+  /posts/{id}/delete-comment/{commentId}:
     delete:
       tags:
         - Post
@@ -669,7 +677,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/{id}/like_post:
+  /posts/{id}/like-post:
     put:
       tags:
         - Post
@@ -698,7 +706,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/{id}/unlike_post:
+  /posts/{id}/unlike-post:
     delete:
       tags:
         - Post
@@ -727,7 +735,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /posts/{id}/delete_post:
+  /posts/{id}/delete-post:
     delete:
       tags:
         - Post
@@ -759,7 +767,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /profile/user_profile:
+  /profile/user-profile:
     get:
       tags:
         - Profile
@@ -779,7 +787,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /profile/create_profile:
+  /profile/create-profile:
     post:
       tags:
         - Profile
@@ -805,6 +813,8 @@ paths:
           $ref: '#/components/responses/400BadRequest'
         '401':
           $ref: '#/components/responses/401Unauthorized'
+        '409':
+          $ref: '#/components/responses/409ConflictError'
         '500':
           $ref: '#/components/responses/500ServerError'
     

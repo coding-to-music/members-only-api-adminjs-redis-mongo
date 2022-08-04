@@ -33,7 +33,7 @@ export interface IUser extends Document {
   generateCode: () => Promise<string>;
   generateTokens(usr: IUser): Promise<ITokens>;
   validatePassword(password: string): Promise<boolean>;
-  validateRefreshToken(req: Request): Promise<IValidate>;
+  validateRefreshToken(efreshToken: string, tokenVersion: number): Promise<IValidate>;
   verifyCode: (code: string) => Promise<IVerify>;
 }
 

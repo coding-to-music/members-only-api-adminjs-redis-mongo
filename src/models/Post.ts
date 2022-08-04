@@ -3,8 +3,9 @@ import { Schema, model } from 'mongoose';
 
 const PostSchema = new Schema<IPost>({
   user: { type: 'ObjectId', ref: 'User' },
-  post_content: { type: String, required: true },
-  date_posted: { type: Date, default: new Date(Date.now()) },
+  postTitle: { type: String, required: true },
+  postContent: { type: String, required: true },
+  datePosted: { type: Date, default: new Date(Date.now()) },
   comments: [
     {
       comment_user: { type: 'ObjectId', ref: 'User' },

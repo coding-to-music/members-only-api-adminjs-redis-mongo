@@ -4,7 +4,7 @@ import { sendMail } from '@utils/sendMail';
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 
-export const post_verification_code = [
+export const put_verification_code = [
     body('email').notEmpty().isEmail(),
 
     async (req: Request, res: Response, next: NextFunction) => {

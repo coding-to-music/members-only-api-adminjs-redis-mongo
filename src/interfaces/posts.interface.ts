@@ -18,8 +18,9 @@ export interface IComment {
 
 export interface IPost extends Document {
     user: Types.ObjectId;
-    post_content: string;
-    date_posted: Date;
+    postTitle: string;
+    postContent: string;
+    datePosted: Date;
     comments: IComment[];
     likes: ILike[];
 };

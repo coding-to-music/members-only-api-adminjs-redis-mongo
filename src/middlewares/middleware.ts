@@ -19,9 +19,9 @@ export const authorizeJWT = (req: Request, res: Response, next: NextFunction): v
     };
 };
 
-export const authorize_user = (req: RequestWithUser, res: Response, next: NextFunction): void | Response => {
+export const authorizeUser = (req: RequestWithUser, res: Response, next: NextFunction): void | Response => {
     try {
-        const { roles, tokenVersion } = req.user;
+        const { roles } = req.user;
         if (roles.indexOf(Role.ADMIN) === -1) throw new AppError('User not authorized to access this resource', 403);
         next();
     } catch (err) {

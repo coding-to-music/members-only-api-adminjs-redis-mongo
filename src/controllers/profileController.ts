@@ -1,8 +1,10 @@
-import Profile from '@models/Profile';
 import { body, validationResult } from "express-validator";
 import { Response, NextFunction } from 'express';
+import { Types } from 'mongoose';
+import Profile from '@models/Profile';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { formatProifleBody } from '@utils/lib';
+import { AppError } from "@src/errors/AppError";
 
 export const get_user_profile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
@@ -39,8 +41,14 @@ export const post_create_profile = [
 
         try {
 
-            const profile = new Profile({
-                user: req.user._id,
+            const { _id } = req.user
+            
+            // Check if user already has a profile
+            const isProfileExists = await Profile.findOne({ user: _id })
+            if (isProfileExists) throw new AppError('User Already has a Profile', 409)
+
+            const profileToCreate = new Profile({
+                user: new Types.ObjectId(_id),
                 bio: req.body.bio,
                 address: req.body.address,
                 phoneNumber: +req.body.phoneNumber,
@@ -49,10 +57,10 @@ export const post_create_profile = [
                 social: req.body.social,
             });
 
-            await profile.save();
+            await profileToCreate.save();
             res.status(201).json({
                 message: 'Profile created successfully',
-                profile
+                profileToCreate
             });
         } catch (err) {
             if (err instanceof Error) {
