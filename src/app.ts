@@ -35,7 +35,8 @@ const whitelist = [
     'http://localhost:3000', 
     'https://api-mbo.herokuapp.com',
     'https://api-mbo.polldevs.com',
-    'http://api-mbo.polldevs.com'
+    'http://api-mbo.polldevs.com',
+    'https://mema.polldevs.com'
 ];
 const corsOptions: CorsOptions = {
     credentials: true,
