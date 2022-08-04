@@ -42,7 +42,7 @@ export const createTokens = async (user: IUser): Promise<ITokens> => {
 
 
 export const cookieOptions: CookieOptions = {
-    path: '/api/auth/refresh_token',
+    path: '/v1/auth/refresh-token',
     httpOnly: true,
     maxAge: 604800000,
     signed: true,
