@@ -4,11 +4,11 @@
  * Module dependencies.
  */
 
-import app from "@src/app";
-import debugLib from "debug";
-import http from "http";
+import app from '@src/app';
+import debugLib from 'debug';
+import http from 'http';
 
-const debug = debugLib('members-only-api:server');
+const debug = debugLib('http');
 /**
  * Get port from environment and store in Express.
  */
@@ -51,7 +51,7 @@ function normalizePort(val: string) {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Event listener for HTTP server 'error' event.
  */
 
 function onError(error: { syscall: string; code: any; }) {
@@ -79,7 +79,7 @@ function onError(error: { syscall: string; code: any; }) {
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Event listener for HTTP server 'listening' event.
  */
 
 function onListening() {
@@ -88,5 +88,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr?.port;
   debug('Listening on ' + bind);
-  console.log(`Server Started on port: ${port}`)
+  console.log(`Server Running on port: ${port}`)
 }

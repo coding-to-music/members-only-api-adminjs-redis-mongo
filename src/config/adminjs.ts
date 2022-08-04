@@ -7,6 +7,8 @@ import User from '@models/User';
 import Post from '@models/Post';
 import Profile from '@models/Profile';
 import { IUser, Role } from '@interfaces/users.interface'
+import { SessionOptions } from 'express-session';
+import { Router } from 'express';
 
 const getActions = () => {
     return {
@@ -55,18 +57,31 @@ const adminJsOptions: AdminJSOptions = {
 
 AdminJS.registerAdapter(AdminJSMongoose)
 
+const adminRouter = Router()
+
+const sessionOptions: SessionOptions = {
+    resave: true,
+    saveUninitialized: false,
+    secret: ENV.COOKIE_SECRET
+} 
+
 export const adminJs = new AdminJS(adminJsOptions)
 
-export const adminJSRouter = AdminJSExpress.buildAuthenticatedRouter(adminJs, {
-    authenticate: async (email, password) => {
-        const user = await User.findOne({ email })
-        if (user) {
-            const matched = await compare(password, user.password)
-            if (matched) {
-                return user
+export const adminJSRouter = AdminJSExpress.buildAuthenticatedRouter(
+    adminJs,
+    {
+        authenticate: async (email, password) => {
+            const user = await User.findOne({ email })
+            if (user) {
+                const matched = await compare(password, user.password)
+                if (matched) {
+                    return user
+                }
             }
-        }
-        return false
+            return false
+        },
+        cookiePassword: ENV.COOKIE_SECRET,
     },
-    cookiePassword: ENV.COOKIE_SECRET,
-})
+    adminRouter,
+    sessionOptions
+)
