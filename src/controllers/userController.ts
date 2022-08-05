@@ -7,8 +7,12 @@ import Post from '@models/Post';
 import Profile from '@models/Profile';
 import { Types } from 'mongoose';
 import { getCacheKey, setCacheKey } from '@config/cache';
+import {
+    ConflictException,
+    ValidationBodyException,
+} from '@exceptions/commonExceptions';
 
-export const get_all_users = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const getAllUsers = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const value = await getCacheKey('all_users')
         if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
@@ -20,7 +24,7 @@ export const get_all_users = async (req: RequestWithUser, res: Response, next: N
     }
 };
 
-export const get_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const getCurrentUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const { password, resetPassword, refreshToken, tokenVersion, ...data } = req.user._doc;
         res.json(data)
@@ -29,7 +33,7 @@ export const get_user = async (req: RequestWithUser, res: Response, next: NextFu
     }
 }
 
-export const post_create_user = [
+export const postCreateUser = [
 
     body('email').notEmpty().isEmail(),
     body('firstName', 'First Name is Required').trim().isLength({ min: 1 }).escape(),
@@ -38,14 +42,15 @@ export const post_create_user = [
 
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-
         try {
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+
             const { email, firstName, lastName, confirmPassword, img } = req.body;
 
             const foundUser = await User.findOne({ email: email }).exec();
-            if (foundUser) return res.status(409).json({ msg: 'User already exists' });
+            if (foundUser) throw new ConflictException('User already exists');
 
             const avatar = gravatar.url(email, { s: '100', r: 'pg', d: 'retro' }, true);
 
@@ -66,14 +71,14 @@ export const post_create_user = [
     }
 ];
 
-export const put_update_user = [
+export const putUpdateUser = [
 
     async (req: Request, res: Response, next: NextFunction) => {
         res.send('NOT YET IMPLEMENTED')
     }
 ]
 
-export const delete_delete_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const deleteUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
 
         await Post.deleteMany({ user: req.user._id }).exec();

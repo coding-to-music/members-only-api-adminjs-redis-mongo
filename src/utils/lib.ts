@@ -6,6 +6,7 @@ import { IPost } from '@interfaces/posts.interface';
 import { sign } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
 import { ITokens } from '@interfaces/auth.interface';
+import { NotFoundException } from '@exceptions/commonExceptions';
 
 export const generateRandomCode = async (length: number): Promise<string | null> => {
     try {
@@ -101,7 +102,7 @@ export const formatProifleBody = (req: Request, res: Response, next: NextFunctio
 export const checkIfPostExists = async (req: Request, res: Response, next: NextFunction): Promise<IPost | void | Response> => {
     try {
         const document = await Post.findById(req.params.id).exec();
-        if (!document) return res.status(404).json({ message: 'Post not found' });
+        if (!document) throw new NotFoundException('Post Not Found')
         return document;
     } catch (error) {
         return next(error);

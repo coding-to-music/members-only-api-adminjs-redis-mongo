@@ -11,6 +11,7 @@ import compression from 'compression';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import rateLimit from 'express-rate-limit'
+import { HttpException } from '@exceptions/HttpException'
 
 // Import Configs
 import initDB from '@config/database';
@@ -31,8 +32,8 @@ passportConfig(passport);
 
 const app = express();
 const whitelist = [
-    'https://localhost:3000', 
-    'http://localhost:3000', 
+    'https://localhost:3000',
+    'http://localhost:3000',
     'https://api-mbo.herokuapp.com',
     'https://api-mbo.polldevs.com',
     'http://api-mbo.polldevs.com',
@@ -93,8 +94,8 @@ app.use((req: Request, res: Response, next) => {
 });
 
 // Error handler
-app.use((err: { status: number; message: any; toString: () => any; }, req: Request, res: Response, next: NextFunction) => {
-    res.status(err.status || 500).json({ error: err.message || err.toString() });
+app.use((error: HttpException, req: Request, res: Response, next: NextFunction) => {
+    res.status(error.statusCode ?? 500).json(error);
 })
 
 export default app;

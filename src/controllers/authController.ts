@@ -5,63 +5,80 @@ import bcrypt from 'bcrypt';
 import { ENV } from '@utils/validateEnv';
 import { Request, Response, NextFunction } from 'express';
 import { sendTokens, cookieOptions } from '@utils/lib';
+import {
+    ForbiddenException,
+    NotFoundException,
+    UnAuthorizedException,
+    ValidationBodyException,
+} from '@exceptions/commonExceptions';
 
-export const post_login_user = [
+export const postLoginUser = [
 
     body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email'),
     body('password').notEmpty().isLength({ min: 6 }).withMessage('Password is required and must be at least 6 characters long'),
 
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-
         try {
-            const user = await User.findOne({ email: req.body.email }).exec();
-            if (!user) return res.status(404).json({ msg: 'User not found' });
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) throw new ValidationBodyException(errors.array())
+
+            const { email } = req.body;
+            const user = await User.findOne({ email }).exec();
+            if (!user) throw new NotFoundException(`User with email: ${email} not found`)
 
             const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
-            if (!validPassword) return res.status(401).json({ msg: 'Invalid email/password combination' });
+            if (!validPassword) throw new UnAuthorizedException('Invalid Login Credentials');
 
             // Generate new Tokens and send them to the client
             const { token, refresh_token } = await user.generateTokens(user);
             sendTokens(res, refresh_token, 'Login Successful', token);
         } catch (err) {
-            return next(err);
+            console.log(err)
+            next(err);
         }
     }
 ]
 
-export const get_logout_user = (req: Request, res: Response) => {
-    return res
-        .clearCookie("jit", cookieOptions)
-        .json({ message: "Logout successful" });
+export const getLogoutUser = (req: Request, res: Response, next: NextFunction) => {
+    try {
+        return res
+            .clearCookie('jit', cookieOptions)
+            .json({
+                status: 'success',
+                message: 'Logout successful'
+            });
+    } catch (error) {
+        next(error)
+    }
 };
 
-export const post_refresh_token = async (req: Request, res: Response, next: NextFunction) => {
-    
-    const { jit } = req.signedCookies;
-    
-    if (!jit) return res.status(404).json({ msg: 'Refresh Token not found' });
+export const postRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
+
     try {
+
+        const { jit } = req.signedCookies;
+        if (!jit) throw new NotFoundException('Refresh Token not found');
+
         // Verify refresh token in request
         const REFRESH_TOKEN_PUBLIC_KEY = Buffer.from(ENV.REFRESH_TOKEN_PUBLIC_KEY_BASE64, 'base64').toString('ascii');
         const verifiedToken = verify(jit, REFRESH_TOKEN_PUBLIC_KEY) as JwtPayload;
 
         // Check if user exists in DB
         const user = await User.findOne({ _id: verifiedToken.sub });
-        if (!user) return res.status(404).json({ msg: 'User not found' });
+        if (!user) throw new NotFoundException('User not found');
 
         // Check if refresh token is valid
         const { validToken, refreshTokenNotExpired, tokenVersionValid } = await user.validateRefreshToken(jit, verifiedToken.tokenVersion);
-        if (!validToken) return res.status(403).json({ msg: 'Invalid Refresh token' });
-        if (!refreshTokenNotExpired) return res.status(403).json({ msg: 'Refresh token has expired, please initiate a new sign in request.' });
-        if (!tokenVersionValid) return res.status(403).json({ msg: 'Token Invalid' });
+        if (!validToken) throw new ForbiddenException('Invalid Refresh token');
+        if (!refreshTokenNotExpired) throw new ForbiddenException('Refresh token has expired, please initiate a new sign in request');
+        if (!tokenVersionValid) throw new ForbiddenException('Token Invalid')
 
         // Generate new Tokens and send them to the client
         const { token, refresh_token } = await user.generateTokens(user);
         sendTokens(res, refresh_token, 'Token Refresh Successful!!!', token);
     } catch (err) {
-        return next(err);
+        next(err);
     }
 }

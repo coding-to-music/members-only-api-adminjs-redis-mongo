@@ -1,22 +1,28 @@
-import { body, validationResult } from "express-validator";
+import { body, validationResult } from 'express-validator';
 import { Response, NextFunction } from 'express';
 import { Types } from 'mongoose';
 import Profile from '@models/Profile';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { formatProifleBody } from '@utils/lib';
-import { AppError } from "@src/errors/AppError";
+import {
+    ConflictException,
+    NotFoundException,
+    ValidationBodyException,
+} from '@exceptions/commonExceptions';
 
-export const get_user_profile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+
+export const getUserProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const profile = await Profile.findOne({ user: req.user._id }).exec();
-        if (!profile) return res.status(404).json({ message: `No profile found for :- ${req.user.name}` });
+        if (!profile) throw new NotFoundException(`No Profile found for ${req.user.name}`);
         res.json({ profile });
     } catch (err) {
-        if (err) return next(err);
+        next(err)
     }
 };
 
-export const post_create_profile = [
+export const postCreateProfile = [
+
     (req: RequestWithUser, res: Response, next: NextFunction) => formatProifleBody(req, res, next),
 
     body('bio').not().isEmpty().withMessage('Bio cannot be empty').trim().escape(),
@@ -36,16 +42,16 @@ export const post_create_profile = [
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-
         try {
 
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+
             const { _id } = req.user
-            
+
             // Check if user already has a profile
             const isProfileExists = await Profile.findOne({ user: _id })
-            if (isProfileExists) throw new AppError('User Already has a Profile', 409)
+            if (!isProfileExists) throw new ConflictException('User Already has a Profile');
 
             const profileToCreate = new Profile({
                 user: new Types.ObjectId(_id),
@@ -63,10 +69,7 @@ export const post_create_profile = [
                 profileToCreate
             });
         } catch (err) {
-            if (err instanceof Error) {
-                console.error(err);
-                next(err);
-            }
+            next(err);
         }
     }
 ]

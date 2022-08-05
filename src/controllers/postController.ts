@@ -7,9 +7,14 @@ import { Comment, Like } from '@utils/classes';
 import { Types } from 'mongoose';
 import { IPost } from '@interfaces/posts.interface';
 import { getCacheKey, setCacheKey } from '@config/cache';
-import { AppError } from '@src/errors/AppError';
+import {
+    ConflictException,
+    ForbiddenException,
+    NotFoundException,
+    ValidationBodyException,
+} from '@exceptions/commonExceptions';
 
-export const get_get_all_posts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const getAllPosts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const value = await getCacheKey('all_posts')
         if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
@@ -21,34 +26,45 @@ export const get_get_all_posts = async (req: RequestWithUser, res: Response, nex
     }
 };
 
-export const get_posts_by_user = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const getPostsByUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const { _id } = req.user;
+
+        // Check cache for matching key
         const value = await getCacheKey(`posts/${_id}`);
         if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
+
+        // If value doesn't exist, load from DB and set new cache key
         const posts = await Post.find({ user: _id }).exec();
-        if (!posts.length) return res.status(404).json({ msg: 'No posts found' });
+        if (!posts.length) throw new NotFoundException('User has no posts');
         await setCacheKey(`posts/${_id}`, posts);
+
         res.status(200).json({ fromCache: false, data: posts });
     } catch (error) {
         next(error)
     }
 }
 
-export const get_get_post_by_id = async (req: Request, res: Response, next: NextFunction) => {
+export const getPostById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
+
+        // Check cache for matching key
         const value = await getCacheKey(`posts/${id}`)
         if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
+
+        // If value doesn't exist, load from DB and set new cache key
         const post = await checkIfPostExists(req, res, next);
         await setCacheKey(`posts/${id}`, post);
+
         res.status(200).json({ fromCache: false, data: post });
     } catch (error) {
         next(error);
     }
 };
 
-export const post_create_post = [
+export const postCreatePost = [
+
     (req: Request, res: Response, next: NextFunction) => formatPostCommentsAndLikes(req, res, next),
 
     body('postTitle').not().isEmpty().withMessage('Post Title cannot be empty').isLength({ min: 3, max: 30 }).withMessage('Post Title be between 3 to 30 characters '),
@@ -57,16 +73,16 @@ export const post_create_post = [
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
         const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
 
         try {
 
             const { _id } = req.user;
             const { postContent, postTitle } = req.body
-            
+
             // Check if the user has an existing post with the same title
             const isPostExists = await Post.find({ user: _id, postTitle })
-            if (isPostExists) throw new AppError('User has an existing post with the same title', 409)
+            if (isPostExists) throw new ConflictException('User has an existing post with the same title');
 
             const post = new Post({
                 user: new Types.ObjectId(_id),
@@ -84,16 +100,16 @@ export const post_create_post = [
     }
 ];
 
-export const put_add_comments = [
+export const putAddComments = [
 
     body('comment').not().isEmpty().withMessage('Comment cannot be empty'),
 
     async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-
         try {
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
 
             const post = await checkIfPostExists(req, res, next) as IPost;
 
@@ -120,13 +136,13 @@ export const put_add_comments = [
     }
 ];
 
-export const delete_delete_comment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const deleteComment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
 
         const post = await checkIfPostExists(req, res, next) as IPost;
 
         const commentIndex: number = post.comments.findIndex(comment => comment.comment_user.equals(new Types.ObjectId(req.user._id)));
-        if (commentIndex === -1) return res.status(404).json({ msg: 'User has not commented on this post' });
+        if (commentIndex === -1) throw new NotFoundException('User has not commented on this post');
 
         const commentIndexInCommentList: number = post.comments[commentIndex].comment_list.findIndex(comment => comment._id!.equals(new Types.ObjectId(req.params.commentId)));
         if (commentIndexInCommentList === -1) return res.status(404).json({ msg: 'Comment not found' });
@@ -135,17 +151,19 @@ export const delete_delete_comment = async (req: RequestWithUser, res: Response,
         await post.save();
 
         res.status(200).json({ message: 'Comment deleted successfully', post });
+
     } catch (error) {
         next(error);
     };
 };
 
-export const put_like_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const putLikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
 
     try {
         const post = await checkIfPostExists(req, res, next) as IPost;
 
         const userId = new Types.ObjectId(req.user._id);
+
         switch (true) {
             case !post.likes.length || !post.likes.some(like => like.like_user.equals(userId)):
                 const newLike = new Like(userId, new Date(Date.now()));
@@ -153,7 +171,7 @@ export const put_like_post = async (req: RequestWithUser, res: Response, next: N
                 await post.save();
                 break;
             case post.likes.some(like => like.like_user.equals(userId)):
-                return res.status(403).json({ message: 'You have already liked this post' });
+                throw new ForbiddenException('You have already liked this post')
         }
 
         res.status(200).json({ message: 'Like added successfully', post });
@@ -164,12 +182,12 @@ export const put_like_post = async (req: RequestWithUser, res: Response, next: N
     }
 };
 
-export const delete_unlike_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const deleteUnlikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const post = await checkIfPostExists(req, res, next) as IPost;
 
         const likeIndex: number = post.likes.findIndex(like => like.like_user.equals(new Types.ObjectId(req.user._id)));
-        if (likeIndex === -1) return res.status(404).json({ msg: 'User has not liked this post' });
+        if (likeIndex === -1) throw new NotFoundException('User has not liked this post')
 
         post.likes.splice(likeIndex, 1);
         await post.save();
@@ -181,11 +199,12 @@ export const delete_unlike_post = async (req: RequestWithUser, res: Response, ne
     }
 };
 
-export const delete_delete_post = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const deletePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const post = await checkIfPostExists(req, res, next) as IPost;
 
-        if (!post.user.equals(new Types.ObjectId(req.user._id))) return res.status(403).json({ msg: 'You cannot delete this post' });
+        if (!post.user.equals(new Types.ObjectId(req.user._id)))
+            throw new ForbiddenException('You cannot delete this post');
 
         await post.remove();
         res.status(200).json({ message: 'Post deleted successfully' });

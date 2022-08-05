@@ -27,7 +27,7 @@
             "@config/*": ["src/config/*"],
             "@controllers/*": ["src/controllers/*"],
             "@docs/*": ["src/docs/*"],
-            "@errors/*": ["src/errors/*"],
+            "@exceptions/*": ["src/exceptions/*"],
             "@global": ["src/global.d.ts"],
             "@interfaces/*": ["src/interfaces/*"],
             "@middlewares/*": ["src/middlewares/*"],
