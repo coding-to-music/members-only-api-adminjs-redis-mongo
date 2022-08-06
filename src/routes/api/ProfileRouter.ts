@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import { getUserProfile, postCreateProfile } from '@controllers/profileController';
+import profileController from '@controllers/profileController';
 
 const profileRouter: CustomIRouter = Router();
 
-profileRouter.get('/user-profile', passport.authenticate('jwt', { session: false }), getUserProfile);
+profileRouter.get('/user-profile', passport.authenticate('jwt', { session: false }), profileController.getUserProfile);
 
-profileRouter.post('/create-profile', passport.authenticate('jwt', { session: false }), postCreateProfile);
+profileRouter.post('/create-profile', passport.authenticate('jwt', { session: false }), profileController.postCreateProfile);
 
 export default profileRouter;
