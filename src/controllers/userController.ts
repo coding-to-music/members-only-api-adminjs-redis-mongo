@@ -11,6 +11,7 @@ import {
     ConflictException,
     ValidationBodyException,
 } from '@exceptions/commonExceptions';
+import { sendMail } from '@utils/sendMail';
 
 class UserController {
 
@@ -63,16 +64,25 @@ class UserController {
                 const avatar = gravatar.url(email, { s: '100', r: 'pg', d: 'retro' }, true);
 
                 const user = new User({
-                    name: firstName + lastName,
-                    email: email,
+                    name: `${firstName} ${lastName}`,
+                    email,
                     password: confirmPassword,
                     avatar: avatar || img || ''
                 });
 
                 await user.save();
 
-                const { password, resetPassword, refreshToken, ...data } = user._doc;
-                res.json({ message: 'Success, User Account Created', newUser: data });
+                const mailOptions: [string, string, string, string] = [
+                    email,
+                    'New Account Creation',
+                    `Welcome to Members Only`,
+                    `<p>Dear ${firstName} ${lastName}, Welcome to the Members Only platform, we are glad to have you onboard</p>`
+                ];
+
+                await sendMail(...mailOptions);
+
+                res.json({ message: 'Success, User Account Created' })
+
             } catch (error) {
                 next(error)
             }
