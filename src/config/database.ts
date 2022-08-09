@@ -1,5 +1,6 @@
 import { connect, connection } from 'mongoose';
 import { ENV } from '@utils/validateEnv';
+import { logger } from '@utils/logger';
 
 const initDB = () => {
 
@@ -14,9 +15,9 @@ const initDB = () => {
 
     const mongoDB = ENV.DB_URL;
     connect(mongoDB, options);
-    connection.on('connected', () => console.log('Mongoose connected to DB cluster'));
-    connection.on('error', () => console.error.bind(console, 'MongoDB connection error:'));
-    connection.on('disconnected', () => console.log('Mongoose disconnected'));
+    connection.on('connected', () => logger.info('Mongoose connected to DB cluster'));
+    connection.on('error', () => logger.error('MongoDB connection error:'));
+    connection.on('disconnected', () => logger.info('Mongoose disconnected'));
 }
 
 export default initDB

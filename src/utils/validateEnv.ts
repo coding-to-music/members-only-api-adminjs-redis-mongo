@@ -16,5 +16,6 @@ export const ENV = cleanEnv(process.env, {
     SENDGRID_API_KEY: str(),
     REDIS_HOST: str(),
     REDIS_USERNAME: str(),
-    REDIS_PASSWORD: str()
+    REDIS_PASSWORD: str(),
+    LOGTAIL_SOURCE_TOKEN: str()
 });

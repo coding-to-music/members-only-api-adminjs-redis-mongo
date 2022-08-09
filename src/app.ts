@@ -16,7 +16,7 @@ import { HttpException } from '@exceptions/HttpException'
 // Import Configs
 import initDB from '@config/database';
 import passportConfig from '@middlewares/passport';
-import { adminJs, adminJSRouter } from '@config/adminjs';
+import { stream } from '@utils/logger';
 
 // Import Routes
 import apiRouter from '@routes/api/api';
@@ -62,8 +62,9 @@ const apiLimiter = rateLimit({
 })
 
 // AdminJS moved to the top to fix cors and bodyParser issues
+// import { adminJs, adminJSRouter } from '@config/adminjs';
 // app.use(adminJs.options.rootPath, adminJSRouter);    // Currenly disabled, causing error crashing app
-app.use(morgan('dev'));
+app.use(morgan('combined', { stream }));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
 

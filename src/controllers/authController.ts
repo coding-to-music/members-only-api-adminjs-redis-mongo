@@ -11,6 +11,7 @@ import {
     UnAuthorizedException,
     ValidationBodyException,
 } from '@exceptions/commonExceptions';
+import { logger } from '@utils/logger';
 
 class AuthController {
 
@@ -36,8 +37,15 @@ class AuthController {
                 // Generate new Tokens and send them to the client
                 const { token, refresh_token } = await user.generateTokens(user);
                 sendTokens(res, refresh_token, 'Login Successful', token);
-            } catch (err) {
-                console.log(err)
+            } catch (err: any) {
+               
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `, err);
                 next(err);
             }
         }
@@ -51,8 +59,16 @@ class AuthController {
                     status: 'success',
                     message: 'Logout successful'
                 });
-        } catch (error) {
-            next(error)
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err)
         }
     };
 
@@ -80,7 +96,15 @@ class AuthController {
             // Generate new Tokens and send them to the client
             const { token, refresh_token } = await user.generateTokens(user);
             sendTokens(res, refresh_token, 'Token Refresh Successful!!!', token);
-        } catch (err) {
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
             next(err);
         }
     }

@@ -12,6 +12,7 @@ import {
     ValidationBodyException,
 } from '@exceptions/commonExceptions';
 import { sendMail } from '@utils/sendMail';
+import { logger } from '@utils/logger';
 
 class UserController {
 
@@ -22,8 +23,16 @@ class UserController {
             const users = await User.find({}).exec();
             await setCacheKey('all_users', users);
             res.status(200).json({ fromCache: false, data: users });
-        } catch (error) {
-            next(error);
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
         }
     };
 
@@ -37,8 +46,17 @@ class UserController {
                 ...data
             } = req.user._doc;
             res.json(data)
-        } catch (error) {
-            next(error)
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+
+            next(err)
         }
     }
 
@@ -83,8 +101,16 @@ class UserController {
 
                 res.json({ message: 'Success, User Account Created' })
 
-            } catch (error) {
-                next(error)
+            } catch (err: any) {
+
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err)
             }
         }
     ];
@@ -129,8 +155,16 @@ class UserController {
 
             res.status(200).json({ msg: 'User deleted successfully' });
 
-        } catch (error) {
-            next(error)
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err)
         }
     }
 

@@ -9,6 +9,7 @@ import {
     NotFoundException,
     ValidationBodyException,
 } from '@exceptions/commonExceptions';
+import { logger } from '@utils/logger'
 
 
 class ProfileController {
@@ -18,7 +19,16 @@ class ProfileController {
             const profile = await Profile.findOne({ user: req.user._id }).exec();
             if (!profile) throw new NotFoundException(`No Profile found for ${req.user.name}`);
             res.json({ profile });
-        } catch (err) {
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+
             next(err)
         }
     };
@@ -70,7 +80,15 @@ class ProfileController {
                     message: 'Profile created successfully',
                     profileToCreate
                 });
-            } catch (err) {
+            } catch (err: any) {
+                
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
                 next(err);
             }
         }

@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { Response, NextFunction, Request } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { formatPostCommentsAndLikes, checkIfPostExists } from '@utils/lib';
-import { Comment, Like } from '@utils/classes';
+import { Comment, Like } from '@interfaces/posts.interface';
 import { Types } from 'mongoose';
 import { IPost } from '@interfaces/posts.interface';
 import { getCacheKey, setCacheKey } from '@config/cache';
@@ -13,6 +13,7 @@ import {
     NotFoundException,
     ValidationBodyException,
 } from '@exceptions/commonExceptions';
+import { logger } from '@utils/logger'
 
 class PostController {
 
@@ -23,8 +24,16 @@ class PostController {
             const posts = await Post.find({}).exec();
             await setCacheKey('all_posts', posts);
             res.status(200).json({ fromCache: false, data: posts });
-        } catch (error) {
-            next(error);
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
         }
     };
 
@@ -42,8 +51,16 @@ class PostController {
             await setCacheKey(`posts/${_id}`, posts);
 
             res.status(200).json({ fromCache: false, data: posts });
-        } catch (error) {
-            next(error)
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err)
         }
     };
 
@@ -60,8 +77,16 @@ class PostController {
             await setCacheKey(`posts/${id}`, post);
 
             res.status(200).json({ fromCache: false, data: post });
-        } catch (error) {
-            next(error);
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
         }
     };
 
@@ -96,7 +121,15 @@ class PostController {
                     message: 'Post created successfully',
                     post
                 });
-            } catch (err) {
+            } catch (err: any) {
+
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
                 next(err);
             }
         }
@@ -131,9 +164,15 @@ class PostController {
 
                 res.status(200).json({ message: 'Comment added successfully', post });
 
-            } catch (error) {
-                console.error(error);
-                next(error);
+            } catch (err: any) {
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err);
             };
         }
     ];
@@ -154,8 +193,16 @@ class PostController {
 
             res.status(200).json({ message: 'Comment deleted successfully', post });
 
-        } catch (error) {
-            next(error);
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
         };
     };
 
@@ -178,9 +225,16 @@ class PostController {
 
             res.status(200).json({ message: 'Like added successfully', post });
 
-        } catch (error) {
-            console.error(error);
-            next(error);
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
         }
     };
 
@@ -197,8 +251,16 @@ class PostController {
 
             res.status(200).json({ message: 'Like deleted successfully', post });
 
-        } catch (error) {
-            next(error);
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
         }
     };
 
@@ -212,8 +274,16 @@ class PostController {
             await post.remove();
             res.status(200).json({ message: 'Post deleted successfully' });
 
-        } catch (error) {
-            next(error);
+        } catch (err: any) {
+
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
         }
     }
 }

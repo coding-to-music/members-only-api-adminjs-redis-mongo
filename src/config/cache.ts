@@ -1,5 +1,6 @@
 import { createClient, RedisClientType } from 'redis';
 import { ENV } from '@utils/validateEnv';
+import { logger } from '@utils/logger';
 
 let redisClient: RedisClientType;
 
@@ -11,7 +12,7 @@ let redisClient: RedisClientType;
         password: ENV.REDIS_PASSWORD
     });
 
-    redisClient.on('error', (err) => console.log('Redis Client Error', err));
+    redisClient.on('error', (err) => logger.error('Redis Client Error', err));
 
     await redisClient.connect()
 

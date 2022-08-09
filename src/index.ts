@@ -7,6 +7,7 @@
 import app from '@src/app';
 import debugLib from 'debug';
 import http from 'http';
+import { logger } from '@utils/logger';
 
 const debug = debugLib('http');
 /**
@@ -88,5 +89,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr?.port;
   debug('Listening on ' + bind);
-  console.log(`Server Running on port: ${port}`)
+  logger.info(`Server Running on port: ${port}`)
 }
