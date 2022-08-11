@@ -23,6 +23,6 @@ const PostSchema = new Schema<IPost>({
       date_liked: { type: Date, default: new Date(Date.now()) },
     }
   ]
-});
+}, { timestamps: true });
 
 export default model<IPost>('Post', PostSchema);

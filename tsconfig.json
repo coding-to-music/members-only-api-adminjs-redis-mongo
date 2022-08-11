@@ -3,6 +3,7 @@
     "display": "Node 16",
     "extends": "@tsconfig/node16/tsconfig.json",
     "compilerOptions": {
+        "experimentalDecorators": true,
         "lib": [
             "es2021"
         ],
@@ -33,7 +34,7 @@
             "@middlewares/*": ["src/middlewares/*"],
             "@models/*": ["src/models/*"],
             "@routes/*": ["src/routes/*"],
-            "@src/*": ["src/*"],
+            "@/*": ["src/*"],
             "@utils/*": ["src/utils/*"]
         }
     }

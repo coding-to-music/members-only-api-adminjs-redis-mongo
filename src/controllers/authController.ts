@@ -9,7 +9,7 @@ import {
     ForbiddenException,
     NotFoundException,
     UnAuthorizedException,
-    ValidationBodyException,
+    ValidationException,
 } from '@exceptions/commonExceptions';
 import { logger } from '@utils/logger';
 
@@ -25,20 +25,21 @@ class AuthController {
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
-                const { email } = req.body;
+                const { email, password } = req.body
+
                 const user = await User.findOne({ email }).exec();
                 if (!user) throw new NotFoundException(`User with email: ${email} not found`)
 
-                const validPassword: boolean = await bcrypt.compare(req.body.password, user.password);
+                const validPassword: boolean = await bcrypt.compare(password, user.password);
                 if (!validPassword) throw new UnAuthorizedException('Invalid Login Credentials');
 
                 // Generate new Tokens and send them to the client
                 const { token, refresh_token } = await user.generateTokens(user);
                 sendTokens(res, refresh_token, 'Login Successful', token);
             } catch (err: any) {
-               
+
                 logger.error(`
                 ${err.statusCode || 500} - 
                 ${err.error || 'Something Went Wrong'} - 

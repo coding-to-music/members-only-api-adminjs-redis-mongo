@@ -31,6 +31,6 @@ const ProfileSchema = new Schema<IProifle>({
         linkedin: { type: String },
         twitter: { type: String }
     },
-}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+}, { timestamps: true });
 
 export default model<IProifle>('Profile', ProfileSchema);

@@ -6,7 +6,7 @@ import { RequestWithUser } from '@interfaces/users.interface';
 import {
     ForbiddenException,
     NotFoundException,
-    ValidationBodyException,
+    ValidationException,
 } from '@exceptions/commonExceptions';
 import { logger } from '@utils/logger';
 
@@ -20,7 +20,7 @@ class PasswordContoller {
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const { email } = req.body;
 
@@ -68,7 +68,7 @@ class PasswordContoller {
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const { email, new_password, code } = req.body;
                 const user = await User.findOne({ email }).exec();
@@ -112,7 +112,7 @@ class PasswordContoller {
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const { old_password, new_password } = req.body;
 

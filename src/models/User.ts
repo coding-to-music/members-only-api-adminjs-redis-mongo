@@ -22,7 +22,7 @@ const UserSchema = new Schema<IUser>({
         expiresBy: { type: Date, default: '' }
     },
     tokenVersion: { type: Number, default: 0 }
-}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+}, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {
     if (this.isNew || this.isModified('password')) {

@@ -8,8 +8,9 @@ import Profile from '@models/Profile';
 import { Types } from 'mongoose';
 import { getCacheKey, setCacheKey } from '@config/cache';
 import {
+    BadRequestException,
     ConflictException,
-    ValidationBodyException,
+    ValidationException,
 } from '@exceptions/commonExceptions';
 import { sendMail } from '@utils/sendMail';
 import { logger } from '@utils/logger';
@@ -65,14 +66,20 @@ class UserController {
         body('email').notEmpty().isEmail(),
         body('firstName', 'First Name is Required').trim().isLength({ min: 1 }).escape(),
         body('lastName', 'Last Name is Required').trim().isLength({ min: 1 }).escape(),
-        body('confirmPassword').notEmpty().isLength({ min: 6 }),
+        body('password').isString().trim().isLength({ min: 6 }).withMessage('password must contain at least 6 characters').escape(),
+        body('confirmPassword').custom((value, { req }) => {
+            if (value !== req.body.password) {
+                throw new BadRequestException('confirmPassword must match password')
+            }
+            return true
+        }),
 
         async (req: Request, res: Response, next: NextFunction) => {
 
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const { email, firstName, lastName, confirmPassword, img } = req.body;
 
@@ -85,7 +92,7 @@ class UserController {
                     name: `${firstName} ${lastName}`,
                     email,
                     password: confirmPassword,
-                    avatar: avatar || img || ''
+                    avatar: avatar ?? img ?? ''
                 });
 
                 await user.save();

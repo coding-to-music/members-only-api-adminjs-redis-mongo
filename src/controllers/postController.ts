@@ -11,7 +11,7 @@ import {
     ConflictException,
     ForbiddenException,
     NotFoundException,
-    ValidationBodyException,
+    ValidationException,
 } from '@exceptions/commonExceptions';
 import { logger } from '@utils/logger'
 
@@ -102,7 +102,7 @@ class PostController {
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const { _id } = req.user;
                 const { postContent, postTitle } = req.body
@@ -144,7 +144,7 @@ class PostController {
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const post = await checkIfPostExists(req, res, next) as IPost;
 

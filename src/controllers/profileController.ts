@@ -7,7 +7,7 @@ import { formatProifleBody } from '@utils/lib';
 import {
     ConflictException,
     NotFoundException,
-    ValidationBodyException,
+    ValidationException,
 } from '@exceptions/commonExceptions';
 import { logger } from '@utils/logger'
 
@@ -57,7 +57,7 @@ class ProfileController {
             try {
 
                 const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationBodyException(errors.array());
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const { _id } = req.user
 

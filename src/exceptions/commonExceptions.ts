@@ -57,7 +57,7 @@ export class NotFoundException extends HttpException {
 };
 
 export class UnAuthorizedException extends HttpException {
-    
+
     constructor(error: string) {
 
         super(401, error)
@@ -68,7 +68,7 @@ export class UnAuthorizedException extends HttpException {
 
 };
 
-export class ValidationBodyException extends HttpException {
+export class ValidationException extends HttpException {
 
     public errors: ValidationError[];
 
