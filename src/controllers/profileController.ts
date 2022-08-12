@@ -16,7 +16,8 @@ class ProfileController {
 
     public async getUserProfile(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
-            const profile = await Profile.findOne({ user: req.user._id }).exec();
+            const { _id } = req.user
+            const profile = await Profile.findOne({ user: _id }).exec();
             if (!profile) throw new NotFoundException(`No Profile found for ${req.user.name}`);
             res.json({ profile });
         } catch (err: any) {
@@ -81,7 +82,7 @@ class ProfileController {
                     profileToCreate
                 });
             } catch (err: any) {
-                
+
                 logger.error(`
                 ${err.statusCode || 500} - 
                 ${err.error || 'Something Went Wrong'} - 

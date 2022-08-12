@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from 'passport';
+import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
 import passwordController from '@controllers/passwordController';
 
@@ -9,6 +9,6 @@ passwordRouter.put('/get-verification-code', passwordController.getVerificationC
 
 passwordRouter.put('/reset-password', passwordController.putResetPassword);
 
-passwordRouter.put('/change-password', authenticate('jwt', { session: false }), passwordController.putChangePassword);
+passwordRouter.put('/change-password', passport.authenticate('jwt', { session: false }), passwordController.putChangePassword);
 
 export default passwordRouter;

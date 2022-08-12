@@ -20,154 +20,169 @@ servers:
 components:
   schemas:
     User:
-      type: "object"
+      type: object
       properties:
         _id:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: mongo_id
         name:
-          type: "string"
+          type: string
         email:
-          type: "string"
-          format: "email"
+          type: string
+          format: email
         password:
-          type: "string"
-          format: "password"
+          type: string
+          format: password
+          minLength: 6
         avatar:
-          type: "string"
+          type: string
         lastLogin:
-          type: "string"
-          format: "date-time"
+          type: string
+          format: date-time
         isAdmin:
-          type: "boolean"
+          type: boolean
         isMember:
-          type: "boolean"
+          type: boolean
         resetPassword:
-          type: "object"
+          type: object
           properties:
             code:
-              type: "string"
+              type: string
             expiresBy:
-              type: "string"
-              format: "date-time"
+              type: string
+              format: date-time
         refreshToken:
-          type: "object"
+          type: object
           properties:
             token:
-              type: "string"
-              format: "byte"
+              type: string
+              format: byte
             expiresBy:
-              type: "string"
-              format: "date-time"
+              type: string
+              format: date-time
         tokenVersion:
-          type: "integer"
-          format: "int32"
+          type: integer
+          format: int32
         createdAt:
-          type: "string"
-          format: "date-time"
+          type: string
+          format: date-time
         updatedAt:
-          type: "string"
-          format: "date-time"
+          type: string
+          format: date-time
     Profile:
-      type: "object"
+      type: object
       properties:
         _id:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: mongo_id
         user:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: mongo_id
         bio:
-          type: "string"
+          type: string
         address:
-          type: "string"
+          type: string
         phoneNumber:
-          type: "integer"
-          format: "int64"
+          type: integer
+          format: int64
         education:
-          type: "array"
+          type: array
           items:
-            type: "object"
+            type: object
             properties:
               school:
-                type: "string"
+                type: string
               degree:
-                type: "string"
+                type: string
               field:
-                type: "string"
+                type: string
               from:
-                type: "string"
-                format: "date-time"
+                type: string
+                format: date-time
               to:
-                type: "string"
-                format: "date-time"
+                type: string
+                format: date-time
               description:
-                type: "string"
+                type: string
         social:
-          type: "object"
+          type: object
           properties:
             github:
-              type: "string"
+              type: string
             linkedin:
-              type: "string"
+              type: string
             twitter:
-              type: "string"
+              type: string
     Post:
-      type: "object"
+      type: object
       properties:
         _id:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: mongo_id
         user:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: mongo_id
         postTitle:
-          type: "string"
+          type: string
         postContent:
-          type: "string"
+          type: string
         datePosted:
-          type: "string"
-          format: "date-time"
+          type: string
+          format: date-time
         comments:
-          type: "array"
+          type: array
           items:
-            type: "object"
+            type: object
             properties:
               comment_user:
-                type: "string"
-                format: "uuid"
+                type: string
+                format: mongo_id
               comment_list:
-                type: "array"
+                type: array
                 items:
-                  type: "object"
+                  type: object
                   properties:
                     comment:
-                      type: "string"
+                      type: string
                     comment_date:
-                      type: "string"
-                      format: "date-time"
+                      type: string
+                      format: date-time
+    Message:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: mongo_id
+        sender:
+          type: string
+          format: mongo_id
+        recipient:
+          type: string
+          format: mongo_id
+        content:
+          type: string
   securitySchemes:
     BearerAuth:
-      type: "http"
-      scheme: "bearer"
-      bearerFormat: "JWT"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
     cookieAuth:
-      type: "apiKey"
-      in: "cookie"
-      name: "jit"
+      type: http
+      in: cookie
+      name: jit
   responses:
     400BadRequest:
       description: Bad request
     401Unauthorized:
-      description: "Unauthorized"
+      description: Unauthorized
     403Forbidden:
-      description: "Forbidden"
+      description: Forbidden
     404NotFound:
-      description: "The specified resource was not found"
+      description: The specified resource was not found
     409ConflictError:
-      description: "There is a conflict with the state of the requested operation"
+      description: There is a conflict with the state of the requested operation
     500ServerError:
-      description: "Internal Server Error"
+      description: Internal Server Error
 paths:
   /auth/logout:
     get:
@@ -178,14 +193,14 @@ paths:
       operationId: logoutUser
       responses:
         '200':
-          description: "Successfully logged out"
+          description: Successfully logged out
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '500':
           $ref: '#/components/responses/500ServerError'
   /auth/login:
@@ -200,36 +215,36 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: "object"
+              type: object
               properties:
                 email:
-                  type: "string"
-                  format: "email"
+                  type: string
+                  format: email
                 password:
-                  type: "string"
-                  format: "password"
+                  type: string
+                  format: password
       responses:
         '200':
-          description: "Successfully logged in"
+          description: Successfully logged in
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
                   token:
-                    type: "string"
-                    format: "byte"
+                    type: string
+                    format: byte
         '400':
-          description: "Invalid Credentials/Validation Error"
+          description: Invalid Credentials/Validation Error
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
@@ -245,25 +260,25 @@ paths:
         - cookieAuth: []
       responses:
         '200':
-          description: 'Successfully refreshed token'
+          description: Successfully refreshed token
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
                   token:
-                    type: "string"
+                    type: string
         '403':
-          description: 'Refresh Token Validation Failures'
+          description: Refresh Token Validation Failures
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
@@ -280,38 +295,38 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: "object"
+              type: object
               properties:
                 email:
-                  type: "string"
+                  type: string
                 firstName:
-                  type: "string"
+                  type: string
                 lastName:
-                  type: "string"
+                  type: string
                 confirmPassword:
-                  type: "string"
-                  format: "password"
+                  type: string
+                  format: password
       responses:
         '200':
-          description: "Success, User Account Created"
+          description: Success, User Account Created
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
                   newUser:
-                    $ref: "#/components/schemas/User"
+                    $ref: '#/components/schemas/User'
         '400':
-          description: "Invalid Credentials/Validation Error"
+          description: Invalid Credentials/Validation Error
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '409':
           $ref: '#/components/responses/409ConflictError'
         '500':
@@ -327,11 +342,11 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: "Success, User Info"
+          description: Success, User Info
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '403':
@@ -349,11 +364,11 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: "Success, User Info"
+          description: Success, User Info
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
@@ -369,14 +384,14 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: "Success, User Account Deleted"
+          description: Success, User Account Deleted
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
@@ -393,20 +408,20 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: "object"
+              type: object
               properties:
                 email:
-                  type: "string"
+                  type: string
       responses:
         '200':
-          description: "Success, Verification Code Sent"
+          description: Success, Verification Code Sent
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '400':
           $ref: '#/components/responses/400BadRequest'
         '404':
@@ -425,38 +440,38 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: "object"
+              type: object
               properties:
                 email:
-                  type: "string"
+                  type: string
                 new_password:
-                  type: "string"
-                  format: "password"
+                  type: string
+                  format: password
                 verification_code:
-                  type: "string"
+                  type: string
       responses:
         '200':
-          description: "Success, Password Reset"
+          description: Success, Password Reset
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
                   user:
-                    $ref: "#/components/schemas/User"
+                    $ref: '#/components/schemas/User'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '403':
-          description: "Verification Code Validation Failures"
+          description: Verification Code Validation Failures
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
@@ -475,26 +490,26 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: "object"
+              type: object
               properties:
                 old_password:
-                  type: "string"
-                  format: "password"
+                  type: string
+                  format: password
                 new_password:
-                  type: "string"
-                  format: "password"
+                  type: string
+                  format: password
       responses:
         '200':
-          description: "Success, Password Changed"
+          description: Success, Password Changed
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
                   user:
-                    $ref: "#/components/schemas/User"
+                    $ref: '#/components/schemas/User'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -514,13 +529,13 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: "Success, All Posts"
+          description: Success, All Posts
           content:
             application/json:
               schema:
-                type: "array"
+                type: array
                 items:
-                  $ref: "#/components/schemas/Post"
+                  $ref: '#/components/schemas/Post'
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
@@ -536,13 +551,13 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: "Success, All Posts"
+          description: Success, All Posts
           content:
             application/json:
               schema:
-                type: "array"
+                type: array
                 items:
-                  $ref: "#/components/schemas/Post"
+                  $ref: '#/components/schemas/Post'
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
@@ -561,14 +576,14 @@ paths:
           in: path
           required: true
           schema:
-            type: "string"
+            type: string
       responses:
         '200':
-          description: "Success, Post"
+          description: Success, Post
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: '#/components/schemas/Post'
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '404':
@@ -589,14 +604,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Post"
+              $ref: '#/components/schemas/Post'
       responses:
         '200':
-          description: "Success, Post Created"
+          description: Success, Post Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: '#/components/schemas/Post'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -619,23 +634,23 @@ paths:
           in: path
           required: true
           schema:
-            type: "string"
+            type: string
       requestBody:
         required: true
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: "object"
+              type: object
               properties:
                 comment:
-                  type: "string"
+                  type: string
       responses:
         '200':
-          description: "Success, Comment Added"
+          description: Success, Comment Added
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: '#/components/schemas/Post'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -656,21 +671,21 @@ paths:
           in: path
           required: true
           schema:
-            type: "string"
-            format: "uuid"
+            type: string
+            format: mongo_id
         - name: commentId
           in: path
           required: true
           schema:
-            type: "string"
-            format: "uuid"
+            type: string
+            format: mongo_id
       responses:
         '200':
-          description: "Success, Comment Deleted"
+          description: Success, Comment Deleted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: '#/components/schemas/Post'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -691,15 +706,15 @@ paths:
           in: path
           required: true
           schema:
-            type: "string"
-            format: "uuid"
+            type: string
+            format: mongo_id
       responses:
         '200':
-          description: "Success, Post Liked"
+          description: Success, Post Liked
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: '#/components/schemas/Post'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -720,15 +735,15 @@ paths:
           in: path
           required: true
           schema:
-            type: "string"
-            format: "uuid"
+            type: string
+            format: mongo_id
       responses:
         '200':
-          description: "Success, Post Unliked"
+          description: Success, Post Unliked
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: '#/components/schemas/Post'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -749,18 +764,18 @@ paths:
           in: path
           required: true
           schema:
-            type: "string"
-            format: "uuid"
+            type: string
+            format: mongo_id
       responses:
         '200':
-          description: "Success, Post Deleted"
+          description: Success, Post Deleted
           content:
             application/json:
               schema:
-                type: "object"
+                type: object
                 properties:
                   message:
-                    type: "string"
+                    type: string
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -778,11 +793,11 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: "Success, User Profile"
+          description: Success, User Profile
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Profile"
+                $ref: '#/components/schemas/Profile'
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
@@ -801,14 +816,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Profile"
+              $ref: '#/components/schemas/Profile'
       responses:
         '200':
-          description: "Success, Profile Created"
+          description: Success, Profile Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Profile"
+                $ref: '#/components/schemas/Profile'
         '400':
           $ref: '#/components/responses/400BadRequest'
         '401':
@@ -817,4 +832,53 @@ paths:
           $ref: '#/components/responses/409ConflictError'
         '500':
           $ref: '#/components/responses/500ServerError'
-    
+  /messaging/get-messages:
+    get:
+      tags:
+        - Message
+      summary: Get Messages from a User
+      description: Returns All messages from the authenticated user
+      operationId: getMessages
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success, Messages from user returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /messaging/send-message:
+    post:
+      tags:
+        - Message
+      summary: Send Message
+      description: Saves a new message
+      operationId: sendMessage
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '200':
+          description: Success, Message Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '409':
+          $ref: '#/components/responses/409ConflictError'
+        '500':
+          $ref: '#/components/responses/500ServerError'

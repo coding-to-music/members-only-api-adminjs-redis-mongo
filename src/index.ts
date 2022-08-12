@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
-  path: '/v1/instant-messaging',
+  path: '/v1/messaging',
   pingTimeout: 30000
 })
 
