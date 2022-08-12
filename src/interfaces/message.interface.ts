@@ -6,7 +6,7 @@ export interface IMessage extends Document {
     content: string
 }
 
-export interface IOnlineUserData {
+export interface IUserOnlineData {
     clientID: string,
     username: string,
     avatar: string

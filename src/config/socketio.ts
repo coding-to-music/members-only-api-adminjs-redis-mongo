@@ -2,42 +2,39 @@ import { Socket } from 'socket.io'
 import { logger } from '@utils/logger'
 import User from '@models/User'
 import { IMessage } from '@interfaces/message.interface'
-import { IUser } from '@interfaces/users.interface';
-import { IOnlineUserData } from '@interfaces/message.interface';
+import { IUserOnlineData } from '@interfaces/message.interface';
 
 
-const onlineUsers: Map<string, IOnlineUserData> = new Map<string, IOnlineUserData>()
+const onlineUsers: Map<string, IUserOnlineData> = new Map<string, IUserOnlineData>()
 
 export const onConnection = (client: Socket) => {
 
     logger.info(`Client with socket ID ${client.id} has connected`)
 
-    client.on('userOnline', (userID: string) => {
+    client.on('userOnline', async (userID: string) => {
 
-        if (!onlineUsers.has(userID)) {
+        if (onlineUsers.has(userID)) {
 
-            User.findById(userID, (err: any, user: IUser) => {
-
-                if (err) {
-                    client.emit('userNotFound', `User with id ${userID} not found`)
-                } else {
-
-                    const data: IOnlineUserData = {
-                        clientID: client.id,
-                        username: user.name,
-                        avatar: user.avatar
-                    };
-
-                    onlineUsers.set(userID, data)
-                    client.broadcast.emit('onlineUsers', [...onlineUsers.values()])
-                }
-
-            })
+            client.emit('userAlreadyOnline', 'User is already online')
 
         } else {
-            client.emit('userAlreadyOnline', 'User is already online')
-        }
 
+            const user = await User.findById(userID).exec();
+
+            if (user) {
+
+                const data: IUserOnlineData = {
+                    clientID: client.id,
+                    username: user.name,
+                    avatar: user.avatar
+                };
+
+                onlineUsers.set(userID, data)
+                client.broadcast.emit('onlineUsers', [...onlineUsers.values()])
+            } else {
+                client.emit('userNotFound', `User with id ${userID} not found`)
+            }
+        }
     })
 
     client.on('sendPrivateMessage', (message: IMessage) => {
@@ -56,7 +53,7 @@ export const onConnection = (client: Socket) => {
     client.on('userOffline', (userID: string) => {
 
         if (onlineUsers.has(userID)) {
-            
+
             onlineUsers.delete(userID);
             client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
             logger.info(`User with ID ${userID} is offline`);
