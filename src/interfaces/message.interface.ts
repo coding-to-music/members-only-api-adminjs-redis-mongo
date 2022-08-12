@@ -5,3 +5,9 @@ export interface IMessage extends Document {
     recipient: Types.ObjectId;
     content: string
 }
+
+export interface IOnlineUserData {
+    clientID: string,
+    username: string,
+    avatar: string
+}

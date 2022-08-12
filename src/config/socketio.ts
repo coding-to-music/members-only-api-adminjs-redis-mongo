@@ -1,43 +1,68 @@
 import { Socket } from 'socket.io'
 import { logger } from '@utils/logger'
+import User from '@models/User'
 import { IMessage } from '@interfaces/message.interface'
+import { IUser } from '@interfaces/users.interface';
+import { IOnlineUserData } from '@interfaces/message.interface';
 
-const onlineUsers: Map<string, string> = new Map<string, string>()
+
+const onlineUsers: Map<string, IOnlineUserData> = new Map<string, IOnlineUserData>()
 
 export const onConnection = (client: Socket) => {
 
     logger.info(`Client with socket ID ${client.id} has connected`)
 
-    client.on('user-online', (userID: string) => {
+    client.on('userOnline', (userID: string) => {
 
         if (!onlineUsers.has(userID)) {
-            onlineUsers.set(userID, client.id)
+
+            User.findById(userID, (err: any, user: IUser) => {
+
+                if (err) {
+                    client.emit('userNotFound', `User with id ${userID} not found`)
+                } else {
+
+                    const data: IOnlineUserData = {
+                        clientID: client.id,
+                        username: user.name,
+                        avatar: user.avatar
+                    };
+
+                    onlineUsers.set(userID, data)
+                    client.broadcast.emit('onlineUsers', [...onlineUsers.values()])
+                }
+
+            })
+
         } else {
-            client.emit('user-already-online', 'User is already on-line')
+            client.emit('userAlreadyOnline', 'User is already online')
         }
 
     })
 
-    client.on('send-private-message', (message: IMessage) => {
+    client.on('sendPrivateMessage', (message: IMessage) => {
 
         const { recipient, content } = message;
-        const recipientSocketID = onlineUsers.get(String(recipient));
+        const recipientData = onlineUsers.get(String(recipient));
 
-        if (recipientSocketID) {
-            client.to(recipientSocketID).emit('receive-private-message', content)
+        if (recipientData) {
+            client.to(recipientData.clientID).emit('receivePrivateMessage', content)
         } else {
-            client.emit('recipient-offline', `Recipient with userID ${recipient} is currently offline`)
+            client.emit('recipientOffline', `Recipient with userID ${recipient} is currently offline`)
         }
 
     });
 
-    client.on('user-offline', (userID: string) => {
+    client.on('userOffline', (userID: string) => {
 
         if (onlineUsers.has(userID)) {
-            onlineUsers.delete(userID)
-            logger.info(`User with ID ${userID} is offline`)
+            
+            onlineUsers.delete(userID);
+            client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
+            logger.info(`User with ID ${userID} is offline`);
+
         } else {
-            client.emit('user-not-online', 'Cannot set oser offline, User not currently online')
+            client.emit('userNotOnline', 'Cannot set user offline, User not currently online')
         }
 
     });
