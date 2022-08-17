@@ -1,6 +1,6 @@
 import http from 'http';
 import { Server } from 'socket.io'
-import app from '@/app';
+import app, { corsOptions } from '@/app';
 import { logger } from '@utils/logger';
 import { onConnection } from '@config/socketio';
 
@@ -11,7 +11,8 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   path: '/v1/messaging',
-  pingTimeout: 30000
+  pingTimeout: 30000,
+  cors: corsOptions
 })
 
 io.on('connection', onConnection)

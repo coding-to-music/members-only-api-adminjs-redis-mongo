@@ -39,7 +39,7 @@ const whitelist = [
     'http://api-mbo.polldevs.com',
     'https://mema.polldevs.com'
 ];
-const corsOptions: CorsOptions = {
+export const corsOptions: CorsOptions = {
     credentials: true,
     methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT', 'PATCH'],
     origin: (requestOrigin: string | undefined, callback) => {
