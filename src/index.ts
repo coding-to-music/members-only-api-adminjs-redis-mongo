@@ -5,14 +5,14 @@ import { logger } from '@utils/logger';
 import { onConnection } from '@config/socketio';
 
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   path: '/v1/messaging',
   pingTimeout: 30000,
-  // cors: corsOptions
+  cors: corsOptions
 })
 
 io.on('connection', onConnection)

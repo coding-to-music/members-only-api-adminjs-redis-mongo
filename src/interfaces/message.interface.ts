@@ -11,3 +11,9 @@ export interface IUserOnlineData {
     username: string,
     avatar: string
 }
+
+export interface IncomingSocketData {
+    _id: string,
+    name: string,
+    avatar: string
+}

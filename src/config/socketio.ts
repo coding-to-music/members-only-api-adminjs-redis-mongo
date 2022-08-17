@@ -2,8 +2,7 @@ import { Socket } from 'socket.io'
 import { logger } from '@utils/logger'
 import User from '@models/User'
 import { IMessage } from '@interfaces/message.interface'
-import { IUserOnlineData } from '@interfaces/message.interface';
-
+import { IUserOnlineData, IncomingSocketData } from '@interfaces/message.interface';
 
 const onlineUsers: Map<string, IUserOnlineData> = new Map<string, IUserOnlineData>()
 
@@ -11,30 +10,32 @@ export const onConnection = (client: Socket) => {
 
     logger.info(`Client with socket ID ${client.id} has connected`)
 
-    client.on('userOnline', async (userID: string) => {
+    client.on('userOnline', async (data: IncomingSocketData) => {
 
-        if (onlineUsers.has(userID)) {
+        try {
+            
+            const { _id, avatar, name } = data;
 
-            client.emit('userAlreadyOnline', 'User is already online')
+            if (onlineUsers.has(_id)) {
 
-        } else {
+                client.emit('userAlreadyOnline', 'User is already online')
 
-            const user = await User.findById(userID).exec();
+            } else {
 
-            if (user) {
-
-                const data: IUserOnlineData = {
+                const userData: IUserOnlineData = {
                     clientID: client.id,
-                    username: user.name,
-                    avatar: user.avatar
+                    username: name,
+                    avatar: avatar
                 };
 
-                onlineUsers.set(userID, data)
+                onlineUsers.set(_id, userData)
                 client.broadcast.emit('onlineUsers', [...onlineUsers.values()])
-            } else {
-                client.emit('userNotFound', `User with id ${userID} not found`)
+
             }
+        } catch (error) {
+            console.log(error)
         }
+
     })
 
     client.on('sendPrivateMessage', (message: IMessage) => {
