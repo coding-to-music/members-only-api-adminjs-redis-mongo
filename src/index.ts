@@ -12,7 +12,7 @@ const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   path: '/v1/messaging',
   pingTimeout: 30000,
-  cors: corsOptions
+  // cors: corsOptions
 })
 
 io.on('connection', onConnection)
