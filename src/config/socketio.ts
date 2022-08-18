@@ -3,6 +3,7 @@ import { logger } from '@utils/logger'
 import { IMessage } from '@interfaces/message.interface'
 import { IUserOnlineData, IncomingSocketData } from '@interfaces/message.interface';
 import { getDisconnectedUser } from '@utils/lib';
+import { HttpException } from '@exceptions/HttpException';
 
 const onlineUsers: Map<string, IUserOnlineData> = new Map<string, IUserOnlineData>()
 
@@ -32,51 +33,66 @@ export const onConnection = (client: Socket) => {
                 client.broadcast.emit('onlineUsers', [...onlineUsers.values()])
 
             }
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            logger.error('Something went wrong', error)
+            throw new HttpException(500, error.message ?? 'Something went wrong')
         }
 
     })
 
     client.on('sendPrivateMessage', (message: IMessage) => {
 
-        const { recipient, content } = message;
-        const recipientData = onlineUsers.get(String(recipient));
+        try {
+            const { recipient, content } = message;
+            const recipientData = onlineUsers.get(String(recipient));
 
-        if (recipientData) {
-            client.to(recipientData.clientID).emit('receivePrivateMessage', content)
-        } else {
-            client.emit('recipientOffline', `Recipient with userID ${recipient} is currently offline`)
+            if (recipientData) {
+                client.to(recipientData.clientID).emit('receivePrivateMessage', content)
+            } else {
+                client.emit('recipientOffline', `Recipient with userID ${recipient} is currently offline`)
+            }
+        } catch (error) {
+            logger.error('Something went wrong', error)
+            throw new HttpException(500, 'Something went wrong')
         }
 
     });
 
     client.on('userOffline', (userID: string) => {
 
-        if (onlineUsers.has(userID)) {
+        try {
+            if (onlineUsers.has(userID)) {
 
-            onlineUsers.delete(userID);
-            client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
-            logger.info(`User with ID ${userID} is offline`);
+                onlineUsers.delete(userID);
+                client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
+                logger.info(`User with ID ${userID} is offline`);
 
-        } else {
-            client.emit('userNotOnline', 'Cannot set user offline, User not currently online')
+            } else {
+                client.emit('userNotOnline', 'Cannot set user offline, User not currently online')
+            }
+        } catch (error: any) {
+            logger.error('Something went wrong', error)
+            throw new HttpException(500, error.message ?? 'Something went wrong')
         }
 
     });
 
     client.on('disconnect', () => {
 
-        const disconnectedUser = getDisconnectedUser(onlineUsers, client.id)
+        try {
 
-        if (disconnectedUser) {
+            if (getDisconnectedUser(onlineUsers, client.id)) {
 
-            onlineUsers.delete(disconnectedUser);
-            client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
-            logger.info(`Client with socket ID ${client.id} has disconnected`);
-            
-        } else {
-            logger.info(`Client with socket ID ${client.id} has disconnected`);
+                onlineUsers.delete(getDisconnectedUser(onlineUsers, client.id));
+                client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
+                logger.info(`Client with socket ID ${client.id} has disconnected`);
+
+            } else {
+                logger.info(`Client with socket ID ${client.id} has disconnected`);
+            }
+        } catch (error: any) {
+            logger.error('Something went wrong', error)
+            throw new HttpException(500, error.message ?? 'Something went wrong')
         }
 
     });
