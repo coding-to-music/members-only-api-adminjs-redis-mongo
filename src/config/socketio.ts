@@ -3,7 +3,6 @@ import { logger } from '@utils/logger'
 import { IMessage } from '@interfaces/message.interface'
 import { IUserOnlineData, IncomingSocketData } from '@interfaces/message.interface';
 import { getDisconnectedUser } from '@utils/lib';
-import { HttpException } from '@exceptions/HttpException';
 
 const onlineUsers: Map<string, IUserOnlineData> = new Map<string, IUserOnlineData>()
 
@@ -35,7 +34,7 @@ export const onConnection = (client: Socket) => {
             }
         } catch (error: any) {
             logger.error('Something went wrong', error)
-            throw new HttpException(500, error.message ?? 'Something went wrong')
+            client.emit('errorOccured', error.message ?? 'Something went wrong')
         }
 
     })
@@ -51,9 +50,9 @@ export const onConnection = (client: Socket) => {
             } else {
                 client.emit('recipientOffline', `Recipient with userID ${recipient} is currently offline`)
             }
-        } catch (error) {
+        } catch (error: any) {
             logger.error('Something went wrong', error)
-            throw new HttpException(500, 'Something went wrong')
+            client.emit('errorOccured', error.message ?? 'Something went wrong')
         }
 
     });
@@ -72,7 +71,7 @@ export const onConnection = (client: Socket) => {
             }
         } catch (error: any) {
             logger.error('Something went wrong', error)
-            throw new HttpException(500, error.message ?? 'Something went wrong')
+            client.emit('errorOccured', error.message ?? 'Something went wrong')
         }
 
     });
@@ -81,9 +80,11 @@ export const onConnection = (client: Socket) => {
 
         try {
 
-            if (getDisconnectedUser(onlineUsers, client.id)) {
+            const foundKey = getDisconnectedUser(onlineUsers, client.id) 
+            
+            if (foundKey) {
 
-                onlineUsers.delete(getDisconnectedUser(onlineUsers, client.id));
+                onlineUsers.delete(foundKey);
                 client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
                 logger.info(`Client with socket ID ${client.id} has disconnected`);
 
@@ -92,7 +93,7 @@ export const onConnection = (client: Socket) => {
             }
         } catch (error: any) {
             logger.error('Something went wrong', error)
-            throw new HttpException(500, error.message ?? 'Something went wrong')
+            client.emit('errorOccured', error.message ?? 'Something went wrong')
         }
 
     });

@@ -6,7 +6,7 @@ import { IPost } from '@interfaces/posts.interface';
 import { sign } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
 import { ITokens } from '@interfaces/auth.interface';
-import { NotFoundException } from '@exceptions/commonExceptions';
+import { InternalServerErrorException, NotFoundException } from '@exceptions/commonExceptions';
 import { IUserOnlineData } from '@interfaces/message.interface';
 
 
@@ -112,5 +112,11 @@ export const checkIfPostExists = async (req: Request, res: Response, next: NextF
 }
 
 export const getDisconnectedUser = (map: Map<string, IUserOnlineData>, searchValue: string) => {
-    return [...map.entries()].filter(([_key, value]) => value.clientID === searchValue)[0][0]
+
+    try {
+        const foundKey = [...map.entries()].find(([_key, value]) => value.clientID === searchValue)![0]
+        return foundKey ? foundKey : false
+    } catch (error: any) {
+        throw new InternalServerErrorException(error.message ?? 'Something went wrong')
+    }
 }
