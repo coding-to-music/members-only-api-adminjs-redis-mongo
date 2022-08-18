@@ -5,7 +5,7 @@ import { logger } from '@utils/logger';
 import { onConnection } from '@config/socketio';
 
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 const httpServer = http.createServer(app);
 

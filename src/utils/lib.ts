@@ -7,6 +7,8 @@ import { sign } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
 import { ITokens } from '@interfaces/auth.interface';
 import { NotFoundException } from '@exceptions/commonExceptions';
+import { IUserOnlineData } from '@interfaces/message.interface';
+
 
 export const generateRandomCode = async (length: number): Promise<string | null> => {
     try {
@@ -107,4 +109,8 @@ export const checkIfPostExists = async (req: Request, res: Response, next: NextF
     } catch (error) {
         return next(error);
     }
+}
+
+export const getDisconnectedUser = (map: Map<string, IUserOnlineData>, searchValue: string) => {
+    return [...map.entries()].filter(([_key, value]) => value.clientID === searchValue)[0][0]
 }

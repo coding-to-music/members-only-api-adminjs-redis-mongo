@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io'
 import { logger } from '@utils/logger'
-import User from '@models/User'
 import { IMessage } from '@interfaces/message.interface'
 import { IUserOnlineData, IncomingSocketData } from '@interfaces/message.interface';
+import { getDisconnectedUser } from '@utils/lib';
 
 const onlineUsers: Map<string, IUserOnlineData> = new Map<string, IUserOnlineData>()
 
@@ -13,7 +13,7 @@ export const onConnection = (client: Socket) => {
     client.on('userOnline', async (data: IncomingSocketData) => {
 
         try {
-            
+
             const { _id, avatar, name } = data;
 
             if (onlineUsers.has(_id)) {
@@ -66,7 +66,19 @@ export const onConnection = (client: Socket) => {
     });
 
     client.on('disconnect', () => {
-        logger.info(`Client with socket ID ${client.id} has disconnected`);
+
+        const disconnectedUser = getDisconnectedUser(onlineUsers, client.id)
+
+        if (disconnectedUser) {
+
+            onlineUsers.delete(disconnectedUser);
+            client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
+            logger.info(`Client with socket ID ${client.id} has disconnected`);
+            
+        } else {
+            logger.info(`Client with socket ID ${client.id} has disconnected`);
+        }
+
     });
 
 }
