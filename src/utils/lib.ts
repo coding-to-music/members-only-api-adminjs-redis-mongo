@@ -7,7 +7,7 @@ import { sign } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
 import { ITokens } from '@interfaces/auth.interface';
 import { InternalServerErrorException, NotFoundException } from '@exceptions/commonExceptions';
-import { IUserOnlineData } from '@interfaces/message.interface';
+import { IChatUserData } from '@interfaces/message.interface';
 
 
 export const generateRandomCode = async (length: number): Promise<string | null> => {
@@ -111,12 +111,7 @@ export const checkIfPostExists = async (req: Request, res: Response, next: NextF
     }
 }
 
-export const getDisconnectedUser = (map: Map<string, IUserOnlineData>, searchValue: string) => {
-
-    try {
-        const foundKey = [...map.entries()].find(([_key, value]) => value.clientID === searchValue)![0]
-        return foundKey ? foundKey : false
-    } catch (error: any) {
-        throw new InternalServerErrorException(error.message ?? 'Something went wrong')
-    }
+export const getDisconnectedUser = (map: Map<string, IChatUserData>, searchValue: string): string | false => {
+    const foundKey = [...map.entries()].find(([_key, value]) => value.clientID === searchValue);
+    return foundKey ? foundKey[0] : false;
 }

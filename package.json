@@ -78,6 +78,6 @@
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "jest --coverage",
-    "dev-ts": "ts-node-dev -r tsconfig-paths/register src/index.ts"
+    "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts"
   }
 }

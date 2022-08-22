@@ -36,7 +36,7 @@ class MessageController {
 
     public sendMessage = [
 
-        body('recepient').notEmpty().isMongoId().withMessage('Recipient must be a valid MongoDB ID string'),
+        body('recipient').notEmpty().isMongoId().withMessage('Recipient must be a valid MongoDB ID string'),
         body('content').notEmpty().isString().trim().isLength({ min: 1 }).withMessage('Message Content must be a string with a least 1 character'),
 
         async (req: RequestWithUser, res: Response, next: NextFunction) => {

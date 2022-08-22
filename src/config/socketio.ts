@@ -1,10 +1,10 @@
 import { Socket } from 'socket.io'
+import { io } from '@/index'
 import { logger } from '@utils/logger'
-import { IMessage } from '@interfaces/message.interface'
-import { IUserOnlineData, IncomingSocketData } from '@interfaces/message.interface';
+import { IChatUserData, IMessageData, IncomingSocketData } from '@interfaces/message.interface';
 import { getDisconnectedUser } from '@utils/lib';
 
-const onlineUsers: Map<string, IUserOnlineData> = new Map<string, IUserOnlineData>()
+const onlineUsers: Map<string, IChatUserData> = new Map<string, IChatUserData>();
 
 export const onConnection = (client: Socket) => {
 
@@ -22,14 +22,15 @@ export const onConnection = (client: Socket) => {
 
             } else {
 
-                const userData: IUserOnlineData = {
+                const userData: IChatUserData = {
+                    avatar: avatar,
                     clientID: client.id,
-                    username: name,
-                    avatar: avatar
+                    userID: _id,
+                    username: name
                 };
 
                 onlineUsers.set(_id, userData)
-                client.broadcast.emit('onlineUsers', [...onlineUsers.values()])
+                io.emit('setOnlineUsers', [...onlineUsers.values()])
 
             }
         } catch (error: any) {
@@ -39,16 +40,16 @@ export const onConnection = (client: Socket) => {
 
     })
 
-    client.on('sendPrivateMessage', (message: IMessage) => {
+    client.on('sendPrivateMessage', (message: IMessageData) => {
 
         try {
-            const { recipient, content } = message;
-            const recipientData = onlineUsers.get(String(recipient));
+            const { content, recipientID } = message;
+            const recipientData = onlineUsers.get(recipientID);
 
             if (recipientData) {
                 client.to(recipientData.clientID).emit('receivePrivateMessage', content)
             } else {
-                client.emit('recipientOffline', `Recipient with userID ${recipient} is currently offline`)
+                client.emit('recipientOffline', `Recipient with userID ${recipientID} is currently offline`)
             }
         } catch (error: any) {
             logger.error('Something went wrong', error)
@@ -63,11 +64,11 @@ export const onConnection = (client: Socket) => {
             if (onlineUsers.has(userID)) {
 
                 onlineUsers.delete(userID);
-                client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
+                client.broadcast.emit('setOnlineUsers', [...onlineUsers.values()]);
                 logger.info(`User with ID ${userID} is offline`);
 
             } else {
-                client.emit('userNotOnline', 'Cannot set user offline, User not currently online')
+                client.emit('userNotOnline', 'Cannot set user offline, user not currently online')
             }
         } catch (error: any) {
             logger.error('Something went wrong', error)
@@ -80,12 +81,12 @@ export const onConnection = (client: Socket) => {
 
         try {
 
-            const foundKey = getDisconnectedUser(onlineUsers, client.id) 
-            
+            const foundKey = getDisconnectedUser(onlineUsers, client.id)
+
             if (foundKey) {
 
                 onlineUsers.delete(foundKey);
-                client.broadcast.emit('onlineUsers', [...onlineUsers.values()]);
+                client.broadcast.emit('setOnlineUsers', [...onlineUsers.values()]);
                 logger.info(`Client with socket ID ${client.id} has disconnected`);
 
             } else {

@@ -6,8 +6,9 @@ export interface IMessage extends Document {
     content: string
 }
 
-export interface IUserOnlineData {
+export interface IChatUserData {
     clientID: string,
+    userID: string,
     username: string,
     avatar: string
 }
@@ -16,4 +17,9 @@ export interface IncomingSocketData {
     _id: string,
     name: string,
     avatar: string
+}
+
+export interface IMessageData {
+    content: string,
+    recipientID: string
 }

@@ -1,21 +1,20 @@
 import http from 'http';
-import { Server } from 'socket.io'
+import { Server } from 'socket.io';
 import app, { corsOptions } from '@/app';
 import { logger } from '@utils/logger';
-import { onConnection } from '@config/socketio';
+import { onConnection } from './config/socketio';
 
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 const httpServer = http.createServer(app);
 
-const io = new Server(httpServer, {
+export const io = new Server(httpServer, {
   path: '/v1/messaging',
   pingTimeout: 30000,
   cors: corsOptions
 })
 
-io.on('connection', onConnection)
+io.on('connection', onConnection);
 
 httpServer.listen(PORT, () => {
   logger.info(`Server Started on port: ${PORT}`)
