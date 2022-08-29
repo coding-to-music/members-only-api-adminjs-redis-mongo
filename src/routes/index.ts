@@ -1,7 +1,7 @@
-import express from "express";
+import { Router } from 'express';
 
-const router = express.Router();
+const indexRouter = Router();
 
-router.get('/', (req, res) => res.redirect('/v1'));
+indexRouter.get('/', (req, res) => res.redirect('/v1'));
 
-export default router
+export default indexRouter;

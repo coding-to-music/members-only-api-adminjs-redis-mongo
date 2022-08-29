@@ -12,9 +12,10 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import rateLimit from 'express-rate-limit'
 import { HttpException } from '@exceptions/HttpException'
+import { ENV } from '@utils/validateEnv';
 
 // Import Configs
-import initDB from '@config/database';
+import { connectDatabase } from '@config/database';
 import passportConfig from '@middlewares/passport';
 import { stream } from '@utils/logger';
 
@@ -22,10 +23,8 @@ import { stream } from '@utils/logger';
 import apiRouter from '@routes/api/api';
 import indexRouter from '@routes/index';
 
-config();
-
-// Initialize DB
-initDB();
+// Connect To Database
+connectDatabase();
 
 // Load Paasport configuration
 passportConfig(passport);
@@ -69,7 +68,7 @@ app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
 
 app.use(passport.initialize());
-app.use(cookieParser(process.env['COOKIE_SECRET']));
+app.use(cookieParser(ENV.COOKIE_SECRET));
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression());

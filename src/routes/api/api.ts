@@ -1,20 +1,25 @@
 import { Router } from 'express';
-import authRouter from '@routes/api/AuthRouter';
-import messageRouter from '@routes/api/MessageRouter';
-import passwordRouter from '@routes/api/PasswordRouter';
-import postRouter from '@routes/api/PostRouter';
-import profileRouter from '@routes/api/ProfileRouter';
-import userRouter from '@routes/api/UserRouter';
+import authRouter from '@src/routes/api/authRouter';
+import mediaRouter from '@src/routes/api/mediaRouter';
+import messageRouter from '@src/routes/api/messageRouter';
+import passwordRouter from '@src/routes/api/passwordRouter';
+import postRouter from '@routes/api/postRouter';
+import profileRouter from '@src/routes/api/profileRouter';
+import userRouter from '@src/routes/api/userRouter';
 
-const router: Router = Router();
+const apiRouter: Router = Router();
 
-router.get('/', (req, res) => { res.json({ msg: 'HELLO VISITOR, THANKS FOR STOPPING BY AND WELCOME TO MEMBERS-ONLY API' }) });
+apiRouter.get('/', (req, res) => res.json({
+    message: 'HELLO VISITOR, THANK YOU FOR STOPPING-BY AND WELCOME TO MEMBERS-ONLY API',
+    documentation: `Please visit '/api-docs' for API Documentation`
+}));
 
-router.use('/auth', authRouter);
-router.use('/messaging', messageRouter);
-router.use('/password', passwordRouter);
-router.use('/posts', postRouter);
-router.use('/profile', profileRouter);
-router.use('/users', userRouter);
+apiRouter.use('/auth', authRouter);
+apiRouter.use('/media', mediaRouter);
+apiRouter.use('/messaging', messageRouter);
+apiRouter.use('/password', passwordRouter);
+apiRouter.use('/posts', postRouter);
+apiRouter.use('/profile', profileRouter);
+apiRouter.use('/users', userRouter);
 
-export default router;
+export default apiRouter;
