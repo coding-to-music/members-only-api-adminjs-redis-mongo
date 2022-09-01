@@ -1,7 +1,6 @@
 import Message from '@models/Message';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { NextFunction, Response } from 'express';
-import { NotFoundException } from '@exceptions/commonExceptions';
 import { logger } from '@utils/logger';
 
 class MessageController {
@@ -9,10 +8,14 @@ class MessageController {
     public async getMessages(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
 
-            const { _id } = req.user
+            const { _id } = req.user;
 
-            const messages = await Message.find({ sender: _id });
-            if (!messages.length) throw new NotFoundException('User has no messages');
+            const fromUser = (await Message.find({ sender: _id }))
+                .map(message => { return { content: message.content, recipient: message.recipient } });
+            const toUser = (await Message.find({ recipient: _id }))
+                .map(message => { return { content: message.content, sender: message.sender } });
+
+            const messages = { fromUser, toUser };
 
             res.status(200).json({ status: 'success', messages });
 
