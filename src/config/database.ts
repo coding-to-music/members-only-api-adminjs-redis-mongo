@@ -1,6 +1,6 @@
 import { connect, connection, mongo } from 'mongoose';
 import { ENV } from '@utils/validateEnv';
-import { GridFSBucket } from 'mongodb';
+import { GridFSBucket } from 'mongoose/node_modules/mongodb';
 
 let bucket: GridFSBucket;
 
