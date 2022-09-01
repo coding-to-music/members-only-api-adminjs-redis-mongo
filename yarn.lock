@@ -5964,9 +5964,9 @@ raw-body@2.5.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-"react-currency-input-field@git+https://github.com/dziraf/react-currency-input-field.git":
+"react-currency-input-field@https://github.com/dziraf/react-currency-input-field":
   version "3.6.4"
-  resolved "git+https://github.com/dziraf/react-currency-input-field.git#6ee883672ecee131b1503d48319a50aa64fdcd26"
+  resolved "https://github.com/dziraf/react-currency-input-field#6ee883672ecee131b1503d48319a50aa64fdcd26"
 
 react-datepicker@^4.8.0:
   version "4.8.0"

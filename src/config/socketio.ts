@@ -22,7 +22,7 @@ export const onConnection = (client: Socket) => {
 
                 client.emit('userAlreadyOnline', 'User is already online')
 
-            } else {
+            } else if (_id && avatar && name) {
 
                 const userData: IChatUserData = {
                     avatar: avatar,
@@ -34,6 +34,8 @@ export const onConnection = (client: Socket) => {
                 onlineUsers.set(_id, userData)
                 io.emit('setOnlineUsers', [...onlineUsers.values()])
 
+            } else {
+                client.emit('errorOccured', 'Something went wrong')
             }
         } catch (error: any) {
             logger.error('Something went wrong', error)
