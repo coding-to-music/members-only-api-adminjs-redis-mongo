@@ -21,5 +21,6 @@ export interface IncomingSocketData {
 
 export interface IMessageData {
     content: string,
+    senderID: string,
     recipientID: string
 }

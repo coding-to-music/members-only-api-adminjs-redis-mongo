@@ -7,6 +7,6 @@ const messageRouter: CustomIRouter = Router();
 
 messageRouter.get('/get-messages', passport.authenticate('jwt', { session: false }), messageController.getMessages);
 
-messageRouter.post('/send-message', passport.authenticate('jwt', { session: false }), messageController.sendMessage)
+messageRouter.delete('/delete-message/:_id', passport.authenticate('jwt', { session: false }), messageController.deleteMessage)
 
 export default messageRouter;

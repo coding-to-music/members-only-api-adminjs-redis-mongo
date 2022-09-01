@@ -8,4 +8,6 @@ mediaRouter.post('/upload', mediaController.uploadMedia);
 
 mediaRouter.get('/:filename', mediaController.getMediaFile);
 
+mediaRouter.delete('/:filename/delete', mediaController.deleteMediaFile);
+
 export default mediaRouter;

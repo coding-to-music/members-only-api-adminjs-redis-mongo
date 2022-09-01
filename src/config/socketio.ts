@@ -1,6 +1,8 @@
 import { Socket } from 'socket.io'
 import { io } from '@/index'
 import { logger } from '@utils/logger'
+import { Types } from 'mongoose'
+import Message from '@models/Message'
 import { IChatUserData, IMessageData, IncomingSocketData } from '@interfaces/message.interface';
 import { getDisconnectedUser } from '@utils/lib';
 
@@ -40,14 +42,22 @@ export const onConnection = (client: Socket) => {
 
     })
 
-    client.on('sendPrivateMessage', (message: IMessageData) => {
+    client.on('sendPrivateMessage', async (message: IMessageData) => {
 
         try {
-            const { content, recipientID } = message;
+            const { content, senderID, recipientID } = message;
             const recipientData = onlineUsers.get(recipientID);
 
+            const messageToSave = new Message({
+                sender: new Types.ObjectId(senderID),
+                recipient: new Types.ObjectId(recipientID),
+                content
+            });
+
+            await messageToSave.save();
+
             if (recipientData) {
-                client.to(recipientData.clientID).emit('receivePrivateMessage', content)
+                client.to(recipientData.clientID).emit('receivePrivateMessage', content);
             } else {
                 client.emit('recipientOffline', `Recipient with userID ${recipientID} is currently offline`)
             }

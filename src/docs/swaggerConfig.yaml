@@ -161,6 +161,9 @@ components:
           format: mongo_id
         content:
           type: string
+    File:
+      type: string
+      format: binary
   securitySchemes:
     BearerAuth:
       type: http
@@ -852,13 +855,13 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /messaging/send-message:
-    post:
+  /messaging/delete-message/{_id}:
+    delete:
       tags:
         - Message
-      summary: Send Message
-      description: Saves a new message
-      operationId: sendMessage
+      summary: Delete Message
+      description: Deletes a message
+      operationId: deleteMessage
       security:
         - BearerAuth: []
       requestBody:
@@ -869,7 +872,7 @@ paths:
               $ref: '#/components/schemas/Message'
       responses:
         '200':
-          description: Success, Message Created
+          description: Success, Message Deleted
           content:
             application/json:
               schema:
@@ -878,7 +881,77 @@ paths:
           $ref: '#/components/responses/400BadRequest'
         '401':
           $ref: '#/components/responses/401Unauthorized'
-        '409':
-          $ref: '#/components/responses/409ConflictError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /media/upload:
+    post:
+      tags:
+        - Media
+      summary: Upload Media
+      description: Uploads a new File
+      operationId: uploadMedia
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File'
+      responses:
+        '200':
+          description: Success, Message Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /media/{filename}:
+    get:
+      tags:
+        - File
+      summary: Get File
+      description: Returns file with the specified filename
+      operationId: getMediaFile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success, File returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /media/{filename}/delete:
+    delete:
+      tags:
+        - File
+      summary: Delete File
+      description: Deletes a single file with the specified filename
+      operationId: deleteMediaFile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success, File deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'

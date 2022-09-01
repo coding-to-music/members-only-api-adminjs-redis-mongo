@@ -3,6 +3,7 @@ import { param, validationResult } from 'express-validator';
 import { NotFoundException, ValidationException } from '@exceptions/commonExceptions';
 import { getBucket } from '@config/database';
 import { getFileStorage } from '@middlewares/multer';
+import { logger } from '@utils/logger';
 
 
 class MediaController {
@@ -15,10 +16,19 @@ class MediaController {
 
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                return res.status(200).json({ status: 'success', message: 'File Uploaded Successfully' })
-            } catch (error: any) {
-                console.error(error.message)
-                next(error)
+                return res.status(200).json({
+                    status: 'success',
+                    message: 'File Uploaded Successfully'
+                })
+            } catch (err: any) {
+                logger.error(`
+                ${err.statusCode ?? 500} - 
+                ${err.error ?? 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err);
             }
         }
     ];
@@ -46,9 +56,55 @@ class MediaController {
 
                 bucket.openDownloadStreamByName(filename).pipe(res)
 
-            } catch (error: any) {
-                console.error(error.message)
-                next(error)
+            } catch (err: any) {
+                logger.error(`
+                ${err.statusCode ?? 500} - 
+                ${err.error ?? 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err);
+            }
+        }
+
+    ]
+
+
+    public deleteMediaFile = [
+
+        param('filename', 'File name is required').notEmpty().trim().escape(),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            try {
+
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
+
+                const { filename } = req.params;
+
+                const bucket = getBucket();
+
+                const mediaFile = await bucket.find({ filename }).toArray();
+
+                if (!mediaFile.length) throw new NotFoundException(`File with ${filename} does not exist`);
+
+                await bucket.delete(mediaFile[0]._id);
+
+                res.status(200).json({
+                    status: 'success',
+                    message: 'File Deleted Successfully'
+                });
+
+            } catch (err: any) {
+                logger.error(`
+                ${err.statusCode ?? 500} - 
+                ${err.error ?? 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err);
             }
         }
 

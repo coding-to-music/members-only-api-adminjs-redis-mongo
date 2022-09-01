@@ -3,7 +3,6 @@ import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
 import { readFileSync } from 'fs';
 import morgan from 'morgan';
-import { config } from 'dotenv';
 import passport from 'passport';
 import cors, { CorsOptions } from 'cors'
 import helmet from 'helmet';
@@ -62,7 +61,7 @@ const apiLimiter = rateLimit({
 
 // AdminJS moved to the top to fix cors and bodyParser issues
 // import { adminJs, adminJSRouter } from '@config/adminjs';
-// app.use(adminJs.options.rootPath, adminJSRouter);    // Currenly disabled, causing error crashing app
+// app.use(adminJs.options.rootPath, adminJSRouter);    // Currenly disabled, causing error crashing app on heroku
 app.use(morgan('combined', { stream }));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ limit: '16mb', extended: true }));
