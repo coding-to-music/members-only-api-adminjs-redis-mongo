@@ -11,9 +11,9 @@ class MessageController {
             const { _id } = req.user;
 
             const fromUser = (await Message.find({ sender: _id }))
-                .map(message => { return { content: message.content, recipient: message.recipient } });
+                .map(message => { return { content: message.content, recipientID: message.recipientID } });
             const toUser = (await Message.find({ recipient: _id }))
-                .map(message => { return { content: message.content, sender: message.sender } });
+                .map(message => { return { content: message.content, senderID: message.senderID } });
 
             const messages = { fromUser, toUser };
 

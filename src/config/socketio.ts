@@ -48,12 +48,12 @@ export const onConnection = (client: Socket) => {
 
         try {
             const { content, senderID, recipientID } = message;
-            const recipientData = onlineUsers.get(recipientID);
+            const recipientData = onlineUsers.get(String(recipientID));
 
             const messageToSave = new Message({
-                sender: new Types.ObjectId(senderID),
-                recipient: new Types.ObjectId(recipientID),
-                content
+                content,
+                senderID: new Types.ObjectId(senderID),
+                recipientID: new Types.ObjectId(recipientID),
             });
 
             await messageToSave.save();

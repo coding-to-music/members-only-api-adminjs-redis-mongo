@@ -1,9 +1,9 @@
 import { Document, Types } from 'mongoose';
 
 export interface IMessage extends Document {
-    sender: Types.ObjectId;
-    recipient: Types.ObjectId;
-    content: string
+    content: string,
+    senderID: Types.ObjectId;
+    recipientID: Types.ObjectId;
 }
 
 export interface IChatUserData {
@@ -19,8 +19,4 @@ export interface IncomingSocketData {
     avatar: string
 }
 
-export interface IMessageData {
-    content: string,
-    senderID: string,
-    recipientID: string
-}
+export type IMessageData = Pick<IMessage, 'content' | 'senderID' | 'recipientID'>
