@@ -3,7 +3,7 @@
 FROM node:lts-alpine
 WORKDIR /app
 COPY package.json yarn.lock ./
-RUN yarn --frozen-lockfile
+RUN yarn install
 COPY . .
 EXPOSE ${PORT}
 CMD yarn start
