@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
 import { readFileSync } from 'fs';
@@ -14,7 +14,7 @@ import { HttpException } from '@exceptions/HttpException'
 import { ENV } from '@utils/validateEnv';
 
 // Import Configs
-import { connectDatabase } from '@config/database';
+import { connectDB } from '@config/database';
 import passportConfig from '@middlewares/passport';
 import { stream } from '@utils/logger';
 
@@ -23,13 +23,14 @@ import apiRouter from '@routes/api/api';
 import indexRouter from '@routes/index';
 
 // Connect To Database
-connectDatabase();
+connectDB();
 
 // Load Paasport configuration
 passportConfig(passport);
 
-const app = express();
-const whitelist = [
+const app: Express = express();
+
+const whitelist: string[] = [
     'https://localhost:3000',
     'http://localhost:3000',
     'https://api-mbo.herokuapp.com',
@@ -37,6 +38,7 @@ const whitelist = [
     'http://api-mbo.polldevs.com',
     'https://mema.polldevs.com'
 ];
+
 export const corsOptions: CorsOptions = {
     credentials: true,
     methods: ['GET', 'DELETE', 'OPTIONS', 'POST', 'PUT', 'PATCH'],
@@ -88,7 +90,7 @@ const swaggerDocument = YAML.load('./src/docs/swaggerConfig.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 
 // Handle 404 errors
-app.use((req: Request, res: Response, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     next(createHttpError(404, 'The requested resource was not found on this server!!!'));
 });
 
