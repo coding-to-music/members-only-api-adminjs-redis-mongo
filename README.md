@@ -19,14 +19,20 @@ A sample API mimicking a members only service, it allows members to access only 
 
 ## Tech Stack
 
-* TypeScript
-* Express
-* MongoDB
-* Mongoose
-* Passport-Jwt
-* JsonWebToken
-* Jest
-* Supertest
+* [TypeScript](https://www.typescriptlang.org/)
+* [Node.js](https://nodejs.org/en/)
+* [Express](https://expressjs.com)
+* [MongoDB](https://mongodb.com)
+* [Mongoose](https://mongoosejs.com)
+* [Redis](https://redis.io/)
+* [Socket.IO](https://socket.io)
+* [Passportjs](https://www.passportjs.org/)
+* [Jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
+* [SendGrid Mail](https://www.npmjs.com/package/@sendgrid/mail)
+* [AdminJS](https://adminjs.co)
+* [WInstonJS](https://github.com/winstonjs/winston)
+* [Jest](https://jestjs.io/)
+* [Supertest](https://www.npmjs.com/package/supertest)
 
 
 ## Endpoints 
