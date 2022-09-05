@@ -1,6 +1,6 @@
+import { NextFunction, Response } from 'express';
 import Message from '@models/Message';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { NextFunction, Response } from 'express';
 import { logger } from '@utils/logger';
 
 class MessageController {
@@ -10,12 +10,12 @@ class MessageController {
 
             const { _id } = req.user;
 
-            const fromUser = (await Message.find({ sender: _id }))
-                .map(message => { return { content: message.content, recipientID: message.recipientID } });
-            const toUser = (await Message.find({ recipient: _id }))
-                .map(message => { return { content: message.content, senderID: message.senderID } });
+            const toOthers = (await Message.find({ senderID: _id }))
+                .map(mes => { return { content: mes.content, recipientID: mes.recipientID } });
+            const fromOthers = (await Message.find({ recipientID: _id }))
+                .map(mes => { return { content: mes.content, senderID: mes.senderID } });
 
-            const messages = { fromUser, toUser };
+            const messages = { toOthers, fromOthers };
 
             res.status(200).json({ status: 'success', messages });
 
@@ -34,8 +34,8 @@ class MessageController {
     public async deleteMessage(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
 
-            const { _id } = req.params;         // this is subject to change, decision still to be made on how input will be passed
-            await Message.deleteOne({ _id })
+            const { id } = req.params;         // this is subject to change, decision still to be made on how input will be passed
+            await Message.deleteOne({ id })
 
             res.status(200).json({
                 status: 'success',
