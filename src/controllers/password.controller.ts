@@ -1,13 +1,13 @@
 import User from '@models/User';
 import { body, validationResult } from 'express-validator';
 import { sendMail } from '@utils/sendMail';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 import {
     ForbiddenException,
     NotFoundException,
     ValidationException,
-} from '@exceptions/commonExceptions';
+} from '@exceptions/common.exception';
 import { logger } from '@utils/logger';
 
 class PasswordContoller {

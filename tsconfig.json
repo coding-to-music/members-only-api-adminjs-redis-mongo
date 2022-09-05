@@ -29,7 +29,6 @@
             "@controllers/*": ["src/controllers/*"],
             "@docs/*": ["src/docs/*"],
             "@exceptions/*": ["src/exceptions/*"],
-            "@global": ["src/global.d.ts"],
             "@interfaces/*": ["src/interfaces/*"],
             "@middlewares/*": ["src/middlewares/*"],
             "@models/*": ["src/models/*"],

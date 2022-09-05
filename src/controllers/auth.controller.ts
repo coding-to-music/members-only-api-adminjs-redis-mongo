@@ -1,16 +1,16 @@
-import User from '@models/User';
+import { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import User from '@models/User';
 import { ENV } from '@utils/validateEnv';
-import { Request, Response, NextFunction } from 'express';
 import { sendTokens, cookieOptions } from '@utils/lib';
 import {
     ForbiddenException,
     NotFoundException,
     UnAuthorizedException,
     ValidationException,
-} from '@exceptions/commonExceptions';
+} from '@exceptions/common.exception';
 import { logger } from '@utils/logger';
 
 class AuthController {

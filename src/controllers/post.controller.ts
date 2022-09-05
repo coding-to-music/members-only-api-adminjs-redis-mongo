@@ -1,7 +1,7 @@
-import Post from '@models/Post';
+import { NextFunction, Response, Request } from 'express';
 import { body, validationResult } from 'express-validator';
-import { Response, NextFunction, Request } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
+import Post from '@models/Post';
 import { formatPostCommentsAndLikes, checkIfPostExists } from '@utils/lib';
 import { Comment, Like } from '@interfaces/posts.interface';
 import { Types } from 'mongoose';
@@ -12,7 +12,7 @@ import {
     ForbiddenException,
     NotFoundException,
     ValidationException,
-} from '@exceptions/commonExceptions';
+} from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 
 class PostController {

@@ -1,5 +1,5 @@
 import { ValidationError } from 'express-validator';
-import { HttpException } from '@exceptions/HttpException';
+import { HttpException } from '@exceptions/http.exception';
 
 export class BadRequestException extends HttpException {
 

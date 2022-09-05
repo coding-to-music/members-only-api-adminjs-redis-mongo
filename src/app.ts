@@ -10,7 +10,7 @@ import compression from 'compression';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import rateLimit from 'express-rate-limit'
-import { HttpException } from '@exceptions/HttpException'
+import { HttpException } from '@exceptions/http.exception'
 import { ENV } from '@utils/validateEnv';
 
 // Import Configs
@@ -19,8 +19,8 @@ import passportConfig from '@middlewares/passport';
 import { stream } from '@utils/logger';
 
 // Import Routes
-import apiRouter from '@routes/api/api';
-import indexRouter from '@routes/index';
+import apiRouter from '@routes/api/api.route';
+import indexRouter from '@routes/index.route';
 
 // Connect To Database
 connectDB();

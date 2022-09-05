@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { decode } from 'jsonwebtoken';
 import { Role } from '@interfaces/users.interface';
-import { ForbiddenException, NotFoundException } from '@exceptions/commonExceptions';
+import { ForbiddenException, NotFoundException } from '@exceptions/common.exception';
 
 export const authorizeJWT = (req: Request, res: Response, next: NextFunction): void | Response => {
     try {

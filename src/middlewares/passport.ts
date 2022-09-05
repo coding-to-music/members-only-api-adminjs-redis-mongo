@@ -1,7 +1,7 @@
-import { ENV } from '@utils/validateEnv';
-import { Request } from 'express';
 import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
+import { Request } from 'express';
 import { Types } from 'mongoose';
+import { ENV } from '@utils/validateEnv';
 import User from '@models/User';
 
 // Convert base64 .pem public key

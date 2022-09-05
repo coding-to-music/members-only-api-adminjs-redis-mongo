@@ -1,5 +1,5 @@
+import { NextFunction, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { Response, NextFunction } from 'express';
 import { Types } from 'mongoose';
 import Profile from '@models/Profile';
 import { RequestWithUser } from '@interfaces/users.interface';
@@ -8,7 +8,7 @@ import {
     ConflictException,
     NotFoundException,
     ValidationException,
-} from '@exceptions/commonExceptions';
+} from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 
 

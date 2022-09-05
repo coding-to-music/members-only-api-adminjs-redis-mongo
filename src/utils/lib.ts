@@ -6,7 +6,7 @@ import { IPost } from '@interfaces/posts.interface';
 import { sign } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
 import { ITokens } from '@interfaces/auth.interface';
-import { NotFoundException } from '@exceptions/commonExceptions';
+import { NotFoundException } from '@src/exceptions/common.exception';
 import { IChatUserData } from '@interfaces/message.interface';
 
 

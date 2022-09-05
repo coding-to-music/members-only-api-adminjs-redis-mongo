@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import passwordController from '@controllers/passwordController';
+import passwordController from '@src/controllers/password.controller';
 
 const passwordRouter: CustomIRouter = Router();
 
