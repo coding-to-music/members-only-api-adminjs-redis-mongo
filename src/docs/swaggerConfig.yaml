@@ -835,7 +835,7 @@ paths:
           $ref: '#/components/responses/409ConflictError'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /messaging/get-messages:
+  /messages/all:
     get:
       tags:
         - Message
@@ -855,7 +855,7 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /messaging/delete-message/{_id}:
+  /messages/{id}/delete:
     delete:
       tags:
         - Message

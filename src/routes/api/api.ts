@@ -16,7 +16,7 @@ apiRouter.get('/', (req, res) => res.json({
 
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/media', mediaRouter);
-apiRouter.use('/messaging', messageRouter);
+apiRouter.use('/messages', messageRouter);
 apiRouter.use('/password', passwordRouter);
 apiRouter.use('/posts', postRouter);
 apiRouter.use('/profile', profileRouter);
