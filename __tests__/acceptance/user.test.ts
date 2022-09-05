@@ -1,6 +1,9 @@
-import app from "../../src/app";
-import request from "supertest";
-import mongoose from "mongoose"
+import app from '@/app';
+import request from 'supertest';
+import mongoose from 'mongoose'
+import { connectDatabase } from '@config/database'
+
+beforeAll(() => connectDatabase())
 
 afterAll(async () => {
     await mongoose.disconnect();
@@ -20,13 +23,13 @@ describe('User Routes', () => {
 
         it('should return the user info if a valid token is passed with the request', async () => {
 
-            const token = "GET A VALID TOKEN BEFORE TESTING";
+            const token = (await request(app).post('/v1/auth/login').send({ email: 'labeight@affecting.org', password: 'password123' }).retry(2)).body.authToken;
             const response = await request(app).get('/v1/users/userinfo').auth(token, { type: 'bearer' });
 
             expect(response.status).toEqual(200);
             expect(response.body.email).toEqual('labeight@affecting.org');
-            expect(response.body.name).toEqual('labeight');
-            expect(response.body.isAdmin).toEqual(true);
+            expect(response.body.name).toEqual('Lab Eight');
+            expect(response.body.roles).toEqual(['ADMIN']);
         })
     })
 })

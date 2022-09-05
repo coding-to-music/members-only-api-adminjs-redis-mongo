@@ -1,6 +1,9 @@
-import app from "../../src/app";
-import request from "supertest";
-import mongoose from "mongoose"
+import app from '@/app';
+import request from 'supertest';
+import mongoose from 'mongoose'
+import { connectDatabase } from '@config/database'
+
+beforeAll(() => connectDatabase())
 
 afterAll(async () => {
     await mongoose.disconnect();
@@ -24,9 +27,20 @@ describe('authentication routes', () => {
 
             expect(response.status).toEqual(400);
             expect(response.body).toEqual({
-                errors: [
-                    { "location": "body", "msg": "Invalid value", "param": "email" },
-                    { "location": "body", "msg": "Email is required and must be a valid email", "param": "email" }
+                "error": "Validation Errors",
+                "statusCode": 400,
+                "name": "ValidationException",
+                "errors": [
+                    {
+                        "msg": "Invalid value",
+                        "param": "email",
+                        "location": "body"
+                    },
+                    {
+                        "msg": "Email is required and must be a valid email",
+                        "param": "email",
+                        "location": "body"
+                    }
                 ]
             });
         });
@@ -36,9 +50,20 @@ describe('authentication routes', () => {
 
             expect(response.status).toEqual(400);
             expect(response.body).toEqual({
-                errors: [
-                    { "location": "body", "msg": "Invalid value", "param": "password" },
-                    { "location": "body", "msg": "Password is required and must be at least 6 characters long", "param": "password" }
+                "error": "Validation Errors",
+                "statusCode": 400,
+                "name": "ValidationException",
+                "errors": [
+                    {
+                        "msg": "Invalid value",
+                        "param": "password",
+                        "location": "body"
+                    },
+                    {
+                        "msg": "Password is required and must be at least 6 characters long",
+                        "param": "password",
+                        "location": "body"
+                    }
                 ]
             });
         });
@@ -47,14 +72,22 @@ describe('authentication routes', () => {
             const response = await request(app).post('/v1/auth/login').send({ email: 'labeight@afterlife.com', password: 'password123' }).retry(2);
 
             expect(response.status).toEqual(404);
-            expect(response.body).toEqual({ msg: 'User not found' });
+            expect(response.body).toEqual({
+                error: 'User with email: labeight@afterlife.com not found',
+                name: 'NotFoundException',
+                statusCode: 404
+            });
         });
 
         it('should return an error if the password is incorrect', async () => {
             const response = await request(app).post('/v1/auth/login').send({ email: 'labeight@affecting.org', password: 'password1234' }).retry(2);
 
             expect(response.status).toEqual(401);
-            expect(response.body).toEqual({ msg: 'Invalid email/password combination' });
+            expect(response.body).toEqual({
+                error: 'Invalid Login Credentials',
+                name: 'UnAuthorizedException',
+                statusCode: 401
+            });
         });
     })
 })
