@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import profileController from '@controllers/profileController';
+import profileController from '@src/controllers/profile.controller';
 
 const profileRouter: CustomIRouter = Router();
 

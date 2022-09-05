@@ -1,9 +1,9 @@
 import app from '@/app';
 import request from 'supertest';
 import mongoose from 'mongoose'
-import { connectDatabase } from '@config/database'
+import { connectDB } from '@config/database'
 
-beforeAll(() => connectDatabase())
+beforeAll(() => connectDB())
 
 afterAll(async () => {
     await mongoose.disconnect();

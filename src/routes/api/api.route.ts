@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import authRouter from '@routes/api/authRouter';
-import mediaRouter from '@routes/api/mediaRouter';
-import messageRouter from '@routes/api/messageRouter';
-import passwordRouter from '@routes/api/passwordRouter';
-import postRouter from '@routes/api/postRouter';
-import profileRouter from '@routes/api/profileRouter';
-import userRouter from '@routes/api/userRouter';
+import authRouter from '@src/routes/api/auth.route';
+import mediaRouter from '@src/routes/api/media.route';
+import messageRouter from '@src/routes/api/message.route';
+import passwordRouter from '@src/routes/api/password.route';
+import postRouter from '@src/routes/api/post.route';
+import profileRouter from '@src/routes/api/profile.route';
+import userRouter from '@src/routes/api/user.route';
 
 const apiRouter: Router = Router();
 

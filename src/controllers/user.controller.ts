@@ -1,8 +1,8 @@
-import User from '@models/User';
+import { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import gravatar from 'gravatar';
-import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
+import User from '@models/User';
 import Post from '@models/Post';
 import Profile from '@models/Profile';
 import { Types } from 'mongoose';
@@ -11,7 +11,7 @@ import {
     BadRequestException,
     ConflictException,
     ValidationException,
-} from '@exceptions/commonExceptions';
+} from '@exceptions/common.exception';
 import { sendMail } from '@utils/sendMail';
 import { logger } from '@utils/logger';
 

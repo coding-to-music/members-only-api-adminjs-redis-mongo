@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { param, validationResult } from 'express-validator';
-import { NotFoundException, ValidationException } from '@exceptions/commonExceptions';
+import { NotFoundException, ValidationException } from '@src/exceptions/common.exception';
 import { getBucket } from '@config/database';
 import { getFileStorage } from '@middlewares/multer';
 import { logger } from '@utils/logger';

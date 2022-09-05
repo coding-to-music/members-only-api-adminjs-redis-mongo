@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import authController from '@controllers/authController';
+import authController from '@src/controllers/auth.controller';
 
 const authRouter: CustomIRouter = Router();
 

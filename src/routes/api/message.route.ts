@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import messageController from '@controllers/messageController';
+import messageController from '@controllers/message.controller';
 
 const messageRouter: CustomIRouter = Router();
 

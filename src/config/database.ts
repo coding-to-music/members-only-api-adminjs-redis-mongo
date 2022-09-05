@@ -4,7 +4,7 @@ import { GridFSBucket } from 'mongoose/node_modules/mongodb';
 
 let bucket: GridFSBucket;
 
-export const connectDatabase = () => {
+export const connectDB = () => {
 
     const options = {
         autoIndex: false,

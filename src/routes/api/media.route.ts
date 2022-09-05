@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import mediaController from '@controllers/mediaController';
+import mediaController from '@src/controllers/media.controller';
 
 const mediaRouter: CustomIRouter = Router();
 
