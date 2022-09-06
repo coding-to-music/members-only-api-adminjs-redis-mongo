@@ -1,14 +1,26 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import passwordController from '@src/controllers/password.controller';
+import { PasswordController } from '@controllers/password.controller';
 
-const passwordRouter: CustomIRouter = Router();
 
-passwordRouter.put('/get-verification-code', passwordController.getVerificationCode);
+export class PasswordRouter {
 
-passwordRouter.put('/reset-password', passwordController.putResetPassword);
+    private passwordController = new PasswordController();
+    private router: CustomIRouter = Router();
 
-passwordRouter.put('/change-password', passport.authenticate('jwt', { session: false }), passwordController.putChangePassword);
+    constructor() {
+        this.registerRoutes()
+    }
 
-export default passwordRouter;
+    private registerRoutes() {
+
+        this.router.put('/get-verification-code', this.passwordController.getVerificationCode);
+        this.router.put('/reset-password', this.passwordController.putResetPassword);
+        this.router.put('/change-password', passport.authenticate('jwt', { session: false }), this.passwordController.putChangePassword);
+    }
+
+    public getRoutes() {
+        return this.router;
+    }
+}

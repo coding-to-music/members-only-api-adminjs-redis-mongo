@@ -15,7 +15,7 @@ import {
 import { sendMail } from '@utils/sendMail';
 import { logger } from '@utils/logger';
 
-class UserController {
+export class UserController {
 
     public async getAllUsers(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
@@ -175,6 +175,4 @@ class UserController {
         }
     }
 
-}
-
-export default new UserController()
+};

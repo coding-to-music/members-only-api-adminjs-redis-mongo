@@ -1,13 +1,25 @@
 import { Router } from 'express';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import authController from '@src/controllers/auth.controller';
+import { AuthController } from '@src/controllers/auth.controller';
 
-const authRouter: CustomIRouter = Router();
 
-authRouter.get('/logout', authController.getLogoutUser);
+export class AuthRouter {
 
-authRouter.post('/login', authController.postLoginUser);
+    private authController = new AuthController();
+    private router: CustomIRouter = Router();
 
-authRouter.post('/refresh-token', authController.postRefreshToken);
+    constructor() {
+        this.registerRoutes();
+    }
 
-export default authRouter;
+    private registerRoutes() {
+
+        this.router.get('/logout', this.authController.getLogoutUser);
+        this.router.post('/login', this.authController.postLoginUser);
+        this.router.post('/refresh-token', this.authController.postRefreshToken);
+    }
+
+    public getRoutes() {
+        return this.router;
+    }
+}

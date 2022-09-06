@@ -10,7 +10,7 @@ import {
 } from '@exceptions/common.exception';
 import { logger } from '@utils/logger';
 
-class PasswordContoller {
+export class PasswordController {
 
     public getVerificationCode = [
         body('email').notEmpty().isEmail(),
@@ -146,5 +146,3 @@ class PasswordContoller {
         }
     ]
 };
-
-export default new PasswordContoller();

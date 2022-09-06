@@ -1,12 +1,25 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import messageController from '@controllers/message.controller';
+import { MessageController } from '@controllers/message.controller';
 
-const messageRouter: CustomIRouter = Router();
 
-messageRouter.get('/all', passport.authenticate('jwt', { session: false }), messageController.getMessages);
+export class MessageRouter {
 
-messageRouter.delete('/:id/delete', passport.authenticate('jwt', { session: false }), messageController.deleteMessage);
+    private messageController = new MessageController();
+    private router: CustomIRouter = Router();
 
-export default messageRouter;
+    constructor() {
+        this.registerRoutes()
+    }
+
+    private registerRoutes() {
+
+        this.router.get('/all', passport.authenticate('jwt', { session: false }), this.messageController.getMessages);
+        this.router.delete('/:id/delete', passport.authenticate('jwt', { session: false }), this.messageController.deleteMessage);
+    }
+
+    public getRoutes() {
+        return this.router;
+    }
+}

@@ -1,13 +1,26 @@
 import { Router } from 'express';
+import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import mediaController from '@src/controllers/media.controller';
+import { MediaController } from '@controllers/media.controller';
 
-const mediaRouter: CustomIRouter = Router();
 
-mediaRouter.post('/upload', mediaController.uploadMedia);
+export class MediaRouter {
 
-mediaRouter.get('/:filename', mediaController.getMediaFile);
+    private mediaController = new MediaController();
+    private router: CustomIRouter = Router();
 
-mediaRouter.delete('/:filename/delete', mediaController.deleteMediaFile);
+    constructor() {
+        this.registerRoutes();
+    }
 
-export default mediaRouter;
+    private registerRoutes() {
+
+        this.router.post('/upload', passport.authenticate('jwt', { session: false }), this.mediaController.uploadMedia);
+        this.router.get('/:filename', passport.authenticate('jwt', { session: false }), this.mediaController.getMediaFile);
+        this.router.delete('/:filename/delete', passport.authenticate('jwt', { session: false }), this.mediaController.deleteMediaFile);
+    }
+
+    public getRoutes() {
+        return this.router;
+    }
+}

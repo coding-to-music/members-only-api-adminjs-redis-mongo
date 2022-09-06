@@ -1,4 +1,9 @@
-import express, { Express, NextFunction, Request, Response } from 'express';
+import express, {
+    Express,
+    NextFunction,
+    Request,
+    Response
+} from 'express';
 import cookieParser from 'cookie-parser';
 import createHttpError from 'http-errors';
 import { readFileSync } from 'fs';
@@ -19,13 +24,13 @@ import passportConfig from '@middlewares/passport';
 import { stream } from '@utils/logger';
 
 // Import Routes
-import apiRouter from '@routes/api/api.route';
-import indexRouter from '@routes/index.route';
+import { ApiRouter } from '@routes/api/api.route';
+import { IndexRouter } from '@routes/index.route';
 
 // Connect To Database
 connectDB();
 
-// Load Paasport configuration
+// Load Passport configuration
 passportConfig(passport);
 
 const app: Express = express();
@@ -75,8 +80,8 @@ app.use(helmet());
 app.use(compression());
 app.use(apiLimiter);
 
-app.use('/', indexRouter);
-app.use('/v1', apiRouter);
+app.use('/', new IndexRouter().getRoutes());
+app.use('/v1', new ApiRouter().getRoutes());
 
 // Swagger UI
 const favicon = readFileSync('./src/docs/favicon.ico', { encoding: 'base64' });
