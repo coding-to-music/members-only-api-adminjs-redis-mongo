@@ -15,7 +15,7 @@ import {
 } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 
-class PostController {
+export class PostController {
 
     public async getAllPosts(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
@@ -286,6 +286,4 @@ class PostController {
             next(err);
         }
     }
-}
-
-export default new PostController()
+};

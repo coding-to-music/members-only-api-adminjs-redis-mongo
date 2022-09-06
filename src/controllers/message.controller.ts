@@ -3,7 +3,7 @@ import Message from '@models/Message';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { logger } from '@utils/logger';
 
-class MessageController {
+export class MessageController {
 
     public async getMessages(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
@@ -54,5 +54,3 @@ class MessageController {
         }
     }
 }
-
-export default new MessageController()

@@ -1,7 +1,19 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 
-const indexRouter = Router();
+export class IndexRouter {
 
-indexRouter.get('/', (req, res) => res.redirect('/v1'));
+    private router: Router = Router();
 
-export default indexRouter;
+    constructor() {
+        this.registerRoutes();
+    }
+
+    private registerRoutes() {
+
+        this.router.get('/', (req: Request, res: Response) => res.redirect('/v1'));
+    }
+
+    public getRoutes() {
+        return this.router;
+    }
+}

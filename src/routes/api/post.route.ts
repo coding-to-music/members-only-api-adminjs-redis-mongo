@@ -1,26 +1,32 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import postController from '@src/controllers/post.controller';
+import { PostController } from '@controllers/post.controller';
 
-const postRouter: CustomIRouter = Router();
 
-postRouter.get('/all-posts', passport.authenticate('jwt', { session: false }), postController.getAllPosts);
+export class PostRouter {
 
-postRouter.get('/post-by-user', passport.authenticate('jwt', { session: false }), postController.getPostsByUser);
+    private postController = new PostController();
+    private router: CustomIRouter = Router();
 
-postRouter.get('/:id', passport.authenticate('jwt', { session: false }), postController.getPostById);
+    constructor() {
+        this.registerRoutes()
+    }
 
-postRouter.post('/create-post', passport.authenticate('jwt', { session: false }), postController.postCreatePost);
+    private registerRoutes() {
 
-postRouter.put('/:id/add-comment', passport.authenticate('jwt', { session: false }), postController.putAddComments);
+        this.router.get('/all-posts', passport.authenticate('jwt', { session: false }), this.postController.getAllPosts);
+        this.router.get('/post-by-user', passport.authenticate('jwt', { session: false }), this.postController.getPostsByUser);
+        this.router.get('/:id', passport.authenticate('jwt', { session: false }), this.postController.getPostById);
+        this.router.post('/create-post', passport.authenticate('jwt', { session: false }), this.postController.postCreatePost);
+        this.router.put('/:id/add-comment', passport.authenticate('jwt', { session: false }), this.postController.putAddComments);
+        this.router.put('/:id/like-post', passport.authenticate('jwt', { session: false }), this.postController.putLikePost);
+        this.router.delete('/:id/delete-comment/:commentId', passport.authenticate('jwt', { session: false }), this.postController.deleteComment);
+        this.router.delete('/:id/unlike-post', passport.authenticate('jwt', { session: false }), this.postController.deleteUnlikePost);
+        this.router.delete('/:id/delete-post', passport.authenticate('jwt', { session: false }), this.postController.deletePost);
+    };
 
-postRouter.put('/:id/like-post', passport.authenticate('jwt', { session: false }), postController.putLikePost);
-
-postRouter.delete('/:id/delete-comment/:commentId', passport.authenticate('jwt', { session: false }), postController.deleteComment);
-
-postRouter.delete('/:id/unlike-post', passport.authenticate('jwt', { session: false }), postController.deleteUnlikePost);
-
-postRouter.delete('/:id/delete-post', passport.authenticate('jwt', { session: false }), postController.deletePost);
-
-export default postRouter;
+    public getRoutes() {
+        return this.router;
+    }
+}

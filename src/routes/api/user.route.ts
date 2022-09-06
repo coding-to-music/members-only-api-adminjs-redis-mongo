@@ -2,16 +2,27 @@ import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
 import { authorizeUser } from '@middlewares/middleware';
-import userController from '@src/controllers/user.controller';
+import { UserController } from '@src/controllers/user.controller';
 
-const userRouter: CustomIRouter = Router();
 
-userRouter.get('/all-users', passport.authenticate('jwt', { session: false }), authorizeUser, userController.getAllUsers);
+export class UserRouter {
 
-userRouter.get('/userinfo', passport.authenticate('jwt', { session: false }), userController.getCurrentUser);
+    private userController = new UserController();
+    private router: CustomIRouter = Router();
 
-userRouter.post('/register', userController.postCreateUser);
+    constructor() {
+        this.registerRoutes()
+    }
 
-userRouter.delete('/delete-user', passport.authenticate('jwt', { session: false }), userController.deleteUser);
+    private registerRoutes() {
 
-export default userRouter;
+        this.router.get('/all-users', passport.authenticate('jwt', { session: false }), authorizeUser, this.userController.getAllUsers)
+        this.router.get('/userinfo', passport.authenticate('jwt', { session: false }), this.userController.getCurrentUser);
+        this.router.post('/register', this.userController.postCreateUser);
+        this.router.delete('/delete-user', passport.authenticate('jwt', { session: false }), this.userController.deleteUser);
+    };
+
+    public getRoutes() {
+        return this.router;
+    }
+}

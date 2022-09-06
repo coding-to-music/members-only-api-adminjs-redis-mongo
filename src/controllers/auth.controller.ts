@@ -13,7 +13,7 @@ import {
 } from '@exceptions/common.exception';
 import { logger } from '@utils/logger';
 
-class AuthController {
+export class AuthController {
 
     public postLoginUser = [
 
@@ -110,5 +110,3 @@ class AuthController {
         }
     }
 }
-
-export default new AuthController()

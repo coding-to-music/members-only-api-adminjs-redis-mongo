@@ -1,25 +1,37 @@
-import { Router } from 'express';
-import authRouter from '@src/routes/api/auth.route';
-import mediaRouter from '@src/routes/api/media.route';
-import messageRouter from '@src/routes/api/message.route';
-import passwordRouter from '@src/routes/api/password.route';
-import postRouter from '@src/routes/api/post.route';
-import profileRouter from '@src/routes/api/profile.route';
-import userRouter from '@src/routes/api/user.route';
+import { Request, Response, Router } from 'express';
+import { AuthRouter } from '@routes/api/auth.route';
+import { MediaRouter } from '@routes/api/media.route';
+import { MessageRouter } from '@routes/api/message.route';
+import { PasswordRouter } from '@routes/api/password.route';
+import { PostRouter } from '@routes/api/post.route';
+import { ProfileRouter } from '@routes/api/profile.route';
+import { UserRouter } from '@routes/api/user.route';
 
-const apiRouter: Router = Router();
 
-apiRouter.get('/', (req, res) => res.json({
-    message: `HELLO VISITOR, THANK YOU FOR STOPPING-BY AND WELCOME TO MEMBERS-ONLY API.
-    PLEASE VISIT '/api-docs' FOR FULL API DOCUMENTATION`
-}));
+export class ApiRouter {
 
-apiRouter.use('/auth', authRouter);
-apiRouter.use('/media', mediaRouter);
-apiRouter.use('/messages', messageRouter);
-apiRouter.use('/password', passwordRouter);
-apiRouter.use('/posts', postRouter);
-apiRouter.use('/profile', profileRouter);
-apiRouter.use('/users', userRouter);
+    private router: Router = Router();
 
-export default apiRouter;
+    constructor() {
+        this.registerRoutes()
+    }
+
+    private registerRoutes() {
+
+        this.router.get('/', (req: Request, res: Response) => res.json({
+            message: `HELLO VISITOR, THANK YOU FOR STOPPING-BY AND WELCOME TO MEMBERS-ONLY API.
+            PLEASE VISIT '/api-docs' FOR FULL API DOCUMENTATION`
+        }));
+        this.router.use('/auth', new AuthRouter().getRoutes());
+        this.router.use('/media', new MediaRouter().getRoutes());
+        this.router.use('/messages', new MessageRouter().getRoutes());
+        this.router.use('/password', new PasswordRouter().getRoutes());
+        this.router.use('/posts', new PostRouter().getRoutes());
+        this.router.use('/profile', new ProfileRouter().getRoutes());
+        this.router.use('/users', new UserRouter().getRoutes());
+    };
+
+    public getRoutes() {
+        return this.router;
+    }
+}

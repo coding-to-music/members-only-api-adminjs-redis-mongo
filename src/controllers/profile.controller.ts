@@ -12,7 +12,7 @@ import {
 import { logger } from '@utils/logger'
 
 
-class ProfileController {
+export class ProfileController {
 
     public async getUserProfile(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
@@ -96,5 +96,3 @@ class ProfileController {
     ]
 
 }
-
-export default new ProfileController()

@@ -6,7 +6,7 @@ import { getFileStorage } from '@middlewares/multer';
 import { logger } from '@utils/logger';
 
 
-class MediaController {
+export class MediaController {
 
     private mediaUploads = getFileStorage();
 
@@ -110,6 +110,4 @@ class MediaController {
 
     ]
 
-}
-
-export default new MediaController()
+};
