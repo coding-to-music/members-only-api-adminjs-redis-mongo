@@ -59,7 +59,7 @@ export const onConnection = (client: Socket) => {
             await messageToSave.save();
 
             if (recipientData) {
-                client.to(recipientData.clientID).emit('receivePrivateMessage', content);
+                client.to(recipientData.clientID).emit('receivePrivateMessage', { content, senderID });
             } else {
                 client.emit('recipientOffline', `Recipient with userID ${recipientID} is currently offline`)
             }

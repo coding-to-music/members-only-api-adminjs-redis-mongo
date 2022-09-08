@@ -1,12 +1,13 @@
 import http from 'http';
 import { Server } from 'socket.io';
-import app, { corsOptions } from '@/app';
+import { App } from '@/app';
+import { corsOptions } from '@config/appConfigs';
 import { logger } from '@utils/logger';
 import { onConnection } from './config/socketio';
 
 const PORT = process.env.PORT || 4000;
 
-const httpServer = http.createServer(app);
+const httpServer = http.createServer(new App().getApp());
 
 export const io = new Server(httpServer, {
   path: '/v1/messaging',
