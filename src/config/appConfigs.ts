@@ -3,10 +3,7 @@ import { CorsOptions } from 'cors';
 export const whitelist: string[] = [
     'https://localhost:3000',
     'http://localhost:3000',
-    'https://api-mbo.herokuapp.com',
-    'https://api-mbo.polldevs.com',
-    'http://api-mbo.polldevs.com',
-    'https://mema.polldevs.com'
+    'https://members-o.netlify.app'
 ];
 
 export const corsOptions: CorsOptions = {

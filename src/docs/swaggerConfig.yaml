@@ -187,25 +187,6 @@ components:
     500ServerError:
       description: Internal Server Error
 paths:
-  /auth/logout:
-    get:
-      tags:
-        - Auth
-      summary: User Logout
-      description: Logs out current logged in user session
-      operationId: logoutUser
-      responses:
-        '200':
-          description: Successfully logged out
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '500':
-          $ref: '#/components/responses/500ServerError'
   /auth/login:
     post:
       tags:
@@ -240,7 +221,21 @@ paths:
                     type: string
                     format: byte
         '400':
-          description: Invalid Credentials/Validation Error
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: User Logout
+      description: Logs out current logged in user session
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Successfully logged out
           content:
             application/json:
               schema:
@@ -248,10 +243,8 @@ paths:
                 properties:
                   message:
                     type: string
-        '404':
-          $ref: '#/components/responses/404NotFound'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500ServerError'        
   /auth/refresh-token:
     post:
       tags:
@@ -284,6 +277,103 @@ paths:
                     type: string
         '404':
           $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /auth/register-2fa:
+    post:
+      tags:
+        - Auth
+      summary: Register Two factor Authentication
+      description: Registers Two factor Authentication on a User's Profile to be used during Login
+      operationId: register2FA
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success, QR Code generated and sent to the User
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  qrCode:
+                    type: string
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /auth/verify-2fa:
+    post:
+      tags:
+        - Auth
+      summary: Verify 2FA
+      description: Verifies OTP Token and completes the 2FA Registration Process
+      operationId: verify2FA
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully Completed 2FA Registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '403':
+          description: Invalid OTP Token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  /auth/validate-2fa:
+    post:
+      tags:
+        - Auth
+      summary: User Validate OTP Token
+      description: Validates Provided OTP Token during userLogin for Users with 2FA Enabled
+      operationId: validateOTPToken
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                otpToken:
+                  type: string
+      responses:
+        '200':
+          description: OTP Validated and User Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+                    format: byte
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
   /users/register:
@@ -334,7 +424,7 @@ paths:
           $ref: '#/components/responses/409ConflictError'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /users/all-users:
+  /users/all:
     get:
       tags:
         - User
@@ -399,8 +489,8 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '500':
           $ref: '#/components/responses/500ServerError'
-  /password/get-verification-code:
-    put:
+  /password/reset/get-code:
+    post:
       tags:
         - Password
       summary: Send Verification Code

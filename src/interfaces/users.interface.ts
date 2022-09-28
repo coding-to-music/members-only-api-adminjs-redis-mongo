@@ -12,6 +12,11 @@ interface RefreshToken {
   expiresBy: Date;
 }
 
+interface twoFactor {
+  base32Secret: string,
+  enabled: boolean
+}
+
 export enum Role {
   ADMIN = 'ADMIN',
   MEMBER = 'MEMBER',
@@ -30,6 +35,7 @@ export interface IUser extends Document {
   refreshToken: RefreshToken;
   tokenVersion: number;
   lastLogin?: Date;
+  twoFactor: twoFactor;
   generateCode: () => Promise<string>;
   generateTokens(usr: IUser): Promise<ITokens>;
   validatePassword(password: string): Promise<boolean>;

@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { JwtPayload, verify } from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import speakeasy from 'speakeasy';
+import { toDataURL } from 'qrcode';
 import User from '@models/User';
 import { ENV } from '@utils/validateEnv';
 import { sendTokens, cookieOptions } from '@utils/lib';
@@ -12,6 +13,7 @@ import {
     ValidationException,
 } from '@exceptions/common.exception';
 import { logger } from '@utils/logger';
+import { RequestWithUser } from '@src/interfaces/users.interface';
 
 export class AuthController {
 
@@ -32,12 +34,26 @@ export class AuthController {
                 const user = await User.findOne({ email }).exec();
                 if (!user) throw new NotFoundException(`User with email: ${email} not found`)
 
-                const validPassword: boolean = await bcrypt.compare(password, user.password);
+                const validPassword: boolean = await user.validatePassword(password);
                 if (!validPassword) throw new UnAuthorizedException('Invalid Login Credentials');
 
+                // Check if user has 2FA enabled and respond with uesr's email & 2FA status, else
                 // Generate new Tokens and send them to the client
-                const { token, refresh_token } = await user.generateTokens(user);
-                sendTokens(res, refresh_token, 'Login Successful', token);
+                if (user.twoFactor.enabled) {
+
+                    res.status(200).json({
+                        status: 'sucess',
+                        message: 'Email and Password Validated',
+                        email: user.email,
+                        isTwoFactorEnabled: true
+                    })
+
+                } else {
+
+                    const { accessToken, refreshToken } = await user.generateTokens(user);
+                    return sendTokens(res, refreshToken, 'Login Successful', accessToken);
+                }
+
             } catch (err: any) {
 
                 logger.error(`
@@ -95,8 +111,9 @@ export class AuthController {
             if (!tokenVersionValid) throw new ForbiddenException('Token Invalid')
 
             // Generate new Tokens and send them to the client
-            const { token, refresh_token } = await user.generateTokens(user);
-            sendTokens(res, refresh_token, 'Token Refresh Successful!!!', token);
+            const { accessToken, refreshToken } = await user.generateTokens(user);
+            sendTokens(res, refreshToken, 'Token Refresh Successful!!!', accessToken);
+
         } catch (err: any) {
 
             logger.error(`
@@ -108,5 +125,136 @@ export class AuthController {
                 `);
             next(err);
         }
+    };
+
+    public async registerTwofactor(req: RequestWithUser, res: Response, next: NextFunction) {
+        try {
+
+            const { user } = req;
+
+            const { base32, otpauth_url } = speakeasy.generateSecret({
+                name: 'MEMBERS ONLY'
+            });
+
+            user.twoFactor.base32Secret = base32;
+            await user.save();
+
+            const qrCode = await toDataURL(otpauth_url as string);
+
+            res.status(200).json({
+                status: 'success',
+                messages: 'Secret generated successfully. Please scan the QRCode and respond with a valid token',
+                qrCode
+            })
+
+        } catch (err: any) {
+            console.log(err)
+            logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+            next(err);
+        }
     }
+
+    public verifyTwoFactor = [
+
+        body('otpToken', 'OTP Token is Required').notEmpty().isLength({ min: 6, max: 6 }).withMessage('Token must be six characters long').trim().escape(),
+
+        async (req: RequestWithUser, res: Response, next: NextFunction) => {
+            try {
+
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
+
+                const { otpToken } = req.body;
+                const { user } = req;
+                const { twoFactor } = user;
+
+                const isVerified = speakeasy.totp.verify({
+                    secret: twoFactor.base32Secret,
+                    encoding: 'base32',
+                    token: otpToken
+                });
+
+                if (isVerified) {
+
+                    user.twoFactor.enabled = true;
+                    await user.save();
+
+                    res.status(200).json({
+                        status: 'success',
+                        message: '2FA Enabled Successfully'
+                    })
+
+                } else {
+                    throw new ForbiddenException('Invalid OTP Token')
+                }
+
+            } catch (err: any) {
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err);
+            }
+        }
+    ]
+
+    public validateTwoFactor = [
+
+        body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email').trim().escape(),
+        body('otpToken', 'OTP Token is Required').notEmpty().isLength({ min: 6, max: 6 }).withMessage('Token must be six characters long').trim().escape(),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            try {
+
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) throw new ValidationException(errors.array());
+
+                const { email, otpToken } = req.body;
+
+                const userExists = await User.findOne({ email }).exec();
+
+                if (userExists) {
+
+                    const { twoFactor } = userExists;
+
+                    const isVerified = speakeasy.totp.verify({
+                        secret: twoFactor.base32Secret,
+                        encoding: 'base32',
+                        token: otpToken,
+                        window: 1
+                    });
+
+                    if (isVerified) {
+
+                        const { accessToken, refreshToken } = await userExists.generateTokens(userExists);
+                        return sendTokens(res, refreshToken, 'Login Successful', accessToken);
+                    }
+
+                    throw new UnAuthorizedException('Invalid Login Credentials')
+
+                } else {
+                    throw new UnAuthorizedException('Invalid Login Credentials');
+                }
+
+            } catch (err: any) {
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err);
+            }
+        }
+    ]
 }
