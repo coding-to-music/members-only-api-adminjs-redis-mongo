@@ -46,17 +46,21 @@ export class AuthController {
                     user.twoFactor.passwordValidated = true;
                     await user.save();
 
+                    const { enabled: is2FAEnabled } = user.twoFactor;
+
                     res.status(200).json({
                         status: 'sucess',
                         message: 'Email and Password Validated',
                         email: user.email,
-                        isTwoFactorEnabled: true
+                        is2FAEnabled
                     })
 
                 } else {
 
                     const { accessToken, refreshToken } = await user.generateTokens(user);
-                    return sendTokens(res, refreshToken, 'Login Successful', accessToken);
+                    const { enabled: is2FAEnabled } = user.twoFactor;
+
+                    return sendTokens(res, 'Login Successful', accessToken, refreshToken, is2FAEnabled);
                 }
 
             } catch (err: any) {
@@ -117,7 +121,9 @@ export class AuthController {
 
             // Generate new Tokens and send them to the client
             const { accessToken, refreshToken } = await user.generateTokens(user);
-            sendTokens(res, refreshToken, 'Token Refresh Successful!!!', accessToken);
+            const { enabled: is2FAEnabled } = user.twoFactor;
+
+            sendTokens(res, 'Token Refresh Successful!!!', accessToken, refreshToken, is2FAEnabled);
 
         } catch (err: any) {
 
@@ -137,9 +143,9 @@ export class AuthController {
 
             const { user } = req;
 
-            const { enabled } = user.twoFactor;
+            const { enabled: is2FAEnabled } = user.twoFactor;
 
-            if (enabled) {
+            if (is2FAEnabled) {
 
                 throw new ConflictException(`2FA Already Enabled for User`);
 
@@ -258,7 +264,9 @@ export class AuthController {
                         await userExists.save()
 
                         const { accessToken, refreshToken } = await userExists.generateTokens(userExists);
-                        return sendTokens(res, refreshToken, 'Login Successful', accessToken);
+                        const { enabled: is2FAEnabled } = userExists.twoFactor;
+
+                        return sendTokens(res, 'Login Successful', accessToken, refreshToken, is2FAEnabled);
                     }
 
                     throw new UnAuthorizedException('Invalid Login Credentials')
