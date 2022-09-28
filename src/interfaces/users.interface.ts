@@ -14,7 +14,8 @@ interface RefreshToken {
 
 interface twoFactor {
   base32Secret: string,
-  enabled: boolean
+  enabled: boolean,
+  passwordValidated: boolean
 }
 
 export enum Role {
