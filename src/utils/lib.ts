@@ -52,10 +52,15 @@ export const cookieOptions: CookieOptions = {
     secure: true,
 };
 
-export const sendTokens = (res: Response, refreshToken: string, statusText: string, accessToken: string) => {
+export const sendTokens = (res: Response, message: string, accessToken: string, refreshToken: string, is2FAEnabled: boolean) => {
     return res
         .cookie('jit', refreshToken, cookieOptions)
-        .json({ message: statusText, authToken: accessToken });
+        .json({
+            status: 'success',
+            message,
+            is2FAEnabled,
+            authToken: accessToken
+        });
 };
 
 export const formatPostCommentsAndLikes = (req: Request, res: Response, next: NextFunction): void => {
