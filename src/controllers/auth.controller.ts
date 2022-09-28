@@ -5,15 +5,16 @@ import speakeasy from 'speakeasy';
 import { toDataURL } from 'qrcode';
 import User from '@models/User';
 import { ENV } from '@utils/validateEnv';
+import { logger } from '@utils/logger';
 import { sendTokens, cookieOptions } from '@utils/lib';
 import {
+    ConflictException,
     ForbiddenException,
     NotFoundException,
     UnAuthorizedException,
     ValidationException,
 } from '@exceptions/common.exception';
-import { logger } from '@utils/logger';
-import { RequestWithUser } from '@src/interfaces/users.interface';
+import { RequestWithUser } from '@interfaces/users.interface';
 
 export class AuthController {
 
@@ -136,20 +137,30 @@ export class AuthController {
 
             const { user } = req;
 
-            const { base32, otpauth_url } = speakeasy.generateSecret({
-                name: 'MEMBERS ONLY'
-            });
+            const { enabled } = user.twoFactor;
 
-            user.twoFactor.base32Secret = base32;
-            await user.save();
+            if (enabled) {
 
-            const qrCode = await toDataURL(otpauth_url as string);
+                throw new ConflictException(`2FA Already Enabled for User`);
 
-            res.status(200).json({
-                status: 'success',
-                messages: 'Secret generated successfully. Please scan the QRCode and respond with a valid token',
-                qrCode
-            })
+            } else {
+
+                const { base32, otpauth_url } = speakeasy.generateSecret({
+                    name: 'MEMBERS ONLY'
+                });
+
+                user.twoFactor.base32Secret = base32;
+                await user.save();
+
+                const qrCode = await toDataURL(otpauth_url as string);
+
+                res.status(200).json({
+                    status: 'success',
+                    messages: 'Secret generated successfully. Please scan the QRCode and respond with a valid token',
+                    qrCode
+                })
+
+            }
 
         } catch (err: any) {
             console.log(err)
@@ -211,7 +222,7 @@ export class AuthController {
         }
     ]
 
-    public validateTwoFactor = [
+    public loginValidateTwoFactor = [
 
         body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email').trim().escape(),
         body('otpToken', 'OTP Token is Required').notEmpty().isLength({ min: 6, max: 6 }).withMessage('Token must be six characters long').trim().escape(),

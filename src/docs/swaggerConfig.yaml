@@ -182,9 +182,9 @@ components:
       description: Forbidden
     404NotFound:
       description: The specified resource was not found
-    409ConflictError:
+    409ConflictException:
       description: There is a conflict with the state of the requested operation
-    500ServerError:
+    500InternalServerException:
       description: Internal Server Error
 paths:
   /auth/login:
@@ -225,7 +225,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /auth/logout:
     post:
       tags:
@@ -244,7 +244,7 @@ paths:
                   message:
                     type: string
         '500':
-          $ref: '#/components/responses/500ServerError'        
+          $ref: '#/components/responses/500InternalServerException'        
   /auth/refresh-token:
     post:
       tags:
@@ -278,7 +278,7 @@ paths:
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /auth/register-2fa:
     post:
       tags:
@@ -302,8 +302,10 @@ paths:
                     type: string
                   qrCode:
                     type: string
+        '409':
+          $ref: '#/components/responses/409ConflictException'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /auth/verify-2fa:
     post:
       tags:
@@ -337,8 +339,8 @@ paths:
                   message:
                     type: string
         '500':
-          $ref: '#/components/responses/500ServerError'
-  /auth/validate-2fa:
+          $ref: '#/components/responses/500InternalServerException'
+  /auth/login/validate-2fa:
     post:
       tags:
         - Auth
@@ -375,7 +377,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /users/register:
     post:
       tags:
@@ -421,9 +423,9 @@ paths:
                   message:
                     type: string
         '409':
-          $ref: '#/components/responses/409ConflictError'
+          $ref: '#/components/responses/409ConflictException'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /users/all:
     get:
       tags:
@@ -445,7 +447,7 @@ paths:
         '403':
           $ref: '#/components/responses/403Forbidden'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /users/userinfo:
     get:
       tags:
@@ -465,7 +467,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /users/delete-user:
     delete:
       tags:
@@ -488,7 +490,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /password/reset/get-code:
     post:
       tags:
@@ -520,7 +522,7 @@ paths:
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /password/reset-password:
     put:
       tags:
@@ -568,7 +570,7 @@ paths:
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /password/change-password:
     put:
       tags:
@@ -610,7 +612,7 @@ paths:
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/all-posts:
     get:
       tags:
@@ -632,7 +634,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/post-by-user:
     get:
       tags:
@@ -654,7 +656,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/{id}:
     get:
       tags:
@@ -682,7 +684,7 @@ paths:
         '404':
           $ref: '#/components/responses/404NotFound'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/create-post:
     post:
       tags:
@@ -710,9 +712,9 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '409':
-          $ref: '#/components/responses/409ConflictError'
+          $ref: '#/components/responses/409ConflictException'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/{id}/add-comment:
     put:
       tags:
@@ -749,7 +751,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/{id}/delete-comment/{commentId}:
     delete:
       tags:
@@ -784,7 +786,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/{id}/like-post:
     put:
       tags:
@@ -813,7 +815,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/{id}/unlike-post:
     delete:
       tags:
@@ -842,7 +844,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /posts/{id}/delete-post:
     delete:
       tags:
@@ -874,7 +876,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /profile/user-profile:
     get:
       tags:
@@ -894,7 +896,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /profile/create-profile:
     post:
       tags:
@@ -922,9 +924,9 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '409':
-          $ref: '#/components/responses/409ConflictError'
+          $ref: '#/components/responses/409ConflictException'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /messages/all:
     get:
       tags:
@@ -944,7 +946,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /messages/{id}/delete:
     delete:
       tags:
@@ -972,7 +974,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /media/upload:
     post:
       tags:
@@ -1000,7 +1002,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /media/{filename}:
     get:
       tags:
@@ -1022,7 +1024,7 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'
   /media/{filename}/delete:
     delete:
       tags:
@@ -1044,4 +1046,4 @@ paths:
         '401':
           $ref: '#/components/responses/401Unauthorized'
         '500':
-          $ref: '#/components/responses/500ServerError'
+          $ref: '#/components/responses/500InternalServerException'

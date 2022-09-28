@@ -16,11 +16,11 @@ export class AuthRouter {
     private registerRoutes() {
 
         this.router.post('/login', this.authController.postLoginUser);
+        this.router.post('/login/validate-2fa', this.authController.loginValidateTwoFactor)
         this.router.post('/logout', this.authController.getLogoutUser);
         this.router.post('/refresh-token', this.authController.postRefreshToken);
-        this.router.post('/register-2fa', passport.authenticate('jwt', { session: false }), this.authController.registerTwofactor)
-        this.router.post('/verify-2fa', passport.authenticate('jwt', { session: false }), this.authController.verifyTwoFactor)
-        this.router.post('/validate-2fa', this.authController.validateTwoFactor)
+        this.router.post('/register-2fa', passport.authenticate('jwt', { session: false }), this.authController.registerTwofactor);
+        this.router.post('/verify-2fa', passport.authenticate('jwt', { session: false }), this.authController.verifyTwoFactor);
     }
 
     public getRoutes() {
