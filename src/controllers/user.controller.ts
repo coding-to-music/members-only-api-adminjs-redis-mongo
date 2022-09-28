@@ -19,11 +19,16 @@ export class UserController {
 
     public async getAllUsers(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
-            const value = await getCacheKey('all_users')
+            
+            const value = await getCacheKey('allUsers')
             if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
-            const users = await User.find({}).exec();
-            await setCacheKey('all_users', users);
-            res.status(200).json({ fromCache: false, data: users });
+
+            const allUsers = await User.find({}, 'name email lastLogin avatar roles').exec();
+
+            await setCacheKey('allUsers', allUsers);
+
+            res.status(200).json({ fromCache: false, data: allUsers });
+
         } catch (err: any) {
 
             logger.error(`
@@ -44,6 +49,7 @@ export class UserController {
                 resetPassword,
                 refreshToken,
                 tokenVersion,
+                twoFactor,
                 ...data
             } = req.user._doc;
             res.json(data)

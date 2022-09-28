@@ -15,7 +15,7 @@ export class PasswordRouter {
 
     private registerRoutes() {
 
-        this.router.put('/get-verification-code', this.passwordController.getVerificationCode);
+        this.router.post('/reset/get-code', this.passwordController.getVerificationCode);
         this.router.put('/reset-password', this.passwordController.putResetPassword);
         this.router.put('/change-password', passport.authenticate('jwt', { session: false }), this.passwordController.putChangePassword);
     }

@@ -16,7 +16,7 @@ export class UserRouter {
 
     private registerRoutes() {
 
-        this.router.get('/all-users', passport.authenticate('jwt', { session: false }), authorizeUser, this.userController.getAllUsers)
+        this.router.get('/all', passport.authenticate('jwt', { session: false }), authorizeUser, this.userController.getAllUsers)
         this.router.get('/userinfo', passport.authenticate('jwt', { session: false }), this.userController.getCurrentUser);
         this.router.post('/register', this.userController.postCreateUser);
         this.router.delete('/delete-user', passport.authenticate('jwt', { session: false }), this.userController.deleteUser);

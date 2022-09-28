@@ -5,7 +5,7 @@ import { corsOptions } from '@config/appConfigs';
 import { logger } from '@utils/logger';
 import { onConnection } from './config/socketio';
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4002;
 
 const httpServer = http.createServer(new App().getApp());
 

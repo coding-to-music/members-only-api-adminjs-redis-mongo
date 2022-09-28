@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { IUser, Role } from '@interfaces/users.interface';
@@ -21,12 +21,16 @@ const UserSchema = new Schema<IUser>({
         token: { type: String, default: '' },
         expiresBy: { type: Date, default: '' }
     },
-    tokenVersion: { type: Number, default: 0 }
+    tokenVersion: { type: Number, default: 0 },
+    twoFactor: {
+        base32Secret: { type: String, default: '' },
+        enabled: { type: Boolean, default: false }
+    }
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {
     if (this.isNew || this.isModified('password')) {
-        this.password = await bcrypt.hash(this.password, 10);
+        this.password = await hash(this.password, 10);
     }
     next();
 });
@@ -38,27 +42,27 @@ UserSchema.pre('findOne', async function (next) {
 
 UserSchema.methods.generateCode = async function (): Promise<string | null> {
     const code = await generateRandomCode(3);
-    this.resetPassword.code = bcrypt.hashSync(code!, 10);
+    this.resetPassword.code = await hash(code!, 10);
     this.resetPassword.expiresBy = new Date(Date.now() + 300000);
     this.save();
     return code;
 };
 
 UserSchema.methods.verifyCode = async function (code: string | Buffer): Promise<IVerify> {
-    const validCode = bcrypt.compare(code, this.resetPassword.code);
+    const validCode = compare(code, this.resetPassword.code);
     const codeNotExpired = (Date.now() - new Date(this.resetPassword.expiresBy).getTime()) < 300000;
     return { validCode, codeNotExpired };
 };
 
 UserSchema.methods.generateTokens = async function (usr: IUser): Promise<ITokens> {
-    const { token, refresh_token } = await createLoginTokens(usr);
-    this.refreshToken.token = refresh_token;
-    const decodedJwt: JwtPayload = decode(refresh_token) as JwtPayload;
+    const { accessToken, refreshToken } = await createLoginTokens(usr);
+    this.refreshToken.token = refreshToken;
+    const decodedJwt: JwtPayload = decode(refreshToken) as JwtPayload;
     this.refreshToken.expiresBy = new Date(decodedJwt.exp! * 1000);
     this.tokenVersion++;
     this.lastLogin = new Date(Date.now());
     await this.save();
-    return { token, refresh_token };
+    return { accessToken, refreshToken };
 }
 
 UserSchema.methods.validateRefreshToken = async function (refreshToken: string, tokenVersion: number): Promise<IValidate> {
@@ -69,7 +73,7 @@ UserSchema.methods.validateRefreshToken = async function (refreshToken: string, 
 }
 
 UserSchema.methods.validatePassword = async function (password: string): Promise<boolean> {
-    return bcrypt.compare(password, this.password);
+    return compare(password, this.password);
 };
 
 export default model<IUser>('User', UserSchema);
