@@ -41,6 +41,10 @@ export class AuthController {
                 // Generate new Tokens and send them to the client
                 if (user.twoFactor.enabled) {
 
+                    // This is to prevent users from calling the validate OTP endpoint without validating their email/passwords first
+                    user.twoFactor.passwordValidated = true;
+                    await user.save();
+
                     res.status(200).json({
                         status: 'sucess',
                         message: 'Email and Password Validated',
@@ -226,6 +230,8 @@ export class AuthController {
 
                     const { twoFactor } = userExists;
 
+                    if (!twoFactor.passwordValidated) throw new UnAuthorizedException('Please Validate Your Password To Proceed')
+
                     const isVerified = speakeasy.totp.verify({
                         secret: twoFactor.base32Secret,
                         encoding: 'base32',
@@ -234,6 +240,11 @@ export class AuthController {
                     });
 
                     if (isVerified) {
+
+                        // Reverse Password Validated state to default
+                        // This is to prevent users from calling the validate OTP endpoint without validating their email/passwords first
+                        userExists.twoFactor.passwordValidated = false;
+                        await userExists.save()
 
                         const { accessToken, refreshToken } = await userExists.generateTokens(userExists);
                         return sendTokens(res, refreshToken, 'Login Successful', accessToken);

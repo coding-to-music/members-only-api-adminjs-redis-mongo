@@ -24,7 +24,8 @@ const UserSchema = new Schema<IUser>({
     tokenVersion: { type: Number, default: 0 },
     twoFactor: {
         base32Secret: { type: String, default: '' },
-        enabled: { type: Boolean, default: false }
+        enabled: { type: Boolean, default: false },
+        passwordValidated: { type: Boolean, default: false }
     }
 }, { timestamps: true });
 
