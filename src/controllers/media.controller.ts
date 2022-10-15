@@ -4,6 +4,7 @@ import { NotFoundException, ValidationException } from '@src/exceptions/common.e
 import { getBucket } from '@config/database';
 import { getFileStorage } from '@middlewares/multer';
 import { logger } from '@utils/logger';
+import { SuccessResponse } from '@src/utils/lib';
 
 
 export class MediaController {
@@ -16,10 +17,7 @@ export class MediaController {
 
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                return res.status(200).json({
-                    status: 'success',
-                    message: 'File Uploaded Successfully'
-                })
+                return res.status(200).json(new SuccessResponse(200, 'File Uploaded'))
             } catch (err: any) {
                 logger.error(`
                 ${err.statusCode ?? 500} - 
@@ -91,10 +89,7 @@ export class MediaController {
 
                 await bucket.delete(mediaFile[0]._id);
 
-                res.status(200).json({
-                    status: 'success',
-                    message: 'File Deleted Successfully'
-                });
+                res.status(200).json(new SuccessResponse(200, 'File Deleted'));
 
             } catch (err: any) {
                 logger.error(`
@@ -107,7 +102,6 @@ export class MediaController {
                 next(err);
             }
         }
-
     ]
 
 };

@@ -1,22 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { JwtPayload, verify } from 'jsonwebtoken';
-import speakeasy from 'speakeasy';
-import { toDataURL } from 'qrcode';
-import User from '@models/User';
-import { ENV } from '@utils/validateEnv';
 import { logger } from '@utils/logger';
-import { sendTokens, cookieOptions } from '@utils/lib';
+import { cookieOptions, SuccessResponse } from '@utils/lib';
 import {
-    ConflictException,
-    ForbiddenException,
     NotFoundException,
-    UnAuthorizedException,
     ValidationException,
 } from '@exceptions/common.exception';
 import { RequestWithUser } from '@interfaces/users.interface';
+import { AuthService } from '@services/auth.service';
 
 export class AuthController {
+
+    private readonly authService = new AuthService();
 
     public postLoginUser = [
 
@@ -32,35 +27,21 @@ export class AuthController {
 
                 const { email, password } = req.body
 
-                const user = await User.findOne({ email }).exec();
-                if (!user) throw new NotFoundException(`User with email: ${email} not found`)
+                const responseData = await this.authService.loginUser(email, password);
 
-                const validPassword: boolean = await user.validatePassword(password);
-                if (!validPassword) throw new UnAuthorizedException('Invalid Login Credentials');
+                const { is2FAEnabled } = responseData
 
-                // Check if user has 2FA enabled and respond with uesr's email & 2FA status, else
-                // Generate new Tokens and send them to the client
-                if (user.twoFactor.enabled) {
+                if (is2FAEnabled) {
 
-                    // This is to prevent users from calling the validate OTP endpoint without validating their email/passwords first
-                    user.twoFactor.passwordValidated = true;
-                    await user.save();
-
-                    const { enabled: is2FAEnabled } = user.twoFactor;
-
-                    res.status(200).json({
-                        status: 'sucess',
-                        message: 'Email and Password Validated',
-                        email: user.email,
-                        is2FAEnabled
-                    })
+                    res.status(200).json(new SuccessResponse(200, 'Email and Password Validated', responseData))
 
                 } else {
 
-                    const { accessToken, refreshToken } = await user.generateTokens(user);
-                    const { enabled: is2FAEnabled } = user.twoFactor;
+                    const { refreshToken, ...data } = responseData;
 
-                    return sendTokens(res, 'Login Successful', accessToken, refreshToken, is2FAEnabled);
+                    res
+                        .cookie('jit', refreshToken, cookieOptions)
+                        .json(new SuccessResponse(200, 'Login Successful', data));
                 }
 
             } catch (err: any) {
@@ -79,12 +60,11 @@ export class AuthController {
 
     public getLogoutUser(req: Request, res: Response, next: NextFunction) {
         try {
+
             return res
                 .clearCookie('jit', cookieOptions)
-                .json({
-                    status: 'success',
-                    message: 'Logout successful'
-                });
+                .json(new SuccessResponse(200, 'Logout Successful'));
+
         } catch (err: any) {
 
             logger.error(`
@@ -98,32 +78,17 @@ export class AuthController {
         }
     };
 
-    public async postRefreshToken(req: Request, res: Response, next: NextFunction) {
-
+    public postRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
             const { jit } = req.signedCookies;
             if (!jit) throw new NotFoundException('Refresh Token not found');
 
-            // Verify refresh token in request
-            const REFRESH_TOKEN_PUBLIC_KEY = Buffer.from(ENV.REFRESH_TOKEN_PUBLIC_KEY_BASE64, 'base64').toString('ascii');
-            const verifiedToken = verify(jit, REFRESH_TOKEN_PUBLIC_KEY) as JwtPayload;
+            const { refreshToken, ...data } = await this.authService.postRefreshToken(jit);
 
-            // Check if user exists in DB
-            const user = await User.findOne({ _id: verifiedToken.sub });
-            if (!user) throw new NotFoundException('User not found');
-
-            // Check if refresh token is valid
-            const { validToken, refreshTokenNotExpired, tokenVersionValid } = await user.validateRefreshToken(jit, verifiedToken.tokenVersion);
-            if (!validToken) throw new ForbiddenException('Invalid Refresh token');
-            if (!refreshTokenNotExpired) throw new ForbiddenException('Refresh Token has expired, Please initiate a new login request');
-            if (!tokenVersionValid) throw new ForbiddenException('Token Invalid')
-
-            // Generate new Tokens and send them to the client
-            const { accessToken, refreshToken } = await user.generateTokens(user);
-            const { enabled: is2FAEnabled } = user.twoFactor;
-
-            sendTokens(res, 'Token Refresh Successful!!!', accessToken, refreshToken, is2FAEnabled);
+            res
+                .cookie('jit', refreshToken, cookieOptions)
+                .json(new SuccessResponse(200, 'Token Refresh Successful', data));
 
         } catch (err: any) {
 
@@ -138,35 +103,18 @@ export class AuthController {
         }
     };
 
-    public async registerTwofactor(req: RequestWithUser, res: Response, next: NextFunction) {
+    public registerTwofactor = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
             const { user } = req;
 
-            const { enabled: is2FAEnabled } = user.twoFactor;
+            const qrCode = await this.authService.registerTwofactor(user);
 
-            if (is2FAEnabled) {
-
-                throw new ConflictException(`2FA Already Enabled for User`);
-
-            } else {
-
-                const { base32, otpauth_url } = speakeasy.generateSecret({
-                    name: 'MEMBERS ONLY'
-                });
-
-                user.twoFactor.base32Secret = base32;
-                await user.save();
-
-                const qrCode = await toDataURL(otpauth_url as string);
-
-                res.status(200).json({
-                    status: 'success',
-                    messages: 'Secret generated successfully. Please scan the QRCode and respond with a valid token',
-                    qrCode
-                })
-
-            }
+            res.status(200).json(new SuccessResponse(
+                200,
+                'Secret generated successfully. Please scan the QRCode and respond with a valid token',
+                qrCode
+            ))
 
         } catch (err: any) {
             console.log(err)
@@ -179,7 +127,7 @@ export class AuthController {
                 `);
             next(err);
         }
-    }
+    };
 
     public verifyTwoFactor = [
 
@@ -193,29 +141,13 @@ export class AuthController {
 
                 const { otpToken } = req.body;
                 const { user } = req;
-                const { twoFactor } = user;
 
-                const isVerified = speakeasy.totp.verify({
-                    secret: twoFactor.base32Secret,
-                    encoding: 'base32',
-                    token: otpToken
-                });
+                await this.authService.verifyTwoFactor(otpToken, user);
 
-                if (isVerified) {
-
-                    user.twoFactor.enabled = true;
-                    await user.save();
-
-                    res.status(200).json({
-                        status: 'success',
-                        message: '2FA Enabled Successfully'
-                    })
-
-                } else {
-                    throw new ForbiddenException('Invalid OTP Token')
-                }
+                res.status(200).json(new SuccessResponse(200, '2FA Enabled Successfully'))
 
             } catch (err: any) {
+
                 logger.error(`
                 ${err.statusCode || 500} - 
                 ${err.error || 'Something Went Wrong'} - 
@@ -241,39 +173,13 @@ export class AuthController {
 
                 const { email, otpToken } = req.body;
 
-                const userExists = await User.findOne({ email }).exec();
+                const responseData = await this.authService.loginValidateTwoFactor(email, otpToken)
 
-                if (userExists) {
+                const { refreshToken, ...data } = responseData;
 
-                    const { twoFactor } = userExists;
-
-                    if (!twoFactor.passwordValidated) throw new UnAuthorizedException('Please Validate Your Password To Proceed')
-
-                    const isVerified = speakeasy.totp.verify({
-                        secret: twoFactor.base32Secret,
-                        encoding: 'base32',
-                        token: otpToken,
-                        window: 1
-                    });
-
-                    if (isVerified) {
-
-                        // Reverse Password Validated state to default
-                        // This is to prevent users from calling the validate OTP endpoint without validating their email/passwords first
-                        userExists.twoFactor.passwordValidated = false;
-                        await userExists.save()
-
-                        const { accessToken, refreshToken } = await userExists.generateTokens(userExists);
-                        const { enabled: is2FAEnabled } = userExists.twoFactor;
-
-                        return sendTokens(res, 'Login Successful', accessToken, refreshToken, is2FAEnabled);
-                    }
-
-                    throw new UnAuthorizedException('Invalid Login Credentials')
-
-                } else {
-                    throw new UnAuthorizedException('Invalid Login Credentials');
-                }
+                res
+                    .cookie('jit', refreshToken, cookieOptions)
+                    .json(new SuccessResponse(200, 'Login Successful', data));
 
             } catch (err: any) {
                 logger.error(`

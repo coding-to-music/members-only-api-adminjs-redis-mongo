@@ -106,17 +106,30 @@ export const formatProifleBody = (req: Request, res: Response, next: NextFunctio
     next();
 }
 
-export const checkIfPostExists = async (req: Request, res: Response, next: NextFunction): Promise<IPost | void | Response> => {
-    try {
-        const document = await Post.findById(req.params.id).exec();
-        if (!document) throw new NotFoundException('Post Not Found')
-        return document;
-    } catch (error) {
-        return next(error);
-    }
+export const checkIfPostExists = async (id: string): Promise<IPost> => {
+
+    const post = await Post.findById(id).exec();
+
+    if (!post) throw new NotFoundException('Post Not Found')
+
+    return post;
 }
 
 export const getDisconnectedUser = (map: Map<string, IChatUserData>, searchValue: string): string | false => {
     const foundKey = [...map.entries()].find(([_key, value]) => value.clientID === searchValue);
     return foundKey ? foundKey[0] : false;
+}
+
+export class SuccessResponse {
+
+    private status = 'success';
+    public statusCode: 200 | 201 | 204;
+    public message: string;
+    public data?: any
+
+    constructor(statusCode: 200 | 201 | 204, message: string, data?: any) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.data = data
+    }
 }

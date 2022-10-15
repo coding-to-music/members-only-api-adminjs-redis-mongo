@@ -1,29 +1,22 @@
 import { NextFunction, Response, Request } from 'express';
 import { body, validationResult } from 'express-validator';
 import { RequestWithUser } from '@interfaces/users.interface';
-import Post from '@models/Post';
-import { formatPostCommentsAndLikes, checkIfPostExists } from '@utils/lib';
-import { Comment, Like } from '@interfaces/posts.interface';
-import { Types } from 'mongoose';
-import { IPost } from '@interfaces/posts.interface';
-import { getCacheKey, setCacheKey } from '@config/cache';
-import {
-    ConflictException,
-    ForbiddenException,
-    NotFoundException,
-    ValidationException,
-} from '@exceptions/common.exception';
+import { formatPostCommentsAndLikes, SuccessResponse } from '@utils/lib';
+import { ValidationException } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
+import { PostService } from '@services/post.service';
 
 export class PostController {
 
-    public async getAllPosts(req: RequestWithUser, res: Response, next: NextFunction) {
+    private readonly postService = new PostService()
+
+    public getAllPosts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
-            const value = await getCacheKey('all_posts')
-            if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
-            const posts = await Post.find({}).exec();
-            await setCacheKey('all_posts', posts);
-            res.status(200).json({ fromCache: false, data: posts });
+
+            const data = await this.postService.getAllPosts();
+
+            res.status(200).json(new SuccessResponse(200, 'All Posts', data));
+
         } catch (err: any) {
 
             logger.error(`
@@ -37,20 +30,15 @@ export class PostController {
         }
     };
 
-    public async getPostsByUser(req: RequestWithUser, res: Response, next: NextFunction) {
+    public getPostsByUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
+
             const { _id } = req.user;
 
-            // Check cache for matching key
-            const value = await getCacheKey(`posts/${_id}`);
-            if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
+            const data = await this.postService.getPostsByUser(_id)
 
-            // If value doesn't exist, load from DB and set new cache key
-            const posts = await Post.find({ user: _id }).exec();
-            if (!posts.length) throw new NotFoundException('User has no posts');
-            await setCacheKey(`posts/${_id}`, posts);
+            res.status(200).json(new SuccessResponse(200, 'Post Details', data));
 
-            res.status(200).json({ fromCache: false, data: posts });
         } catch (err: any) {
 
             logger.error(`
@@ -64,19 +52,14 @@ export class PostController {
         }
     };
 
-    public async getPostById(req: Request, res: Response, next: NextFunction) {
+    public getPostById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params;
 
-            // Check cache for matching key
-            const value = await getCacheKey(`posts/${id}`)
-            if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
+            const data = await this.postService.getPostById(id)
 
-            // If value doesn't exist, load from DB and set new cache key
-            const post = await checkIfPostExists(req, res, next);
-            await setCacheKey(`posts/${id}`, post);
+            res.status(200).json(new SuccessResponse(200, 'Post Details', data));
 
-            res.status(200).json({ fromCache: false, data: post });
         } catch (err: any) {
 
             logger.error(`
@@ -102,25 +85,17 @@ export class PostController {
             try {
 
                 const errors = validationResult(req);
+
                 if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
                 const { _id } = req.user;
+
                 const { postContent, postTitle } = req.body
 
-                // Check if the user has an existing post with the same title
-                const isPostExists = await Post.find({ user: _id, postTitle })
-                if (isPostExists) throw new ConflictException('User has an existing post with the same title');
+                const data = await this.postService.createPost(_id, postContent, postTitle)
 
-                const post = new Post({
-                    user: new Types.ObjectId(_id),
-                    postTitle,
-                    postContent
-                });
-                await post.save();
-                res.status(201).json({
-                    message: 'Post created successfully',
-                    post
-                });
+                res.status(201).json(new SuccessResponse(201, 'Post Created', data));
+
             } catch (err: any) {
 
                 logger.error(`
@@ -144,25 +119,16 @@ export class PostController {
             try {
 
                 const errors = validationResult(req);
+
                 if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
-                const post = await checkIfPostExists(req, res, next) as IPost;
+                const { id: postID } = req.params
+                const { _id: userID } = req.user;
+                const { comment } = req.body
 
-                const userId = new Types.ObjectId(req.user._id);
-                switch (true) {
-                    case !post.comments.length || !post.comments.find(comment => comment.comment_user.equals(userId)):
-                        const comments = new Comment(userId, [{ comment: req.body.comment, comment_date: new Date(Date.now()) }]);
-                        post.comments = [...post.comments, comments];
-                        await post.save();
-                        break;
-                    case post.comments.some(comment => comment.comment_user.equals(userId)):
-                        const commentIndex: number = post.comments.findIndex(comment => comment.comment_user.equals(userId));
-                        post.comments[commentIndex].comment_list = [...post.comments[commentIndex].comment_list, { comment: req.body.comment, comment_date: new Date(Date.now()) }];
-                        await post.save();
-                        break;
-                };
+                const data = await this.postService.addComments(postID, userID, comment)
 
-                res.status(200).json({ message: 'Comment added successfully', post });
+                res.status(201).json(new SuccessResponse(200, 'Comment Added', data));
 
             } catch (err: any) {
                 logger.error(`
@@ -177,21 +143,16 @@ export class PostController {
         }
     ];
 
-    public async deleteComment(req: RequestWithUser, res: Response, next: NextFunction) {
+    public deleteComment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
-            const post = await checkIfPostExists(req, res, next) as IPost;
+            const { id: postID, commentId } = req.params;
 
-            const commentIndex: number = post.comments.findIndex(comment => comment.comment_user.equals(new Types.ObjectId(req.user._id)));
-            if (commentIndex === -1) throw new NotFoundException('User has not commented on this post');
+            const { _id: userID } = req.user;
 
-            const commentIndexInCommentList: number = post.comments[commentIndex].comment_list.findIndex(comment => comment._id!.equals(new Types.ObjectId(req.params.commentId)));
-            if (commentIndexInCommentList === -1) return res.status(404).json({ msg: 'Comment not found' });
+            const data = await this.postService.deleteComment(postID, userID, commentId)
 
-            post.comments[commentIndex].comment_list.splice(commentIndexInCommentList, 1);
-            await post.save();
-
-            res.status(200).json({ message: 'Comment deleted successfully', post });
+            res.status(200).json(new SuccessResponse(200, 'Comment Deleted', data));
 
         } catch (err: any) {
 
@@ -206,24 +167,16 @@ export class PostController {
         };
     };
 
-    public async putLikePost(req: RequestWithUser, res: Response, next: NextFunction) {
-
+    public putLikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
-            const post = await checkIfPostExists(req, res, next) as IPost;
 
-            const userId = new Types.ObjectId(req.user._id);
+            const { id: postID } = req.params;
 
-            switch (true) {
-                case !post.likes.length || !post.likes.some(like => like.like_user.equals(userId)):
-                    const newLike = new Like(userId, new Date(Date.now()));
-                    post.likes = [...post.likes, newLike];
-                    await post.save();
-                    break;
-                case post.likes.some(like => like.like_user.equals(userId)):
-                    throw new ForbiddenException('You have already liked this post')
-            }
+            const { _id: userID } = req.user;
 
-            res.status(200).json({ message: 'Like added successfully', post });
+            const data = await this.postService.likePost(postID, userID)
+
+            res.status(200).json(new SuccessResponse(200, 'Post Liked', data));
 
         } catch (err: any) {
 
@@ -238,18 +191,16 @@ export class PostController {
         }
     };
 
-    public async deleteUnlikePost(req: RequestWithUser, res: Response, next: NextFunction) {
+    public deleteUnlikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
-            const post = await checkIfPostExists(req, res, next) as IPost;
+            const { id: postID } = req.params;
 
-            const likeIndex: number = post.likes.findIndex(like => like.like_user.equals(new Types.ObjectId(req.user._id)));
-            if (likeIndex === -1) throw new NotFoundException('User has not liked this post')
+            const { _id: userID } = req.user;
 
-            post.likes.splice(likeIndex, 1);
-            await post.save();
+            const data = await this.postService.unLikePost(postID, userID)
 
-            res.status(200).json({ message: 'Like deleted successfully', post });
+            res.status(200).json(new SuccessResponse(200, 'Post Unliked', data));
 
         } catch (err: any) {
 
@@ -264,15 +215,16 @@ export class PostController {
         }
     };
 
-    public async deletePost(req: RequestWithUser, res: Response, next: NextFunction) {
+    public deletePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
-            const post = await checkIfPostExists(req, res, next) as IPost;
 
-            if (!post.user.equals(new Types.ObjectId(req.user._id)))
-                throw new ForbiddenException('You cannot delete this post');
+            const { id: postID } = req.params;
 
-            await post.remove();
-            res.status(200).json({ message: 'Post deleted successfully' });
+            const { _id: userID } = req.user;
+
+            await this.postService.deletePost(postID, userID)
+
+            res.status(200).json(new SuccessResponse(200, 'Post Deleted'));
 
         } catch (err: any) {
 
