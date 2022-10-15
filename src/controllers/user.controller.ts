@@ -1,33 +1,25 @@
 import { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import gravatar from 'gravatar';
 import { RequestWithUser } from '@interfaces/users.interface';
-import User from '@models/User';
-import Post from '@models/Post';
-import Profile from '@models/Profile';
-import { Types } from 'mongoose';
-import { getCacheKey, setCacheKey } from '@config/cache';
 import {
     BadRequestException,
-    ConflictException,
     ValidationException,
 } from '@exceptions/common.exception';
-import { sendMail } from '@utils/sendMail';
 import { logger } from '@utils/logger';
+
+import { UserService } from '@services/user.service';
+import { SuccessResponse } from '@utils/lib';
 
 export class UserController {
 
+    private readonly userService = new UserService();
+
     public async getAllUsers(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
-            
-            const value = await getCacheKey('allUsers')
-            if (value) return res.status(200).json({ fromCache: true, data: JSON.parse(value) });
 
-            const allUsers = await User.find({}, 'name email lastLogin avatar roles').exec();
+            const allUsers = this.userService.getAllUsers()
 
-            await setCacheKey('allUsers', allUsers);
-
-            res.status(200).json({ fromCache: false, data: allUsers });
+            res.status(200).json(new SuccessResponse(200, 'All Users', allUsers));
 
         } catch (err: any) {
 
@@ -44,6 +36,7 @@ export class UserController {
 
     public async getCurrentUser(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
+
             const {
                 password,
                 resetPassword,
@@ -52,7 +45,9 @@ export class UserController {
                 twoFactor,
                 ...data
             } = req.user._doc;
-            res.json(data)
+
+            res.json(new SuccessResponse(200, 'User details', data))
+
         } catch (err: any) {
 
             logger.error(`
@@ -70,9 +65,13 @@ export class UserController {
     public postCreateUser = [
 
         body('email').notEmpty().isEmail(),
+
         body('firstName', 'First Name is Required').trim().isLength({ min: 1 }).escape(),
+
         body('lastName', 'Last Name is Required').trim().isLength({ min: 1 }).escape(),
+
         body('password').isString().trim().isLength({ min: 6 }).withMessage('password must contain at least 6 characters').escape(),
+
         body('confirmPassword').custom((value, { req }) => {
             if (value !== req.body.password) {
                 throw new BadRequestException('confirmPassword must match password')
@@ -87,32 +86,11 @@ export class UserController {
                 const errors = validationResult(req);
                 if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
-                const { email, firstName, lastName, confirmPassword, img } = req.body;
+                const { body } = req;
 
-                const foundUser = await User.findOne({ email: email }).exec();
-                if (foundUser) throw new ConflictException('User already exists');
+                await this.userService.createUser(body);
 
-                const avatar = gravatar.url(email, { s: '100', r: 'pg', d: 'retro' }, true);
-
-                const user = new User({
-                    name: `${firstName} ${lastName}`,
-                    email,
-                    password: confirmPassword,
-                    avatar: avatar ?? img ?? ''
-                });
-
-                await user.save();
-
-                const mailOptions: [string, string, string, string] = [
-                    email,
-                    'New Account Creation',
-                    `Welcome to Members Only`,
-                    `<p>Dear ${firstName} ${lastName}, Welcome to the Members Only platform, we are glad to have you onboard</p>`
-                ];
-
-                await sendMail(...mailOptions);
-
-                res.json({ message: 'Success, User Account Created' })
+                res.json(new SuccessResponse(201, 'Success, User Account Created'))
 
             } catch (err: any) {
 
@@ -130,43 +108,43 @@ export class UserController {
 
     public putUpdateUser = [
 
-        async (req: Request, res: Response, next: NextFunction) => {
-            res.send('NOT YET IMPLEMENTED')
+        body('firstName', 'First Name is Required').trim().isLength({ min: 1 }).escape(),
+
+        body('lastName', 'Last Name is Required').trim().isLength({ min: 1 }).escape(),
+
+        async (req: RequestWithUser, res: Response, next: NextFunction) => {
+            try {
+
+                const { body } = req
+                const { _id } = req.user
+
+                await this.userService.updateUser(_id, body)
+
+                res.status(200).json(new SuccessResponse(200, 'NOT YET UPDATED'))
+
+            } catch (err: any) {
+
+                logger.error(`
+                ${err.statusCode || 500} - 
+                ${err.error || 'Something Went Wrong'} - 
+                ${req.originalUrl} - 
+                ${req.method} - 
+                ${req.ip}
+                `);
+                next(err)
+            }
+
         }
     ]
 
-    public async deleteUser(req: RequestWithUser, res: Response, next: NextFunction) {
+    public deleteUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
-            await Post.deleteMany({ user: req.user._id }).exec();
+            const { _id } = req.user;
 
-            const userPostComments = await Post.find({}).elemMatch('comments', { comment_user: req.user._id }).exec();
-            if (userPostComments.length) {
-                userPostComments.forEach(async post => {
-                    const commentIndex = post.comments.findIndex(comment => comment.comment_user.equals(new Types.ObjectId(req.user._id)));
-                    if (commentIndex !== -1) {
-                        post.comments.splice(commentIndex, 1);
-                        await post.save();
-                    }
-                });
-            };
+            await this.userService.deleteUser(_id);
 
-            const userPostLikes = await Post.find({}).elemMatch('likes', { like_user: req.user._id }).exec();
-            if (userPostLikes.length) {
-                userPostLikes.forEach(async post => {
-                    const likeIndex = post.likes.findIndex(like => like.like_user.equals(new Types.ObjectId(req.user._id)));
-                    if (likeIndex !== -1) {
-                        post.likes.splice(likeIndex, 1);
-                        await post.save();
-                    }
-                });
-            }
-
-            await Profile.deleteOne({ user: req.user._id }).exec();
-
-            await User.deleteOne({ _id: req.user._id }).exec();
-
-            res.status(200).json({ msg: 'User deleted successfully' });
+            res.status(200).json(new SuccessResponse(200, 'User deleted successfully'));
 
         } catch (err: any) {
 

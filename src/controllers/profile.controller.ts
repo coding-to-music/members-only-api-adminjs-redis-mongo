@@ -3,23 +3,29 @@ import { body, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import Profile from '@models/Profile';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { formatProifleBody } from '@utils/lib';
+import { formatProifleBody, SuccessResponse } from '@utils/lib';
 import {
     ConflictException,
     NotFoundException,
     ValidationException,
 } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
+import { ProfileService } from '@services/profile.service';
 
 
 export class ProfileController {
 
-    public async getUserProfile(req: RequestWithUser, res: Response, next: NextFunction) {
+    private readonly profileService = new ProfileService()
+
+    public getUserProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
-            const { _id } = req.user
-            const profile = await Profile.findOne({ user: _id }).exec();
-            if (!profile) throw new NotFoundException(`No Profile found for ${req.user.name}`);
-            res.json({ profile });
+
+            const { _id: userID } = req.user
+
+            const data = await this.profileService.getUserProfile(userID)
+
+            res.status(200).json(new SuccessResponse(200, 'User Profile', data));
+
         } catch (err: any) {
 
             logger.error(`
@@ -58,29 +64,17 @@ export class ProfileController {
             try {
 
                 const errors = validationResult(req);
+
                 if (!errors.isEmpty()) throw new ValidationException(errors.array());
 
-                const { _id } = req.user
+                const { body } = req;
 
-                // Check if user already has a profile
-                const isProfileExists = await Profile.findOne({ user: _id })
-                if (!isProfileExists) throw new ConflictException('User Already has a Profile');
+                const { _id: userID } = req.user;
 
-                const profileToCreate = new Profile({
-                    user: new Types.ObjectId(_id),
-                    bio: req.body.bio,
-                    address: req.body.address,
-                    phoneNumber: +req.body.phoneNumber,
-                    education: req.body.education,
-                    experience: req.body.experience,
-                    social: req.body.social,
-                });
+                const data = await this.profileService.createProfile(userID, body)
 
-                await profileToCreate.save();
-                res.status(201).json({
-                    message: 'Profile created successfully',
-                    profileToCreate
-                });
+                res.status(201).json(new SuccessResponse(201, 'Profile Created', data));
+
             } catch (err: any) {
 
                 logger.error(`

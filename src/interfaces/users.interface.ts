@@ -12,7 +12,7 @@ interface RefreshToken {
   expiresBy: Date;
 }
 
-interface twoFactor {
+export interface TwoFactor {
   base32Secret: string,
   enabled: boolean,
   passwordValidated: boolean
@@ -36,7 +36,7 @@ export interface IUser extends Document {
   refreshToken: RefreshToken;
   tokenVersion: number;
   lastLogin?: Date;
-  twoFactor: twoFactor;
+  twoFactor: TwoFactor;
   generateCode: () => Promise<string>;
   generateTokens(usr: IUser): Promise<ITokens>;
   validatePassword(password: string): Promise<boolean>;
