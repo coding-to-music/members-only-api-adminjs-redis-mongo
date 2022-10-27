@@ -43,4 +43,33 @@ export class ProfileService {
 
     }
 
+    public async updateProfile(userID: string, body: any) {
+
+        const foundProfile = await Profile.findOne({ user: userID }).exec();
+
+        if (foundProfile) {
+
+            const updatedProfile = Object.assign(foundProfile, body);
+
+            await updatedProfile.save();
+
+            return true
+
+        } else {
+
+            throw new NotFoundException(`No Profile found for user with ID: ${userID}`)
+
+        };
+    }
+
+    public async deleteProfile(userID: string) {
+
+        const profileToDelete = await this.getProfileByUser(userID)
+
+        await profileToDelete.remove();
+
+        return true
+
+    }
+
 }

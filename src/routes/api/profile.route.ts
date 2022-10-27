@@ -21,16 +21,27 @@ export class ProfileRouter {
     private registerRoutes() {
 
         this.router.use(passport.authenticate('jwt', { session: false }));
-        
-        this.router.get(
-            '/user',
-            this.profileController.getProfileByUser
-        );
 
         this.router.post(
             '/',
             this.profileRequestValidator.createProfileValidator,
             this.profileController.createProfile
+        );
+
+        this.router.get(
+            '/user',
+            this.profileController.getProfileByUser
+        );
+
+        this.router.patch(
+            '/',
+            this.profileRequestValidator.createProfileValidator,
+            this.profileController.updateProfile
+        );
+
+        this.router.delete(
+            '/',
+            this.profileController.deleteProfile
         );
     }
 
