@@ -1,12 +1,9 @@
 import { NextFunction, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { Types } from 'mongoose';
-import Profile from '@models/Profile';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { formatProifleBody, SuccessResponse } from '@utils/lib';
 import {
-    ConflictException,
-    NotFoundException,
+    LoggerException,
     ValidationException,
 } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
@@ -26,17 +23,9 @@ export class ProfileController {
 
             res.status(200).json(new SuccessResponse(200, 'User Profile', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-
-            next(err)
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
@@ -75,16 +64,9 @@ export class ProfileController {
 
                 res.status(201).json(new SuccessResponse(201, 'Profile Created', data));
 
-            } catch (err: any) {
-
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
             }
         }
     ]

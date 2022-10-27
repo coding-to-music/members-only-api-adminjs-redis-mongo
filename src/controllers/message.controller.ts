@@ -3,6 +3,7 @@ import { RequestWithUser } from '@interfaces/users.interface';
 import { logger } from '@utils/logger';
 import { SuccessResponse } from '@utils/lib';
 import { MessageService } from '@services/message.service';
+import { LoggerException } from '@exceptions/common.exception';
 
 export class MessageController {
 
@@ -17,15 +18,9 @@ export class MessageController {
 
             res.status(200).json(new SuccessResponse(200, 'All Messages', messages));
 
-        } catch (err: any) {
-            logger.error(`
-                ${err.statusCode ?? 500} - 
-                ${err.error ?? 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     }
 
@@ -38,15 +33,9 @@ export class MessageController {
 
             res.status(200).json(new SuccessResponse(200, 'Message Deleted'));
 
-        } catch (err: any) {
-            logger.error(`
-                ${err.statusCode ?? 500} - 
-                ${err.error ?? 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     }
 }

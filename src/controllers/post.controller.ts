@@ -2,9 +2,10 @@ import { NextFunction, Response, Request } from 'express';
 import { body, validationResult } from 'express-validator';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { formatPostCommentsAndLikes, SuccessResponse } from '@utils/lib';
-import { ValidationException } from '@exceptions/common.exception';
+import { LoggerException, ValidationException } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 import { PostService } from '@services/post.service';
+
 
 export class PostController {
 
@@ -17,16 +18,9 @@ export class PostController {
 
             res.status(200).json(new SuccessResponse(200, 'All Posts', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
@@ -39,16 +33,9 @@ export class PostController {
 
             res.status(200).json(new SuccessResponse(200, 'Post Details', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err)
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
@@ -60,55 +47,28 @@ export class PostController {
 
             res.status(200).json(new SuccessResponse(200, 'Post Details', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
-    public postCreatePost = [
+    public createPost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
 
-        (req: Request, res: Response, next: NextFunction) => formatPostCommentsAndLikes(req, res, next),
+            const { _id } = req.user;
 
-        body('postTitle').not().isEmpty().withMessage('Post Title cannot be empty').isLength({ min: 3, max: 30 }).withMessage('Post Title be between 3 to 30 characters '),
-        body('postContent').not().isEmpty().withMessage('Post content cannot be empty').isLength({ min: 10 }).withMessage('Post Content must contain at least 10 characters'),
+            const { postContent, postTitle } = req.body
 
-        async (req: RequestWithUser, res: Response, next: NextFunction) => {
+            const data = await this.postService.createPost(_id, postContent, postTitle)
 
-            try {
+            res.status(201).json(new SuccessResponse(201, 'Post Created', data));
 
-                const errors = validationResult(req);
-
-                if (!errors.isEmpty()) throw new ValidationException(errors.array());
-
-                const { _id } = req.user;
-
-                const { postContent, postTitle } = req.body
-
-                const data = await this.postService.createPost(_id, postContent, postTitle)
-
-                res.status(201).json(new SuccessResponse(201, 'Post Created', data));
-
-            } catch (err: any) {
-
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
-            }
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
-    ];
+    }
 
     public putAddComments = [
 
@@ -130,16 +90,10 @@ export class PostController {
 
                 res.status(201).json(new SuccessResponse(200, 'Comment Added', data));
 
-            } catch (err: any) {
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
-            };
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
+            }
         }
     ];
 
@@ -154,17 +108,10 @@ export class PostController {
 
             res.status(200).json(new SuccessResponse(200, 'Comment Deleted', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
-        };
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
     };
 
     public putLikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
@@ -178,16 +125,9 @@ export class PostController {
 
             res.status(200).json(new SuccessResponse(200, 'Post Liked', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
@@ -202,16 +142,9 @@ export class PostController {
 
             res.status(200).json(new SuccessResponse(200, 'Post Unliked', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
@@ -226,16 +159,9 @@ export class PostController {
 
             res.status(200).json(new SuccessResponse(200, 'Post Deleted'));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     }
 };

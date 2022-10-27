@@ -4,7 +4,7 @@ import { RequestWithUser } from '@interfaces/users.interface';
 import { logger } from '@utils/logger';
 import { PasswordService } from '@services/password.service';
 import { SuccessResponse } from '@utils/lib';
-import { ValidationException } from '@exceptions/common.exception';
+import { LoggerException, ValidationException } from '@exceptions/common.exception';
 
 export class PasswordController {
 
@@ -26,17 +26,9 @@ export class PasswordController {
 
                 res.json(new SuccessResponse(200, 'Verification Code sent'));
 
-            } catch (err: any) {
-
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-
-                next(err)
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
             }
         }
     ];
@@ -61,16 +53,9 @@ export class PasswordController {
 
                 res.json(new SuccessResponse(200, 'Password Reset Successful', data));
 
-            } catch (err: any) {
-
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
             }
         }
     ];
@@ -95,17 +80,9 @@ export class PasswordController {
 
                 res.json(new SuccessResponse(200, 'Password Changed', data))
 
-            } catch (err: any) {
-
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-
-                next(err);
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
             }
         }
     ]

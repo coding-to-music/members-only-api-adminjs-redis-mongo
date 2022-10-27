@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { param, validationResult } from 'express-validator';
-import { NotFoundException, ValidationException } from '@src/exceptions/common.exception';
+import {
+    LoggerException,
+    NotFoundException,
+    ValidationException
+} from '@exceptions/common.exception';
 import { getBucket } from '@config/database';
 import { getFileStorage } from '@middlewares/multer';
 import { logger } from '@utils/logger';
-import { SuccessResponse } from '@src/utils/lib';
+import { SuccessResponse } from '@utils/lib';
 
 
 export class MediaController {
@@ -17,16 +21,12 @@ export class MediaController {
 
         async (req: Request, res: Response, next: NextFunction) => {
             try {
+
                 return res.status(200).json(new SuccessResponse(200, 'File Uploaded'))
-            } catch (err: any) {
-                logger.error(`
-                ${err.statusCode ?? 500} - 
-                ${err.error ?? 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
+
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
             }
         }
     ];
@@ -54,15 +54,9 @@ export class MediaController {
 
                 bucket.openDownloadStreamByName(filename).pipe(res)
 
-            } catch (err: any) {
-                logger.error(`
-                ${err.statusCode ?? 500} - 
-                ${err.error ?? 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
             }
         }
 
@@ -91,15 +85,9 @@ export class MediaController {
 
                 res.status(200).json(new SuccessResponse(200, 'File Deleted'));
 
-            } catch (err: any) {
-                logger.error(`
-                ${err.statusCode ?? 500} - 
-                ${err.error ?? 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
+            } catch (error: any) {
+                logger.error(JSON.stringify(new LoggerException(error, req)), error);
+                next(error)
             }
         }
     ]

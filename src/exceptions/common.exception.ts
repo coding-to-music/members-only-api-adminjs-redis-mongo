@@ -1,5 +1,6 @@
 import { ValidationError } from 'express-validator';
 import { HttpException } from '@exceptions/http.exception';
+import { Request } from 'express';
 
 export class BadRequestException extends HttpException {
 
@@ -78,3 +79,24 @@ export class ValidationException extends HttpException {
         this.errors = errors
     }
 };
+
+export class LoggerException {
+
+    public error: string;
+    public errorType: string;
+    public requestHost: string;
+    public requestIp: string;
+    public requestMethod: string;
+    public requestOrigin: string;
+    public statusCode: number;
+
+    constructor(err: HttpException, req: Request) {
+        this.error = err.error ?? err.message;
+        this.errorType = err.errorType;
+        this.requestHost = req.hostname;
+        this.requestIp = req.ip;
+        this.requestMethod = req.method;
+        this.requestOrigin = req.originalUrl;
+        this.statusCode = err.statusCode ?? 500;
+    }
+}

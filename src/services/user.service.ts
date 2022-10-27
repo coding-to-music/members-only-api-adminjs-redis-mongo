@@ -66,6 +66,8 @@ export class UserService {
 
             await updatedUser.save()
 
+            return true
+
         } else {
             throw new NotFoundException(`User with ID: ${_id} does not exist`)
         };
