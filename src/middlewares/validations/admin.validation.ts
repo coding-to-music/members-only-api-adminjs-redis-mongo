@@ -3,11 +3,11 @@ import { param } from 'express-validator';
 import { checkValidations } from '@utils/checkValidations';
 
 
-export class MediaRequestValidator {
+export class AdminRequestValidator {
 
-    public fileNameValidator = [
+    public idValidator = [
 
-        param('filename', 'File name is required').notEmpty().trim().escape(),
+        param('id').notEmpty().isMongoId().trim().escape(),
 
         async (req: Request, res: Response, next: NextFunction) => {
             checkValidations(req, res, next)

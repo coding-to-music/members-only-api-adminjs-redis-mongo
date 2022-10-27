@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express';
+import { AdminRouter } from '@routes/api/admin.route';
 import { AuthRouter } from '@routes/api/auth.route';
 import { MediaRouter } from '@routes/api/media.route';
 import { MessageRouter } from '@routes/api/message.route';
@@ -21,6 +22,7 @@ export class ApiRouter {
         this.router.get('/', (req: Request, res: Response) => res.json({
             message: `PLEASE VISIT '/api-docs' FOR FULL API DOCUMENTATION`
         }));
+        this.router.use('/admin', new AdminRouter().getRoutes());
         this.router.use('/auth', new AuthRouter().getRoutes());
         this.router.use('/media', new MediaRouter().getRoutes());
         this.router.use('/messages', new MessageRouter().getRoutes());

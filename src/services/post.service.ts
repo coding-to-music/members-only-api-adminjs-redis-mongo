@@ -13,63 +13,33 @@ import {
 
 export class PostService {
 
-    public async getAllPosts() {
-
-        const value = await getCacheKey('all_posts')
-
-        if (value) return { fromCache: true, data: JSON.parse(value) }
-
-        const posts = await Post.find({}).exec();
-
-        await setCacheKey('all_posts', posts);
-
-        return { fromCache: false, data: posts };
-
-    };
-
-    public async getPostsByUser(_id: string) {
+    public async getPostsByUser(userID: string) {
 
         // Check cache for matching key
-        const value = await getCacheKey(`posts/${_id}`);
+        const value = await getCacheKey(`posts/user/${userID}`);
 
         if (value) return { fromCache: true, data: JSON.parse(value) };
 
         // If value doesn't exist, load from DB and set new cache key
-        const posts = await Post.find({ user: _id }).exec();
+        const posts = await Post.find({ user: userID }).exec();
 
         if (!posts.length) throw new NotFoundException('User has no posts');
 
-        await setCacheKey(`posts/${_id}`, posts);
+        await setCacheKey(`posts/user/${userID}`, posts);
 
         return { fromCache: false, data: posts };
 
     };
 
-    public async getPostById(id: string) {
-
-        // Check cache for matching key
-        const value = await getCacheKey(`posts/${id}`)
-
-        if (value) return { fromCache: true, data: JSON.parse(value) };
-
-        // If value doesn't exist, load from DB and set new cache key
-        const post = await checkIfPostExists(id);
-
-        await setCacheKey(`posts/${id}`, post);
-
-        return { fromCache: false, data: post };
-
-    };
-
-    public async createPost(_id: string, postContent: string, postTitle: string) {
+    public async createPost(userID: string, postContent: string, postTitle: string) {
 
         // Check if the user has an existing post with the same title
-        const isPostExists = await Post.find({ user: _id, postTitle })
+        const isPostExists = await Post.find({ user: userID, postTitle })
 
         if (isPostExists) throw new ConflictException('User has an existing post with the same title');
 
         const newPost = new Post({
-            user: new Types.ObjectId(_id),
+            user: new Types.ObjectId(userID),
             postTitle,
             postContent
         });

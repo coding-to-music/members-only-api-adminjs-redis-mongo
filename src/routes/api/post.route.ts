@@ -21,20 +21,10 @@ export class PostRouter {
     private registerRoutes() {
 
         this.router.use(passport.authenticate('jwt', { session: false }));
-        
-        this.router.get(
-            '/',
-            this.postController.getAllPosts
-        );
 
         this.router.get(
             '/user',
             this.postController.getPostsByUser
-        );
-
-        this.router.get(
-            '/:id',
-            this.postController.getPostById
         );
 
         this.router.post(

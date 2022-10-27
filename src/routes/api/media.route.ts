@@ -29,13 +29,13 @@ export class MediaRouter {
 
         this.router.get(
             '/:filename',
-            this.mediaRequestValidator.checkFileNameValidator,
+            this.mediaRequestValidator.fileNameValidator,
             this.mediaController.getMediaFile
         );
 
         this.router.delete(
             '/:filename',
-            this.mediaRequestValidator.checkFileNameValidator,
+            this.mediaRequestValidator.fileNameValidator,
             this.mediaController.deleteMediaFile
         );
     }

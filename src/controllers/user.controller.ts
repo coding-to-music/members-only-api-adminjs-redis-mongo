@@ -14,19 +14,6 @@ export class UserController {
         this.userService = new UserService()
     }
 
-    public async getAllUsers(req: RequestWithUser, res: Response, next: NextFunction) {
-        try {
-
-            const allUsers = this.userService.getAllUsers()
-
-            res.status(200).json(new SuccessResponse(200, 'All Users', allUsers));
-
-        } catch (error: any) {
-            logger.error(JSON.stringify(new LoggerException(error, req)), error);
-            next(error)
-        }
-    };
-
     public async getCurrentUser(req: RequestWithUser, res: Response, next: NextFunction) {
         try {
 

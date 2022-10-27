@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import { Authorize } from '@middlewares/authorize';
 import { UserController } from '@controllers/user.controller';
 import { UserRequestValidator } from '@middlewares/validations/user.validation';
 
@@ -20,13 +19,6 @@ export class UserRouter {
     }
 
     private registerRoutes() {
-
-        this.router.get(
-            '/',
-            passport.authenticate('jwt', { session: false }),
-            Authorize.admin,
-            this.userController.getAllUsers
-        );
 
         this.router.get(
             '/userinfo',

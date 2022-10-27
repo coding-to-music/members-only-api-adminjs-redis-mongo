@@ -14,12 +14,12 @@ export class ProfileController {
         this.profileService = new ProfileService();
     }
 
-    public getProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    public getProfileByUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
             const { _id: userID } = req.user
 
-            const data = await this.profileService.getUserProfile(userID)
+            const data = await this.profileService.getProfileByUser(userID)
 
             res.status(200).json(new SuccessResponse(200, 'User Profile', data));
 

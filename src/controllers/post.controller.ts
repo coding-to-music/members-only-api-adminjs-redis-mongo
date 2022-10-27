@@ -1,4 +1,4 @@
-import { NextFunction, Response, Request } from 'express';
+import { NextFunction, Response } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { SuccessResponse } from '@utils/lib';
 import { LoggerException } from '@exceptions/common.exception';
@@ -14,39 +14,12 @@ export class PostController {
         this.postService = new PostService()
     }
 
-    public getAllPosts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-        try {
-
-            const data = await this.postService.getAllPosts();
-
-            res.status(200).json(new SuccessResponse(200, 'All Posts', data));
-
-        } catch (error: any) {
-            logger.error(JSON.stringify(new LoggerException(error, req)), error);
-            next(error)
-        }
-    };
-
     public getPostsByUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
             const { _id } = req.user;
 
             const data = await this.postService.getPostsByUser(_id)
-
-            res.status(200).json(new SuccessResponse(200, 'Post Details', data));
-
-        } catch (error: any) {
-            logger.error(JSON.stringify(new LoggerException(error, req)), error);
-            next(error)
-        }
-    };
-
-    public getPostById = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { id } = req.params;
-
-            const data = await this.postService.getPostById(id)
 
             res.status(200).json(new SuccessResponse(200, 'Post Details', data));
 

@@ -24,7 +24,7 @@ export class ProfileRouter {
         
         this.router.get(
             '/user',
-            this.profileController.getProfile
+            this.profileController.getProfileByUser
         );
 
         this.router.post(

@@ -14,16 +14,15 @@ import helmet from 'helmet';
 import compression from 'compression';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
-import rateLimit from 'express-rate-limit'
 import { HttpException } from '@exceptions/http.exception'
 import { ENV } from '@utils/validateEnv';
 
 // Import Configs
 import { connectDB } from '@config/database';
-import { corsOptions, whitelist } from '@config/appConfigs';
+import { corsOptions, apiLimiter } from '@config/appConfigs';
 import passportConfig from '@middlewares/passport';
 import { stream } from '@utils/logger';
-// import { adminJs, adminJSRouter } from '@config/adminjs';
+import { adminJs, adminJSRouter } from '@config/adminjs';
 
 // Import Routes
 import { ApiRouter } from '@routes/api/api.route';
@@ -52,28 +51,18 @@ export class App {
 
     private initializeMiddlewares() {
 
-        const apiLimiter = rateLimit({
-            windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 100, // limit each IP to 100 requests per windowMs
-            standardHeaders: true,
-            legacyHeaders: false,
-            message: 'Too many requests, please try again later.',
-            skipSuccessfulRequests: true,
-            skip: (req, res) => whitelist.includes(req.headers.origin as string)
-        })
-
         // AdminJS moved to the top to fix cors and bodyParser issues
-        // this.app.use(adminJs.options.rootPath, adminJSRouter);    // Currenly disabled, causing error crashing app on heroku
-        this.app.use(morgan('combined', { stream }));
-        this.app.use(express.json({ limit: '16mb' }));
-        this.app.use(express.urlencoded({ limit: '16mb', extended: true }));
-
-        this.app.use(passport.initialize());
-        this.app.use(cookieParser(ENV.COOKIE_SECRET));
-        this.app.use(cors(corsOptions));
-        this.app.use(helmet());
-        this.app.use(compression());
-        this.app.use(apiLimiter);
+        this.app
+        .use(adminJs.options.rootPath, adminJSRouter)
+        .use(morgan('combined', { stream }))
+        .use(express.json({ limit: '16mb' }))
+        .use(express.urlencoded({ limit: '16mb', extended: true }))
+        .use(passport.initialize())
+        .use(cookieParser(ENV.COOKIE_SECRET))
+        .use(cors(corsOptions))
+        .use(helmet())
+        .use(compression())
+        .use(apiLimiter)
     }
 
     private initializeRoutes() {
