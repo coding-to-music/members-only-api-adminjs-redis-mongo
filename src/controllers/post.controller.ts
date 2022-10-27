@@ -1,15 +1,18 @@
 import { NextFunction, Response, Request } from 'express';
-import { body, validationResult } from 'express-validator';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { formatPostCommentsAndLikes, SuccessResponse } from '@utils/lib';
-import { LoggerException, ValidationException } from '@exceptions/common.exception';
+import { SuccessResponse } from '@utils/lib';
+import { LoggerException } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 import { PostService } from '@services/post.service';
 
 
 export class PostController {
 
-    private readonly postService = new PostService()
+    private readonly postService: PostService;
+
+    constructor() {
+        this.postService = new PostService()
+    }
 
     public getAllPosts = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
@@ -70,32 +73,22 @@ export class PostController {
         }
     }
 
-    public putAddComments = [
+    public addComments = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
 
-        body('comment').not().isEmpty().withMessage('Comment cannot be empty'),
+            const { id: postID } = req.params
+            const { _id: userID } = req.user;
+            const { comment } = req.body
 
-        async (req: RequestWithUser, res: Response, next: NextFunction) => {
+            const data = await this.postService.addComments(postID, userID, comment)
 
-            try {
+            res.status(201).json(new SuccessResponse(200, 'Comment Added', data));
 
-                const errors = validationResult(req);
-
-                if (!errors.isEmpty()) throw new ValidationException(errors.array());
-
-                const { id: postID } = req.params
-                const { _id: userID } = req.user;
-                const { comment } = req.body
-
-                const data = await this.postService.addComments(postID, userID, comment)
-
-                res.status(201).json(new SuccessResponse(200, 'Comment Added', data));
-
-            } catch (error: any) {
-                logger.error(JSON.stringify(new LoggerException(error, req)), error);
-                next(error)
-            }
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
-    ];
+    }
 
     public deleteComment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
@@ -114,7 +107,7 @@ export class PostController {
         }
     };
 
-    public putLikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    public likePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
             const { id: postID } = req.params;
@@ -131,7 +124,7 @@ export class PostController {
         }
     };
 
-    public deleteUnlikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    public unlikePost = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
             const { id: postID } = req.params;

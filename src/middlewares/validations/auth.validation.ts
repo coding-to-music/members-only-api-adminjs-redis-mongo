@@ -1,31 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
-import { LoggerException, ValidationException } from '@exceptions/common.exception';
-import { logger } from '@utils/logger';
+import { body } from 'express-validator';
+import { checkValidations } from '@utils/checkValidations';
 
 
 export class AuthRequestValidator {
-
-    private checkValidations(req: Request, res: Response, next: NextFunction) {
-        try {
-
-            const errors = validationResult(req);
-
-            if (errors.isEmpty()) {
-
-                next()
-
-            } else {
-
-                throw new ValidationException(errors.array());
-
-            }
-
-        } catch (error: any) {
-            logger.error(JSON.stringify(new LoggerException(error, req)), error);
-            next(error)
-        }
-    }
 
     public loginUserValidator = [
 
@@ -34,7 +12,7 @@ export class AuthRequestValidator {
         body('password').notEmpty().isLength({ min: 6 }).withMessage('Password is required and must be at least 6 characters long'),
 
         async (req: Request, res: Response, next: NextFunction) => {
-            this.checkValidations(req, res, next)
+            checkValidations(req, res, next)
         }
     ];
 
@@ -43,7 +21,7 @@ export class AuthRequestValidator {
         body('otpToken', 'OTP Token is Required').notEmpty().isLength({ min: 6, max: 6 }).withMessage('Token must be six characters long').trim().escape(),
 
         async (req: Request, res: Response, next: NextFunction) => {
-            this.checkValidations(req, res, next)
+            checkValidations(req, res, next)
         }
     ];
 
@@ -54,7 +32,7 @@ export class AuthRequestValidator {
         body('otpToken', 'OTP Token is Required').notEmpty().isLength({ min: 6, max: 6 }).withMessage('Token must be six characters long').trim().escape(),
 
         async (req: Request, res: Response, next: NextFunction) => {
-            this.checkValidations(req, res, next)
+            checkValidations(req, res, next)
         }
     ]
 }

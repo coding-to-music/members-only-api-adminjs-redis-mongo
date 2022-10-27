@@ -1,35 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
-import {
-    BadRequestException,
-    LoggerException,
-    ValidationException
-} from '@exceptions/common.exception';
-import { logger } from '@utils/logger';
+import { body } from 'express-validator';
+import { BadRequestException } from '@exceptions/common.exception';
+import { checkValidations } from '@utils/checkValidations';
 
 
 export class UserRequestValidator {
-
-    private checkValidations(req: Request, res: Response, next: NextFunction) {
-        try {
-
-            const errors = validationResult(req);
-
-            if (errors.isEmpty()) {
-
-                next()
-
-            } else {
-
-                throw new ValidationException(errors.array());
-
-            }
-
-        } catch (error: any) {
-            logger.error(JSON.stringify(new LoggerException(error, req)), error);
-            next(error)
-        }
-    }
 
     public createUserValidator = [
 
@@ -49,7 +24,7 @@ export class UserRequestValidator {
         }),
 
         async (req: Request, res: Response, next: NextFunction) => {
-            this.checkValidations(req, res, next)
+            checkValidations(req, res, next)
         }
     ];
 
@@ -60,7 +35,7 @@ export class UserRequestValidator {
         body('lastName', 'Last Name is Required').trim().isLength({ min: 1 }).escape(),
 
         async (req: Request, res: Response, next: NextFunction) => {
-            this.checkValidations(req, res, next)
+            checkValidations(req, res, next)
         }
     ];
 

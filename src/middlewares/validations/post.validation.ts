@@ -1,32 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
-import { LoggerException, ValidationException } from '@exceptions/common.exception';
-import { logger } from '@utils/logger';
+import { body } from 'express-validator';
 import { formatPostCommentsAndLikes } from '@utils/lib';
+import { checkValidations } from '@utils/checkValidations';
 
 
 export class PostRequestValidator {
-
-    private checkValidations(req: Request, res: Response, next: NextFunction) {
-        try {
-
-            const errors = validationResult(req);
-
-            if (errors.isEmpty()) {
-
-                next()
-
-            } else {
-
-                throw new ValidationException(errors.array());
-
-            }
-
-        } catch (error: any) {
-            logger.error(JSON.stringify(new LoggerException(error, req)), error);
-            next(error)
-        }
-    }
 
     public createPostValidator = [
 
@@ -37,8 +15,16 @@ export class PostRequestValidator {
         body('postContent').not().isEmpty().withMessage('Post content cannot be empty').isLength({ min: 10 }).withMessage('Post Content must contain at least 10 characters'),
 
         async (req: Request, res: Response, next: NextFunction) => {
-            this.checkValidations(req, res, next)
+            checkValidations(req, res, next)
         }
     ];
 
+    public addCommentValidator = [
+
+        body('comment').not().isEmpty().withMessage('Comment cannot be empty'),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            checkValidations(req, res, next)
+        }
+    ]
 }

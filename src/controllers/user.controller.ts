@@ -8,7 +8,11 @@ import { SuccessResponse } from '@utils/lib';
 
 export class UserController {
 
-    private readonly userService = new UserService();
+    private readonly userService: UserService;
+
+    constructor() {
+        this.userService = new UserService()
+    }
 
     public async getAllUsers(req: RequestWithUser, res: Response, next: NextFunction) {
         try {

@@ -1,18 +1,18 @@
 import { NextFunction, Response } from 'express';
-import { body, validationResult } from 'express-validator';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { formatProifleBody, SuccessResponse } from '@utils/lib';
-import {
-    LoggerException,
-    ValidationException,
-} from '@exceptions/common.exception';
+import { SuccessResponse } from '@utils/lib';
+import { LoggerException } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 import { ProfileService } from '@services/profile.service';
 
 
 export class ProfileController {
 
-    private readonly profileService = new ProfileService()
+    private readonly profileService: ProfileService;
+
+    constructor() {
+        this.profileService = new ProfileService();
+    }
 
     public getUserProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
@@ -29,46 +29,21 @@ export class ProfileController {
         }
     };
 
-    public postCreateProfile = [
+    public createProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
 
-        (req: RequestWithUser, res: Response, next: NextFunction) => formatProifleBody(req, res, next),
+            const { body } = req;
 
-        body('bio').not().isEmpty().withMessage('Bio cannot be empty').trim().escape(),
-        body('address').not().isEmpty().withMessage('Address cannot be empty').trim().escape(),
-        body('phoneNumber').not().isEmpty().withMessage('Phone number cannot be empty'),
+            const { _id: userID } = req.user;
 
-        // Handle validation for array of objects
-        body('education').isArray({ min: 1 }).withMessage('Education must be an array'),
-        body('education[*].*').trim().isLength({ min: 1 }).escape(),
-        body('experience').isArray({ min: 1 }).withMessage('Experience must be an array'),
-        body('experience[*].*').trim().isLength({ min: 1 }).escape(),
+            const data = await this.profileService.createProfile(userID, body)
 
-        body('social').not().isEmpty().withMessage('Social cannot be empty'),
-        body('social.github').not().isEmpty().withMessage('Github cannot be empty'),
-        body('social.linkedin').not().isEmpty().withMessage('Linkedin cannot be empty'),
-        body('social.twitter').not().isEmpty().withMessage('Twitter cannot be empty'),
+            res.status(201).json(new SuccessResponse(201, 'Profile Created', data));
 
-        async (req: RequestWithUser, res: Response, next: NextFunction) => {
-
-            try {
-
-                const errors = validationResult(req);
-
-                if (!errors.isEmpty()) throw new ValidationException(errors.array());
-
-                const { body } = req;
-
-                const { _id: userID } = req.user;
-
-                const data = await this.profileService.createProfile(userID, body)
-
-                res.status(201).json(new SuccessResponse(201, 'Profile Created', data));
-
-            } catch (error: any) {
-                logger.error(JSON.stringify(new LoggerException(error, req)), error);
-                next(error)
-            }
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
-    ]
+    }
 
 }
