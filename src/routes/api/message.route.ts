@@ -2,12 +2,14 @@ import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
 import { MessageController } from '@controllers/message.controller';
+import { MessageRequestValidator } from '@middlewares/validations/message.validation';
 
 
 export class MessageRouter {
 
-    private messageController = new MessageController();
     private router: CustomIRouter = Router();
+    private messageController = new MessageController();
+    private messageRequestValidator = new MessageRequestValidator()
 
     constructor() {
         this.registerRoutes()
@@ -15,8 +17,18 @@ export class MessageRouter {
 
     private registerRoutes() {
 
-        this.router.get('/all', passport.authenticate('jwt', { session: false }), this.messageController.getMessages);
-        this.router.delete('/:id/delete', passport.authenticate('jwt', { session: false }), this.messageController.deleteMessage);
+        this.router.use(passport.authenticate('jwt', { session: false }))
+
+        this.router.get(
+            '/user',
+            this.messageController.getMessages
+        );
+
+        this.router.delete(
+            '/:id',
+            this.messageRequestValidator.idValidator,
+            this.messageController.deleteMessage
+        );
     }
 
     public getRoutes() {

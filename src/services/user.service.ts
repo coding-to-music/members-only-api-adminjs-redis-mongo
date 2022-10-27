@@ -1,5 +1,4 @@
 import gravatar from 'gravatar';
-import { getCacheKey, setCacheKey } from '@config/cache';
 import User from '@models/User';
 import Post from '@models/Post';
 import Profile from '@models/Profile';
@@ -9,24 +8,6 @@ import { Types } from 'mongoose';
 
 
 export class UserService {
-
-    public async getAllUsers() {
-
-        const value = await getCacheKey('allUsers');
-
-        if (value) {
-
-            return { fromCache: true, data: JSON.parse(value) }
-
-        } else {
-
-            const allUsers = await User.find({}, 'name email lastLogin avatar roles').exec();
-
-            await setCacheKey('allUsers', allUsers);
-
-            return { fromCache: false, data: allUsers };
-        };
-    };
 
     public async createUser(body: any): Promise<void> {
 
@@ -65,6 +46,8 @@ export class UserService {
             const updatedUser = Object.assign(foundUser, body)
 
             await updatedUser.save()
+
+            return true
 
         } else {
             throw new NotFoundException(`User with ID: ${_id} does not exist`)

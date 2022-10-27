@@ -1,22 +1,48 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
-import { ProfileController } from '@src/controllers/profile.controller';
+import { ProfileController } from '@controllers/profile.controller';
+import { ProfileRequestValidator } from '@middlewares/validations/profile.validation';
 
 
 export class ProfileRouter {
 
-    private profileController = new ProfileController();
-    private router: CustomIRouter = Router();
+    private router: CustomIRouter;
+    private profileController: ProfileController;
+    private profileRequestValidator: ProfileRequestValidator
 
     constructor() {
+        this.router = Router();
+        this.profileController = new ProfileController();
+        this.profileRequestValidator = new ProfileRequestValidator();
         this.registerRoutes()
     }
 
     private registerRoutes() {
 
-        this.router.get('/user-profile', passport.authenticate('jwt', { session: false }), this.profileController.getUserProfile);
-        this.router.post('/create-profile', passport.authenticate('jwt', { session: false }), this.profileController.postCreateProfile);
+        this.router.use(passport.authenticate('jwt', { session: false }));
+
+        this.router.post(
+            '/',
+            this.profileRequestValidator.createProfileValidator,
+            this.profileController.createProfile
+        );
+
+        this.router.get(
+            '/user',
+            this.profileController.getProfileByUser
+        );
+
+        this.router.patch(
+            '/',
+            this.profileRequestValidator.createProfileValidator,
+            this.profileController.updateProfile
+        );
+
+        this.router.delete(
+            '/',
+            this.profileController.deleteProfile
+        );
     }
 
     public getRoutes() {

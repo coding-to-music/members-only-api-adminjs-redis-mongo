@@ -1,4 +1,9 @@
-import { CookieOptions, Request, Response, NextFunction } from 'express';
+import {
+    CookieOptions,
+    Request,
+    Response,
+    NextFunction
+} from 'express';
 import { randomBytes } from 'crypto';
 import { ENV } from '@utils/validateEnv';
 import Post from '@models/Post';
@@ -6,7 +11,7 @@ import { IPost } from '@interfaces/posts.interface';
 import { sign } from 'jsonwebtoken';
 import { IUser } from '@interfaces/users.interface';
 import { ITokens } from '@interfaces/auth.interface';
-import { NotFoundException } from '@src/exceptions/common.exception';
+import { NotFoundException } from '@exceptions/common.exception';
 import { IChatUserData } from '@interfaces/message.interface';
 
 

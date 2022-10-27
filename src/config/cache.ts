@@ -12,6 +12,8 @@ let redisClient: RedisClientType;
         password: ENV.REDIS_PASSWORD
     });
 
+    redisClient.on('connect', () => logger.info('Redis Client Connected'));
+    
     redisClient.on('error', (err) => logger.error('Redis Client Error', err));
 
     await redisClient.connect()

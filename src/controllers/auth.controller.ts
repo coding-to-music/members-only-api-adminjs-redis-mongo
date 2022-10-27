@@ -1,105 +1,78 @@
 import { NextFunction, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
 import { logger } from '@utils/logger';
 import { cookieOptions, SuccessResponse } from '@utils/lib';
 import {
+    LoggerException,
     NotFoundException,
-    ValidationException,
 } from '@exceptions/common.exception';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
 
+
 export class AuthController {
 
-    private readonly authService = new AuthService();
+    private readonly authService: AuthService;
 
-    public postLoginUser = [
+    constructor() {
+        this.authService = new AuthService()
+    }
 
-        body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email'),
-        body('password').notEmpty().isLength({ min: 6 }).withMessage('Password is required and must be at least 6 characters long'),
+    public loginUser = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
-        async (req: Request, res: Response, next: NextFunction) => {
+            const { email, password } = req.body
 
-            try {
+            const responseData = await this.authService.loginUser(email, password);
 
-                const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationException(errors.array());
+            const { is2FAEnabled } = responseData
 
-                const { email, password } = req.body
+            if (is2FAEnabled) {
 
-                const responseData = await this.authService.loginUser(email, password);
+                res.status(200).json(new SuccessResponse(200, 'Email and Password Validated', responseData))
 
-                const { is2FAEnabled } = responseData
+            } else {
 
-                if (is2FAEnabled) {
+                const { refreshToken, ...data } = responseData;
 
-                    res.status(200).json(new SuccessResponse(200, 'Email and Password Validated', responseData))
-
-                } else {
-
-                    const { refreshToken, ...data } = responseData;
-
-                    res
-                        .cookie('jit', refreshToken, cookieOptions)
-                        .json(new SuccessResponse(200, 'Login Successful', data));
-                }
-
-            } catch (err: any) {
-
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `, err);
-                next(err);
+                res
+                    .cookie('jit', refreshToken, cookieOptions)
+                    .json(new SuccessResponse(200, 'Login Successful', data));
             }
-        }
-    ];
 
-    public getLogoutUser(req: Request, res: Response, next: NextFunction) {
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
+    }
+
+    public logoutUser(req: Request, res: Response, next: NextFunction) {
         try {
 
             return res
                 .clearCookie('jit', cookieOptions)
                 .json(new SuccessResponse(200, 'Logout Successful'));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err)
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
-    public postRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    public refreshToken = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
             const { jit } = req.signedCookies;
             if (!jit) throw new NotFoundException('Refresh Token not found');
 
-            const { refreshToken, ...data } = await this.authService.postRefreshToken(jit);
+            const { refreshToken, ...data } = await this.authService.refreshToken(jit);
 
             res
                 .cookie('jit', refreshToken, cookieOptions)
                 .json(new SuccessResponse(200, 'Token Refresh Successful', data));
 
-        } catch (err: any) {
-
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
@@ -116,81 +89,91 @@ export class AuthController {
                 qrCode
             ))
 
-        } catch (err: any) {
-            console.log(err)
-            logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-            next(err);
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
     };
 
-    public verifyTwoFactor = [
+    public verifyTwoFactor = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
 
-        body('otpToken', 'OTP Token is Required').notEmpty().isLength({ min: 6, max: 6 }).withMessage('Token must be six characters long').trim().escape(),
+            const { otpToken } = req.body;
+            const { user } = req;
 
-        async (req: RequestWithUser, res: Response, next: NextFunction) => {
-            try {
+            await this.authService.verifyTwoFactor(otpToken, user);
 
-                const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationException(errors.array());
+            res.status(200).json(new SuccessResponse(200, '2FA Enabled Successfully'))
 
-                const { otpToken } = req.body;
-                const { user } = req;
-
-                await this.authService.verifyTwoFactor(otpToken, user);
-
-                res.status(200).json(new SuccessResponse(200, '2FA Enabled Successfully'))
-
-            } catch (err: any) {
-
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
-            }
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
-    ]
+    }
 
-    public loginValidateTwoFactor = [
+    public validateTwoFactor = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
-        body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email').trim().escape(),
-        body('otpToken', 'OTP Token is Required').notEmpty().isLength({ min: 6, max: 6 }).withMessage('Token must be six characters long').trim().escape(),
+            const { email, otpToken } = req.body;
 
-        async (req: Request, res: Response, next: NextFunction) => {
-            try {
+            const responseData = await this.authService.validateTwoFactor(email, otpToken)
 
-                const errors = validationResult(req);
-                if (!errors.isEmpty()) throw new ValidationException(errors.array());
+            const { refreshToken, ...data } = responseData;
 
-                const { email, otpToken } = req.body;
+            res
+                .cookie('jit', refreshToken, cookieOptions)
+                .json(new SuccessResponse(200, 'Login Successful', data));
 
-                const responseData = await this.authService.loginValidateTwoFactor(email, otpToken)
-
-                const { refreshToken, ...data } = responseData;
-
-                res
-                    .cookie('jit', refreshToken, cookieOptions)
-                    .json(new SuccessResponse(200, 'Login Successful', data));
-
-            } catch (err: any) {
-                logger.error(`
-                ${err.statusCode || 500} - 
-                ${err.error || 'Something Went Wrong'} - 
-                ${req.originalUrl} - 
-                ${req.method} - 
-                ${req.ip}
-                `);
-                next(err);
-            }
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
         }
-    ]
+    }
+
+    public getVerificationCode = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+
+            const { email } = req.body;
+
+            await this.authService.getVerificationCode(email)
+
+            res.json(new SuccessResponse(200, 'Verification Code sent'));
+
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
+    }
+
+    public resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+
+            const { body } = req;
+
+            const data = await this.authService.resetPassword(body);
+
+            res.json(new SuccessResponse(200, 'Password Reset Successful', data));
+
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
+    }
+
+    public changePassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
+
+            const { currentPassword, newPassword } = req.body;
+
+            const { _id } = req.user;
+
+            const data = await this.authService.changePassword(_id, currentPassword, newPassword);
+
+            res.json(new SuccessResponse(200, 'Password Changed', data))
+
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
+    }
 }

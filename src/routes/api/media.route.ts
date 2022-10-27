@@ -2,22 +2,42 @@ import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
 import { MediaController } from '@controllers/media.controller';
+import { MediaRequestValidator } from '@middlewares/validations/media.validation';
 
 
 export class MediaRouter {
 
+    private router: CustomIRouter;
     private mediaController = new MediaController();
-    private router: CustomIRouter = Router();
+    private mediaRequestValidator = new MediaRequestValidator()
 
     constructor() {
+        this.router = Router();
+        this.mediaController = new MediaController();
+        this.mediaRequestValidator = new MediaRequestValidator()
         this.registerRoutes();
     }
 
     private registerRoutes() {
 
-        this.router.post('/upload', passport.authenticate('jwt', { session: false }), this.mediaController.uploadMedia);
-        this.router.get('/:filename', passport.authenticate('jwt', { session: false }), this.mediaController.getMediaFile);
-        this.router.delete('/:filename/delete', passport.authenticate('jwt', { session: false }), this.mediaController.deleteMediaFile);
+        this.router.use(passport.authenticate('jwt', { session: false }));
+
+        this.router.post(
+            '/upload',
+            this.mediaController.uploadMedia
+        );
+
+        this.router.get(
+            '/:filename',
+            this.mediaRequestValidator.fileNameValidator,
+            this.mediaController.getMediaFile
+        );
+
+        this.router.delete(
+            '/:filename',
+            this.mediaRequestValidator.fileNameValidator,
+            this.mediaController.deleteMediaFile
+        );
     }
 
     public getRoutes() {
