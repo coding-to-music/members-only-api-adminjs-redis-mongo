@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { formatPostCommentsAndLikes } from '@utils/lib';
 import { checkValidations } from '@utils/checkValidations';
 
@@ -23,8 +23,30 @@ export class PostRequestValidator {
 
         body('comment').not().isEmpty().withMessage('Comment cannot be empty'),
 
+        param('id').notEmpty().isMongoId().trim().escape(),
+
         async (req: Request, res: Response, next: NextFunction) => {
             checkValidations(req, res, next)
         }
     ]
+
+    public idValidator = [
+
+        param('id').notEmpty().isMongoId().trim().escape(),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            checkValidations(req, res, next)
+        }
+    ];
+
+    public deleteCommentValidator = [
+
+        param('id').notEmpty().isMongoId().trim().escape(),
+
+        param('commentId').notEmpty().isMongoId().trim().escape(),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            checkValidations(req, res, next)
+        }
+    ];
 }

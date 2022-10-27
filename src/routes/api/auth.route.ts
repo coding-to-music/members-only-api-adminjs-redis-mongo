@@ -62,13 +62,13 @@ export class AuthRouter {
             this.authController.getVerificationCode
         );
 
-        this.router.put(
+        this.router.post(
             '/reset-password',
             this.authRequestValidator.resetPasswordValidator,
             this.authController.resetPassword
         );
 
-        this.router.put(
+        this.router.post(
             '/change-password',
             passport.authenticate('jwt', { session: false }),
             this.authRequestValidator.changePasswordValidator,
