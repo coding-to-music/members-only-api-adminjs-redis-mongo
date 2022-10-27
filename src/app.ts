@@ -79,7 +79,7 @@ export class App {
             customfavIcon: favicon,
         };
 
-        const swaggerDocument = YAML.load('./src/docs/swaggerConfig.yaml');
+        const swaggerDocument = YAML.load('./src/docs/swaggerConfig.yml');
         this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
     }
 

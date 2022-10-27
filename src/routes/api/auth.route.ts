@@ -2,7 +2,6 @@ import { Router } from 'express';
 import passport from 'passport';
 import { CustomIRouter } from '@interfaces/routes.interface';
 import { AuthController } from '@src/controllers/auth.controller';
-
 import { AuthRequestValidator } from '@middlewares/validations/auth.validation'
 
 
@@ -62,13 +61,13 @@ export class AuthRouter {
             this.authController.getVerificationCode
         );
 
-        this.router.put(
+        this.router.post(
             '/reset-password',
             this.authRequestValidator.resetPasswordValidator,
             this.authController.resetPassword
         );
 
-        this.router.put(
+        this.router.post(
             '/change-password',
             passport.authenticate('jwt', { session: false }),
             this.authRequestValidator.changePasswordValidator,

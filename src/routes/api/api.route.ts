@@ -27,7 +27,7 @@ export class ApiRouter {
         this.router.use('/media', new MediaRouter().getRoutes());
         this.router.use('/messages', new MessageRouter().getRoutes());
         this.router.use('/posts', new PostRouter().getRoutes());
-        this.router.use('/profile', new ProfileRouter().getRoutes());
+        this.router.use('/profiles', new ProfileRouter().getRoutes());
         this.router.use('/users', new UserRouter().getRoutes());
     };
 
