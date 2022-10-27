@@ -25,7 +25,7 @@ export class AuthRequestValidator {
         }
     ];
 
-    public loginValidateTwoFactorValidator = [
+    public validateTwoFactorValidator = [
 
         body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email').trim().escape(),
 
@@ -34,5 +34,39 @@ export class AuthRequestValidator {
         async (req: Request, res: Response, next: NextFunction) => {
             checkValidations(req, res, next)
         }
+    ];
+
+    public changePasswordValidator = [
+
+        body('currentPassword').notEmpty().isLength({ min: 6 }),
+
+        body('newPassword').notEmpty().isLength({ min: 6 }),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            checkValidations(req, res, next)
+        }
     ]
+    
+    public getVerificationCodeValidator = [
+
+        body('email').notEmpty().isEmail(),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            checkValidations(req, res, next)
+        }
+    ];
+
+    public resetPasswordValidator = [
+
+        body('email').notEmpty().isEmail(),
+
+        body('newPassword').notEmpty().isLength({ min: 6 }),
+
+        body('code').notEmpty().isLength({ min: 6 }).withMessage('must be at least 6 chars long'),
+
+        async (req: Request, res: Response, next: NextFunction) => {
+            checkValidations(req, res, next)
+        }
+    ];
+
 }

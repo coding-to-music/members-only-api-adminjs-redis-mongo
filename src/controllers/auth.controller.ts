@@ -45,7 +45,7 @@ export class AuthController {
         }
     }
 
-    public getLogoutUser(req: Request, res: Response, next: NextFunction) {
+    public logoutUser(req: Request, res: Response, next: NextFunction) {
         try {
 
             return res
@@ -58,13 +58,13 @@ export class AuthController {
         }
     };
 
-    public postRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    public refreshToken = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
             const { jit } = req.signedCookies;
             if (!jit) throw new NotFoundException('Refresh Token not found');
 
-            const { refreshToken, ...data } = await this.authService.postRefreshToken(jit);
+            const { refreshToken, ...data } = await this.authService.refreshToken(jit);
 
             res
                 .cookie('jit', refreshToken, cookieOptions)
@@ -111,18 +111,65 @@ export class AuthController {
         }
     }
 
-    public loginValidateTwoFactor = async (req: Request, res: Response, next: NextFunction) => {
+    public validateTwoFactor = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
             const { email, otpToken } = req.body;
 
-            const responseData = await this.authService.loginValidateTwoFactor(email, otpToken)
+            const responseData = await this.authService.validateTwoFactor(email, otpToken)
 
             const { refreshToken, ...data } = responseData;
 
             res
                 .cookie('jit', refreshToken, cookieOptions)
                 .json(new SuccessResponse(200, 'Login Successful', data));
+
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
+    }
+
+    public getVerificationCode = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+
+            const { email } = req.body;
+
+            await this.authService.getVerificationCode(email)
+
+            res.json(new SuccessResponse(200, 'Verification Code sent'));
+
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
+    }
+
+    public resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+
+            const { body } = req;
+
+            const data = await this.authService.resetPassword(body);
+
+            res.json(new SuccessResponse(200, 'Password Reset Successful', data));
+
+        } catch (error: any) {
+            logger.error(JSON.stringify(new LoggerException(error, req)), error);
+            next(error)
+        }
+    }
+
+    public changePassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
+
+            const { currentPassword, newPassword } = req.body;
+
+            const { _id } = req.user;
+
+            const data = await this.authService.changePassword(_id, currentPassword, newPassword);
+
+            res.json(new SuccessResponse(200, 'Password Changed', data))
 
         } catch (error: any) {
             logger.error(JSON.stringify(new LoggerException(error, req)), error);

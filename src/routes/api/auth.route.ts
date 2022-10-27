@@ -28,32 +28,51 @@ export class AuthRouter {
         );
 
         this.router.post(
-            '/login/validate-2fa',
-            this.authRequestValidator.loginValidateTwoFactorValidator,
-            this.authController.loginValidateTwoFactor
-        )
-
-        this.router.post(
             '/logout',
-            this.authController.getLogoutUser
+            this.authController.logoutUser
         );
 
         this.router.post(
             '/refresh-token',
-            this.authController.postRefreshToken
+            this.authController.refreshToken
         );
 
         this.router.post(
-            '/register-2fa',
+            '/2fa/register',
             passport.authenticate('jwt', { session: false }),
             this.authController.registerTwofactor
         );
 
         this.router.post(
-            '/verify-2fa',
+            '/2fa/verify',
             passport.authenticate('jwt', { session: false }),
             this.authRequestValidator.verifyTwofactorValidator,
             this.authController.verifyTwoFactor
+        );
+
+        this.router.post(
+            '/2fa/validate',
+            this.authRequestValidator.validateTwoFactorValidator,
+            this.authController.validateTwoFactor
+        )
+
+        this.router.post(
+            '/get-code',
+            this.authRequestValidator.getVerificationCodeValidator,
+            this.authController.getVerificationCode
+        );
+
+        this.router.put(
+            '/reset-password',
+            this.authRequestValidator.resetPasswordValidator,
+            this.authController.resetPassword
+        );
+
+        this.router.put(
+            '/change-password',
+            passport.authenticate('jwt', { session: false }),
+            this.authRequestValidator.changePasswordValidator,
+            this.authController.changePassword
         );
     }
 
