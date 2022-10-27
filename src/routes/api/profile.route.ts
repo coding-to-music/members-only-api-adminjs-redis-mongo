@@ -20,15 +20,15 @@ export class ProfileRouter {
 
     private registerRoutes() {
 
+        this.router.use(passport.authenticate('jwt', { session: false }));
+        
         this.router.get(
             '/user',
-            passport.authenticate('jwt', { session: false }),
-            this.profileController.getUserProfile
+            this.profileController.getProfile
         );
 
         this.router.post(
             '/',
-            passport.authenticate('jwt', { session: false }),
             this.profileRequestValidator.createProfileValidator,
             this.profileController.createProfile
         );

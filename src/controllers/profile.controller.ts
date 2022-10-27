@@ -14,7 +14,7 @@ export class ProfileController {
         this.profileService = new ProfileService();
     }
 
-    public getUserProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    public getProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
             const { _id: userID } = req.user

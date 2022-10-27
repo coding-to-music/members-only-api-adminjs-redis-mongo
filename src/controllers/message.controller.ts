@@ -7,7 +7,11 @@ import { LoggerException } from '@exceptions/common.exception';
 
 export class MessageController {
 
-    private readonly messageService = new MessageService();
+    private readonly messageService: MessageService;
+
+    constructor() {
+        this.messageService = new MessageService()
+    }
 
     public getMessages = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {

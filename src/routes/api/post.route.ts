@@ -20,58 +20,51 @@ export class PostRouter {
 
     private registerRoutes() {
 
+        this.router.use(passport.authenticate('jwt', { session: false }));
+        
         this.router.get(
             '/',
-            passport.authenticate('jwt', { session: false }),
             this.postController.getAllPosts
         );
 
         this.router.get(
             '/user',
-            passport.authenticate('jwt', { session: false }),
             this.postController.getPostsByUser
         );
 
         this.router.get(
             '/:id',
-            passport.authenticate('jwt', { session: false }),
             this.postController.getPostById
         );
 
         this.router.post(
             '/',
-            passport.authenticate('jwt', { session: false }),
             this.postRequestValidator.createPostValidator,
             this.postController.createPost
         );
 
         this.router.put(
             '/:id/add-comment',
-            passport.authenticate('jwt', { session: false }),
             this.postRequestValidator.addCommentValidator,
             this.postController.addComments);
 
         this.router.put(
             '/:id/like-post',
-            passport.authenticate('jwt', { session: false }),
             this.postController.likePost
         );
 
         this.router.delete(
             '/:id/comment/:commentId',
-            passport.authenticate('jwt', { session: false }),
             this.postController.deleteComment
         );
 
         this.router.delete(
             '/:id/unlike-post',
-            passport.authenticate('jwt', { session: false }),
             this.postController.unlikePost
         );
 
         this.router.delete(
             '/:id',
-            passport.authenticate('jwt', { session: false }),
             this.postController.deletePost
         );
     };
