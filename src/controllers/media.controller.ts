@@ -4,8 +4,10 @@ import { getBucket } from '@config/database';
 import { getFileStorage } from '@middlewares/multer';
 import { logger } from '@utils/logger';
 import { SuccessResponse } from '@utils/lib';
+import { Controller } from '@decorators/common.decorator';
 
 
+@Controller()
 export class MediaController {
 
     private mediaUploads = getFileStorage();

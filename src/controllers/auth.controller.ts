@@ -7,8 +7,10 @@ import {
 } from '@exceptions/common.exception';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
+import { Controller } from '@decorators/common.decorator';
 
 
+@Controller()
 export class AuthController {
 
     private readonly authService: AuthService;
@@ -17,7 +19,7 @@ export class AuthController {
         this.authService = new AuthService()
     }
 
-    public loginUser = async (req: Request, res: Response, next: NextFunction) => {
+    public async loginUser(req: Request, res: Response, next: NextFunction) {
         try {
 
             const { email, password } = req.body

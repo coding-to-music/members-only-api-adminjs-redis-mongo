@@ -27,6 +27,7 @@
             "@*": ["*"],
             "@config/*": ["src/config/*"],
             "@controllers/*": ["src/controllers/*"],
+            "@decorators/*": ["src/decorators/*"],
             "@docs/*": ["src/docs/*"],
             "@exceptions/*": ["src/exceptions/*"],
             "@interfaces/*": ["src/interfaces/*"],

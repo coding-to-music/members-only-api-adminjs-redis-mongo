@@ -1,24 +1,23 @@
-import { Router } from 'express';
 import passport from 'passport';
-import { CustomIRouter } from '@interfaces/routes.interface';
+import { BaseRouter } from '../base.router';
 import { MediaController } from '@controllers/media.controller';
 import { MediaRequestValidator } from '@middlewares/validations/media.validation';
 
 
-export class MediaRouter {
+export class MediaRouter extends BaseRouter {
 
-    private router: CustomIRouter;
     private mediaController = new MediaController();
     private mediaRequestValidator = new MediaRequestValidator()
 
     constructor() {
-        this.router = Router();
+        super()
+        
         this.mediaController = new MediaController();
         this.mediaRequestValidator = new MediaRequestValidator()
         this.registerRoutes();
     }
 
-    private registerRoutes() {
+    protected registerRoutes() {
 
         this.router.use(passport.authenticate('jwt', { session: false }));
 
@@ -40,7 +39,4 @@ export class MediaRouter {
         );
     }
 
-    public getRoutes() {
-        return this.router;
-    }
 }

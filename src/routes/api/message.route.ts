@@ -1,21 +1,21 @@
-import { Router } from 'express';
 import passport from 'passport';
-import { CustomIRouter } from '@interfaces/routes.interface';
+import { BaseRouter } from '../base.router';
 import { MessageController } from '@controllers/message.controller';
 import { MessageRequestValidator } from '@middlewares/validations/message.validation';
 
 
-export class MessageRouter {
+export class MessageRouter extends BaseRouter {
 
-    private router: CustomIRouter = Router();
     private messageController = new MessageController();
     private messageRequestValidator = new MessageRequestValidator()
 
     constructor() {
+        super()
+        
         this.registerRoutes()
     }
 
-    private registerRoutes() {
+    protected registerRoutes() {
 
         this.router.use(passport.authenticate('jwt', { session: false }))
 
@@ -31,7 +31,4 @@ export class MessageRouter {
         );
     }
 
-    public getRoutes() {
-        return this.router;
-    }
 }

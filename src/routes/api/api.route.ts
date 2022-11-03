@@ -1,4 +1,5 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
+import { BaseRouter } from '../base.router';
 import { AdminRouter } from '@routes/api/admin.route';
 import { AuthRouter } from '@routes/api/auth.route';
 import { MediaRouter } from '@routes/api/media.route';
@@ -8,20 +9,26 @@ import { ProfileRouter } from '@routes/api/profile.route';
 import { UserRouter } from '@routes/api/user.route';
 
 
-export class ApiRouter {
-
-    private router: Router;
+export class ApiRouter extends BaseRouter {
 
     constructor() {
-        this.router = Router()
+        super()
+
         this.registerRoutes()
     }
 
-    private registerRoutes() {
+    private index(req: Request, res: Response) {
 
-        this.router.get('/', (req: Request, res: Response) => res.json({
+        res.json({
             message: `PLEASE VISIT '/api-docs' FOR FULL API DOCUMENTATION`
-        }));
+        })
+
+    }
+
+    protected registerRoutes() {
+
+        this.router.get('/', this.index);
+
         this.router.use('/admin', new AdminRouter().getRoutes());
         this.router.use('/auth', new AuthRouter().getRoutes());
         this.router.use('/media', new MediaRouter().getRoutes());
@@ -31,7 +38,4 @@ export class ApiRouter {
         this.router.use('/users', new UserRouter().getRoutes());
     };
 
-    public getRoutes() {
-        return this.router;
-    }
 }
