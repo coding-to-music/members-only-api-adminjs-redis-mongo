@@ -4,8 +4,10 @@ import { SuccessResponse } from '@utils/lib';
 import { LoggerException } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 import { AdminService } from '@services/admin.service';
+import { Controller } from '@decorators/common.decorator';
 
 
+@Controller()
 export class AdminController {
 
     private readonly adminService: AdminService;

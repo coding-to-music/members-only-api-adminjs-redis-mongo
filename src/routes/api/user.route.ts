@@ -1,24 +1,23 @@
-import { Router } from 'express';
 import passport from 'passport';
-import { CustomIRouter } from '@interfaces/routes.interface';
+import { BaseRouter } from '../base.router';
 import { UserController } from '@controllers/user.controller';
 import { UserRequestValidator } from '@middlewares/validations/user.validation';
 
 
-export class UserRouter {
+export class UserRouter extends BaseRouter {
 
-    private router: CustomIRouter;
     private userController: UserController;
     private userRequestValidator: UserRequestValidator;
 
     constructor() {
-        this.router = Router();
+        super();
+        
         this.userController = new UserController();
         this.userRequestValidator = new UserRequestValidator();
         this.registerRoutes()
     }
 
-    private registerRoutes() {
+    protected registerRoutes() {
 
         this.router.get(
             '/userinfo',
@@ -46,7 +45,4 @@ export class UserRouter {
         );
     };
 
-    public getRoutes() {
-        return this.router;
-    }
 }

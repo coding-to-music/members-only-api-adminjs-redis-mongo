@@ -1,24 +1,23 @@
-import { Router } from 'express';
 import passport from 'passport';
-import { CustomIRouter } from '@interfaces/routes.interface';
+import { BaseRouter } from '../base.router';
 import { PostController } from '@controllers/post.controller';
 import { PostRequestValidator } from '@middlewares/validations/post.validation';
 
 
-export class PostRouter {
+export class PostRouter extends BaseRouter {
 
-    private router: CustomIRouter;
     private postController: PostController;
     private postRequestValidator: PostRequestValidator
 
     constructor() {
-        this.router = Router();
+        super();
+
         this.postController = new PostController();
         this.postRequestValidator = new PostRequestValidator()
         this.registerRoutes()
     }
 
-    private registerRoutes() {
+    protected registerRoutes() {
 
         this.router.use(passport.authenticate('jwt', { session: false }));
 
@@ -63,7 +62,4 @@ export class PostRouter {
         );
     };
 
-    public getRoutes() {
-        return this.router;
-    }
 }

@@ -4,7 +4,10 @@ import { logger } from '@utils/logger';
 import { SuccessResponse } from '@utils/lib';
 import { MessageService } from '@services/message.service';
 import { LoggerException } from '@exceptions/common.exception';
+import { Controller } from '@decorators/common.decorator';
 
+
+@Controller()
 export class MessageController {
 
     private readonly messageService: MessageService;

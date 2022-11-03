@@ -1,24 +1,23 @@
-import { Router } from 'express';
 import passport from 'passport';
-import { CustomIRouter } from '@interfaces/routes.interface';
-import { AuthController } from '@src/controllers/auth.controller';
+import { BaseRouter } from '../base.router';
+import { AuthController } from '@controllers/auth.controller';
 import { AuthRequestValidator } from '@middlewares/validations/auth.validation'
 
 
-export class AuthRouter {
+export class AuthRouter extends BaseRouter {
 
-    private router: CustomIRouter;
     private authController: AuthController;
     private authRequestValidator: AuthRequestValidator;
 
     constructor() {
-        this.router = Router();
+        super()
+        
         this.authController = new AuthController()
         this.authRequestValidator = new AuthRequestValidator()
         this.registerRoutes();
     }
 
-    private registerRoutes() {
+    protected registerRoutes() {
 
         this.router.post(
             '/login',
@@ -75,7 +74,4 @@ export class AuthRouter {
         );
     }
 
-    public getRoutes() {
-        return this.router;
-    }
 }

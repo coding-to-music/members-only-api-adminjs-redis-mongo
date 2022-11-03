@@ -1,25 +1,24 @@
-import { Router } from 'express';
 import passport from 'passport';
-import { CustomIRouter } from '@interfaces/routes.interface';
+import { BaseRouter } from '../base.router';
 import { AdminController } from '@controllers/admin.controller';
 import { AdminRequestValidator } from '@middlewares/validations/admin.validation';
 import { Authorize } from '@middlewares/authorize';
 
 
-export class AdminRouter {
+export class AdminRouter extends BaseRouter {
 
-    private router: CustomIRouter;
     private adminController: AdminController;
     private adminRequestValidator: AdminRequestValidator
 
     constructor() {
-        this.router = Router();
+        super()
+        
         this.adminController = new AdminController();
         this.adminRequestValidator = new AdminRequestValidator()
         this.registerRoutes()
     }
 
-    private registerRoutes() {
+    protected registerRoutes() {
 
         this.router.use(
             passport.authenticate('jwt', { session: false }),
@@ -61,7 +60,4 @@ export class AdminRouter {
 
     };
 
-    public getRoutes() {
-        return this.router;
-    }
 }

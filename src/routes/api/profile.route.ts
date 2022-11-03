@@ -1,24 +1,23 @@
-import { Router } from 'express';
 import passport from 'passport';
-import { CustomIRouter } from '@interfaces/routes.interface';
+import { BaseRouter } from '../base.router';
 import { ProfileController } from '@controllers/profile.controller';
 import { ProfileRequestValidator } from '@middlewares/validations/profile.validation';
 
 
-export class ProfileRouter {
+export class ProfileRouter extends BaseRouter {
 
-    private router: CustomIRouter;
     private profileController: ProfileController;
     private profileRequestValidator: ProfileRequestValidator
 
     constructor() {
-        this.router = Router();
+        super();
+        
         this.profileController = new ProfileController();
         this.profileRequestValidator = new ProfileRequestValidator();
         this.registerRoutes()
     }
 
-    private registerRoutes() {
+    protected registerRoutes() {
 
         this.router.use(passport.authenticate('jwt', { session: false }));
 
@@ -45,7 +44,4 @@ export class ProfileRouter {
         );
     }
 
-    public getRoutes() {
-        return this.router;
-    }
 }
