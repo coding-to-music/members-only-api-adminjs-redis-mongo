@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { logger } from '@utils/logger';
 import { cookieOptions, SuccessResponse } from '@utils/lib';
-import {
-    LoggerException,
-    NotFoundException,
-} from '@exceptions/common.exception';
+import { LoggerException, NotFoundException } from '@exceptions/common.exception';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
 import { Controller } from '@decorators/common.decorator';
@@ -19,7 +16,7 @@ export class AuthController {
         this.authService = new AuthService()
     }
 
-    public async loginUser(req: Request, res: Response, next: NextFunction) {
+    public loginUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
             const { email, password } = req.body
