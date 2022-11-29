@@ -2,8 +2,8 @@ import gravatar from 'gravatar';
 import User from '@models/User';
 import Post from '@models/Post';
 import Profile from '@models/Profile';
-import { ConflictException, NotFoundException } from '@src/exceptions/common.exception';
-import { sendMail } from '@src/utils/sendMail';
+import { ConflictException, NotFoundException } from '@exceptions/common.exception';
+import { sendMail } from '@utils/sendMail';
 import { Types } from 'mongoose';
 
 

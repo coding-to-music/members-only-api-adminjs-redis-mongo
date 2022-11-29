@@ -1,11 +1,11 @@
 import { connect, connection, mongo } from 'mongoose';
+import { GridFSBucket } from 'mongodb';
 import { ENV } from '@utils/validateEnv';
-import { GridFSBucket } from 'mongoose/node_modules/mongodb';
-import { logger } from '@src/utils/logger';
+import { logger } from '@utils/logger';
 
 let bucket: GridFSBucket;
 
-export const connectDB = () => {
+export const connectDB = async () => {
 
     const options = {
         autoIndex: false,
