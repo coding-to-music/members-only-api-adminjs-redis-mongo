@@ -1,9 +1,15 @@
-import app from '@/app';
+import { App } from '@/app';
 import request from 'supertest';
-import mongoose from 'mongoose'
-import { connectDB } from '@config/database'
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import User from '@models/User'
 
-beforeAll(() => connectDB())
+beforeAll(async () =>{
+
+    const mongoServer = await MongoMemoryServer.create();
+
+    await mongoose.connect(mongoServer.getUri());
+})
 
 afterAll(async () => {
     await mongoose.disconnect();
@@ -12,9 +18,11 @@ afterAll(async () => {
 
 describe('User Routes', () => {
 
+    const app = new App().getApp();
+
     describe('GET /userinfo', () => {
 
-        it('should return an unauthorized error if an invalid token is passed with the request', async () => {
+        it('should return an unauthorized error if an invalid token is passed with the request', async () => {            
             const response = await request(app).get('/v1/users/userinfo').auth('fakeToken', { type: 'bearer' });
 
             expect(response.status).toEqual(401);
@@ -22,14 +30,24 @@ describe('User Routes', () => {
         });
 
         it('should return the user info if a valid token is passed with the request', async () => {
+            const user = new User({
+                name: 'test user',
+                email: 'test@test.com',
+                password: 'password',
+                avatar: '',
+                roles: ['ADMIN']
+            });
+        
+            await user.save();
 
-            const token = (await request(app).post('/v1/auth/login').send({ email: 'labeight@affecting.org', password: 'password123' }).retry(2)).body.authToken;
+            const token = (await request(app).post('/v1/auth/login').send({ email: 'test@test.com', password: 'password' }).retry(2)).body.data.accessToken;
+            
             const response = await request(app).get('/v1/users/userinfo').auth(token, { type: 'bearer' });
 
             expect(response.status).toEqual(200);
-            expect(response.body.email).toEqual('labeight@affecting.org');
-            expect(response.body.name).toEqual('Lab Eight');
-            expect(response.body.roles).toEqual(['ADMIN']);
+            expect(response.body.data.email).toEqual('test@test.com');
+            expect(response.body.data.name).toEqual('test user');
+            expect(response.body.data.roles).toEqual(['ADMIN']);
         })
     })
 })

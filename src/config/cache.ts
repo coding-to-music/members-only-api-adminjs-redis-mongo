@@ -4,7 +4,7 @@ import { logger } from '@utils/logger';
 
 let redisClient: RedisClientType;
 
-(async () => {
+export const connectRedis = async () => {
 
     redisClient = createClient({
         url: ENV.REDIS_HOST,
@@ -18,7 +18,7 @@ let redisClient: RedisClientType;
 
     await redisClient.connect()
 
-})();
+};
 
 export const getCacheKey = async (key: string) => {
     return await redisClient.get(key);

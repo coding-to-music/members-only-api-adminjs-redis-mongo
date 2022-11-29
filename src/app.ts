@@ -18,7 +18,6 @@ import { HttpException } from '@exceptions/http.exception'
 import { ENV } from '@utils/validateEnv';
 
 // Import Configs
-import { connectDB } from '@config/database';
 import { corsOptions, apiLimiter } from '@config/appConfigs';
 import passportConfig from '@middlewares/passport';
 import { stream } from '@utils/logger';
@@ -36,9 +35,6 @@ export class App {
     constructor() {
         
         this.app = express();
-        
-        // Connect To Database
-        connectDB();
 
         // Load Passport configuration
         passportConfig(passport);

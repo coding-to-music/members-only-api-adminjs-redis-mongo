@@ -4,6 +4,8 @@ import { App } from '@/app';
 import { corsOptions } from '@config/appConfigs';
 import { logger } from '@utils/logger';
 import { onConnection } from './config/socketio';
+import { connectDB } from '@config/database';
+import { connectRedis } from './config/cache';
 
 const PORT = process.env.PORT || 4002;
 
@@ -17,9 +19,11 @@ export const io = new Server(httpServer, {
 
 io.on('connection', onConnection);
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
+  await connectDB()
+  await connectRedis()
   logger.info(`Server Started on port: ${PORT}`)
-});
+})
 
 httpServer.on('error', (error: NodeJS.ErrnoException) => {
 
