@@ -2,18 +2,16 @@ import { createClient, RedisClientType } from 'redis';
 import { ENV } from '@utils/validateEnv';
 import { logger } from '@utils/logger';
 
-let redisClient: RedisClientType;
+const redisClient: RedisClientType = createClient({
+    url: ENV.REDIS_HOST,
+    username: ENV.REDIS_USERNAME,
+    password: ENV.REDIS_PASSWORD
+});
 
 export const connectRedis = async () => {
 
-    redisClient = createClient({
-        url: ENV.REDIS_HOST,
-        username: ENV.REDIS_USERNAME,
-        password: ENV.REDIS_PASSWORD
-    });
-
     redisClient.on('connect', () => logger.info('Redis Client Connected'));
-    
+
     redisClient.on('error', (err) => logger.error('Redis Client Error', err));
 
     await redisClient.connect()
