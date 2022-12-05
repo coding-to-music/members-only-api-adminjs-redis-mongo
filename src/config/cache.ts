@@ -6,7 +6,7 @@ const redisClient: RedisClientType = createClient({
     url: ENV.REDIS_HOST,
     username: ENV.REDIS_USERNAME,
     password: ENV.REDIS_PASSWORD
-});;
+});
 
 export const connectRedis = async () => {
 

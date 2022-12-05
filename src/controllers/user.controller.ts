@@ -3,7 +3,7 @@ import { RequestWithUser } from '@interfaces/users.interface';
 import { LoggerException } from '@exceptions/common.exception';
 import { logger } from '@utils/logger';
 import { UserService } from '@services/user.service';
-import { SuccessResponse } from '@utils/lib';
+import { SuccessResponse } from '@utils/httpResponse';
 import { Controller } from '@decorators/common.decorator';
 
 

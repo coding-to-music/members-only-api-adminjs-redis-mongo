@@ -1,4 +1,9 @@
-import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
+import {
+    ExtractJwt,
+    Strategy as JwtStrategy,
+    StrategyOptions
+} from 'passport-jwt';
+import { PassportStatic } from 'passport';
 import { Request } from 'express';
 import { Types } from 'mongoose';
 import { ENV } from '@utils/validateEnv';
@@ -15,22 +20,23 @@ const cookieExtractor = (req: Request) => {
     return token;
 };
 
-const opts: StrategyOptions = {
+const jwtStrategyOptions: StrategyOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: PUBLIC_KEY
 };
 
-export default (passport: { use: (arg0: JwtStrategy) => void; }) => {
-    passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
-        const id = new Types.ObjectId(jwt_payload.sub);
-        User.findById(id).exec((err, found_user) => {
-            if (err) return done(err, null);
-            if (found_user) {
-                return done(null, found_user);
-            } else {
-                return done(null, false);
-                // or create a new user
-            };
-        });
+export const initializePassport = (passport: PassportStatic) => {
+    passport.use(new JwtStrategy(jwtStrategyOptions, async (jwt_payload, done) => {
+        try {
+
+            const id = new Types.ObjectId(jwt_payload.sub);
+
+            const userExists = await User.findById(id).exec();
+
+            return userExists ? done(null, userExists) : done(null, false);
+
+        } catch (error) {
+            done(error, null)
+        }
     }));
 };
