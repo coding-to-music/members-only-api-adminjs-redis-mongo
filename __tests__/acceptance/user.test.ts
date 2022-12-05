@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import User from '@models/User'
 
-beforeAll(async () =>{
+beforeAll(async () => {
 
     const mongoServer = await MongoMemoryServer.create();
 
@@ -22,7 +22,7 @@ describe('User Routes', () => {
 
     describe('GET /userinfo', () => {
 
-        it('should return an unauthorized error if an invalid token is passed with the request', async () => {            
+        it('should return an unauthorized error if an invalid token is passed with the request', async () => {
             const response = await request(app).get('/v1/users/userinfo').auth('fakeToken', { type: 'bearer' });
 
             expect(response.status).toEqual(401);
@@ -37,11 +37,11 @@ describe('User Routes', () => {
                 avatar: '',
                 roles: ['ADMIN']
             });
-        
+
             await user.save();
 
             const token = (await request(app).post('/v1/auth/login').send({ email: 'test@test.com', password: 'password' }).retry(2)).body.data.accessToken;
-            
+
             const response = await request(app).get('/v1/users/userinfo').auth(token, { type: 'bearer' });
 
             expect(response.status).toEqual(200);

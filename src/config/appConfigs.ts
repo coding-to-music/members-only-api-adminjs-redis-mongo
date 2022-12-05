@@ -1,4 +1,5 @@
 import { CorsOptions } from 'cors';
+import { CookieOptions } from 'express';
 import rateLimit from 'express-rate-limit'
 
 export const whitelist: string[] = [
@@ -17,6 +18,15 @@ export const corsOptions: CorsOptions = {
             callback(new Error('Not allowed by CORS'))
         }
     }
+};
+
+export const cookieOptions: CookieOptions = {
+    path: '/v1/auth/refresh-token',
+    httpOnly: true,
+    maxAge: 604800000,
+    signed: true,
+    sameSite: 'none',
+    secure: true,
 };
 
 export const apiLimiter = rateLimit({

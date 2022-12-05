@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
-import { SuccessResponse } from '@utils/lib';
+import { SuccessResponse } from '@utils/httpResponse';
 import { LoggerException } from '@exceptions/common.exception';
 import { logger } from '@utils/logger'
 import { PostService } from '@services/post.service';

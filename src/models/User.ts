@@ -2,17 +2,18 @@ import { compare, hash } from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { IUser, Role } from '@interfaces/users.interface';
-import { generateRandomCode, createLoginTokens } from '@utils/lib';
+import { generateRandomText, createLoginTokens } from '@utils/crypt';
 import { ITokens, IValidate, IVerify } from '@interfaces/auth.interface';
 
 
 const UserSchema = new Schema<IUser>({
     name: { type: String, required: true },
-    email: { type: String, required: true, immutable: true },
+    email: { type: String, required: true, immutable: true, unique: true },
     password: { type: String, required: true },
     avatar: { type: String, default: '' },
     lastLogin: { type: Date, default: Date.now },
     roles: { type: [String], default: [Role.GUEST] },
+    personalKey: { type: String, default: generateRandomText(32, 'lower') },    // EXPERIMENTAL PROPERTY, TO BE APPLIED WITH TOKEN SIGNING AND LOGOUT METHOD
     resetPassword: {
         code: { type: String, default: '' },
         expiresBy: { type: Date, default: '' }
@@ -41,11 +42,11 @@ UserSchema.pre('findOne', async function (next) {
     next();
 });
 
-UserSchema.methods.generateCode = async function (): Promise<string | null> {
-    const code = await generateRandomCode(3);
+UserSchema.methods.generateCode = async function () {
+    const code = generateRandomText(3, 'upper');
     this.resetPassword.code = await hash(code!, 10);
     this.resetPassword.expiresBy = new Date(Date.now() + 300000);
-    this.save();
+    await this.save();
     return code;
 };
 
@@ -55,8 +56,8 @@ UserSchema.methods.verifyCode = async function (code: string | Buffer): Promise<
     return { validCode, codeNotExpired };
 };
 
-UserSchema.methods.generateTokens = async function (usr: IUser): Promise<ITokens> {
-    const { accessToken, refreshToken } = await createLoginTokens(usr);
+UserSchema.methods.generateTokens = async function (user: IUser): Promise<ITokens> {
+    const { accessToken, refreshToken } = await createLoginTokens(user);
     this.refreshToken.token = refreshToken;
     const decodedJwt: JwtPayload = decode(refreshToken) as JwtPayload;
     this.refreshToken.expiresBy = new Date(decodedJwt.exp! * 1000);
@@ -73,8 +74,13 @@ UserSchema.methods.validateRefreshToken = async function (refreshToken: string, 
     return { validToken, refreshTokenNotExpired, tokenVersionValid };
 }
 
-UserSchema.methods.validatePassword = async function (password: string): Promise<boolean> {
-    return compare(password, this.password);
+UserSchema.methods.validatePassword = async function (plainPassword: string): Promise<boolean> {
+    return compare(plainPassword, this.password);
 };
+
+UserSchema.methods.logout = async function () {
+    this.personalKey = generateRandomText(32, 'lower');
+    await this.save();
+}
 
 export default model<IUser>('User', UserSchema);

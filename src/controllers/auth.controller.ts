@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { logger } from '@utils/logger';
-import { cookieOptions, SuccessResponse } from '@utils/lib';
 import { LoggerException, NotFoundException } from '@exceptions/common.exception';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
 import { Controller } from '@decorators/common.decorator';
+import { cookieOptions } from '@config/appConfigs';
+import { SuccessResponse } from '@utils/httpResponse';
 
 
 @Controller()
@@ -44,10 +45,14 @@ export class AuthController {
         }
     }
 
-    public logoutUser(req: Request, res: Response, next: NextFunction) {
+    public logoutUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
 
-            return res
+            const { user } = req;
+
+            await user.logout();
+
+            res
                 .clearCookie('jit', cookieOptions)
                 .json(new SuccessResponse(200, 'Logout Successful'));
 

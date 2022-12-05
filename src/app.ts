@@ -19,7 +19,7 @@ import { ENV } from '@utils/validateEnv';
 
 // Import Configs
 import { corsOptions, apiLimiter } from '@config/appConfigs';
-import passportConfig from '@middlewares/passport';
+import { initializePassport } from '@middlewares/passport';
 import { stream } from '@utils/logger';
 import { adminJs, adminJSRouter } from '@config/adminjs';
 
@@ -33,11 +33,11 @@ export class App {
     private app: Express;
 
     constructor() {
-        
+
         this.app = express();
 
         // Load Passport configuration
-        passportConfig(passport);
+        initializePassport(passport);
 
         this.initializeMiddlewares()
         this.initializeRoutes()
@@ -49,16 +49,16 @@ export class App {
 
         // AdminJS moved to the top to fix cors and bodyParser issues
         this.app
-        .use(adminJs.options.rootPath, adminJSRouter)
-        .use(morgan('combined', { stream }))
-        .use(express.json({ limit: '16mb' }))
-        .use(express.urlencoded({ limit: '16mb', extended: true }))
-        .use(passport.initialize())
-        .use(cookieParser(ENV.COOKIE_SECRET))
-        .use(cors(corsOptions))
-        .use(helmet())
-        .use(compression())
-        .use(apiLimiter)
+            .use(adminJs.options.rootPath, adminJSRouter)
+            .use(morgan('combined', { stream }))
+            .use(express.json({ limit: '16mb' }))
+            .use(express.urlencoded({ limit: '16mb', extended: true }))
+            .use(passport.initialize())
+            .use(cookieParser(ENV.COOKIE_SECRET))
+            .use(cors(corsOptions))
+            .use(helmet())
+            .use(compression())
+            .use(apiLimiter)
     }
 
     private initializeRoutes() {

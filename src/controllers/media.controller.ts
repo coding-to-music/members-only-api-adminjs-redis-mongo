@@ -3,7 +3,7 @@ import { LoggerException, NotFoundException, } from '@exceptions/common.exceptio
 import { getBucket } from '@config/database';
 import { getFileStorage } from '@middlewares/multer';
 import { logger } from '@utils/logger';
-import { SuccessResponse } from '@utils/lib';
+import { SuccessResponse } from '@utils/httpResponse';
 import { Controller } from '@decorators/common.decorator';
 
 

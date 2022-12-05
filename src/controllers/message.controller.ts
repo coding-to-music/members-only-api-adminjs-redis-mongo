@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express';
 import { RequestWithUser } from '@interfaces/users.interface';
 import { logger } from '@utils/logger';
-import { SuccessResponse } from '@utils/lib';
+import { SuccessResponse } from '@utils/httpResponse';
 import { MessageService } from '@services/message.service';
 import { LoggerException } from '@exceptions/common.exception';
 import { Controller } from '@decorators/common.decorator';
