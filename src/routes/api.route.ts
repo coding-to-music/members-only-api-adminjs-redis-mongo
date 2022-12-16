@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import { BaseRouter } from "@shared/routers/base.router";
 import { AdminRouter } from "@admin/admin.route";
 import { AuthRouter } from "@auth/auth.route";
@@ -16,17 +15,7 @@ export class ApiRouter extends BaseRouter {
         this.registerRoutes()
     }
 
-    private index(req: Request, res: Response) {
-
-        res.json({
-            message: `PLEASE VISIT '/api-docs' FOR FULL API DOCUMENTATION`
-        })
-
-    }
-
     protected registerRoutes() {
-
-        this.router.get('/', this.index);
 
         this.router.use('/admin', new AdminRouter().getRoutes());
         this.router.use('/auth', new AuthRouter().getRoutes());

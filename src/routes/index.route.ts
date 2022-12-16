@@ -10,7 +10,9 @@ export class IndexRouter extends BaseRouter {
     }
 
     private index(req: Request, res: Response) {
-        res.redirect('/v1')
+        res.json({
+            message: `PLEASE VISIT '/api-docs' FOR FULL API DOCUMENTATION`
+        })
     }
 
     protected registerRoutes() {
