@@ -1,8 +1,14 @@
 {
-  "name": "members-only-api",
+  "name": "members-only-api-adminjs-redis-mongo",
   "version": "0.0.0",
   "engines": {
     "node": ">=16.15.1"
+  },
+  "scripts": {
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "test": "jest --coverage --watchAll",
+    "deploy": "git add . && git commit -m Build && git push",
+    "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts"
   },
   "private": true,
   "license": "MIT",
@@ -78,10 +84,5 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.0.3",
     "ts-node-dev": "^2.0.0"
-  },
-  "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/index.ts",
-    "test": "jest --coverage --watchAll",
-    "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts"
   }
 }
