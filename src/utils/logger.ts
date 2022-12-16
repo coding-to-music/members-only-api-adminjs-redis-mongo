@@ -2,7 +2,7 @@ import { createLogger, format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import { Logtail } from '@logtail/node'
 import { LogtailTransport } from '@logtail/winston'
-import { ENV } from '@utils/validateEnv';
+import { ENV } from '@utils/loadEnv';
 
 const { align, combine, colorize, printf, timestamp, errors } = format;
 

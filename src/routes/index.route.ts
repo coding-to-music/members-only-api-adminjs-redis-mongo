@@ -1,6 +1,5 @@
-import { Request, Response } from 'express';
-import { BaseRouter } from './base.router';
-
+import { Request, Response } from "express";
+import { BaseRouter } from "@shared/routers/base.router";
 
 export class IndexRouter extends BaseRouter {
 

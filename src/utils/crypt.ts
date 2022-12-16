@@ -1,9 +1,9 @@
-import { sign } from 'jsonwebtoken';
-import { randomBytes } from 'crypto';
-import { ENV } from '@utils/validateEnv';
-import { IUser } from '@interfaces/users.interface';
-import { ITokens } from '@interfaces/auth.interface';
-import { logger } from './logger';
+import { sign } from "jsonwebtoken";
+import { randomBytes } from "crypto";
+import { ENV } from "@utils/loadEnv";
+import { IUser } from "@user/interfaces/users.interface";
+import { ITokens } from "@auth/interfaces/auth.interface";
+import { logger } from "./logger";
 
 type TextCase = 'upper' | 'lower';
 

@@ -1,6 +1,6 @@
-import { ENV } from '@utils/validateEnv';
-import sgMail, { ResponseError } from '@sendgrid/mail';
-import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
+import sgMail, { ResponseError } from "@sendgrid/mail";
+import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
+import { ENV } from "@utils/loadEnv";
 
 export const sendMail = async (email: string, subject: string, title: string, content: string) => {
 

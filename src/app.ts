@@ -3,29 +3,29 @@ import express, {
     NextFunction,
     Request,
     Response
-} from 'express';
-import cookieParser from 'cookie-parser';
-import createHttpError from 'http-errors';
-import { readFileSync } from 'fs';
-import morgan from 'morgan';
-import passport from 'passport';
-import cors from 'cors';
-import helmet from 'helmet';
-import compression from 'compression';
-import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
-import { HttpException } from '@exceptions/http.exception'
-import { ENV } from '@utils/validateEnv';
+} from "express";
+import cookieParser from "cookie-parser";
+import createHttpError from "http-errors";
+import { readFileSync } from "fs";
+import morgan from "morgan";
+import passport from "passport";
+import cors from "cors";
+import helmet from "helmet";
+import compression from "compression";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
+import { HttpException } from "@shared/exceptions/http.exception"
+import { ENV } from "@utils/loadEnv";
 
 // Import Configs
-import { corsOptions, apiLimiter } from '@config/appConfigs';
-import { initializePassport } from '@middlewares/passport';
-import { stream } from '@utils/logger';
-import { adminJs, adminJSRouter } from '@config/adminjs';
+import { corsOptions, apiLimiter } from "@config/appConfigs";
+import { initializePassport } from "@auth/middlewares/passport";
+import { stream } from "@utils/logger";
+import { adminJs, adminJSRouter } from "@config/adminjs";
 
 // Import Routes
-import { ApiRouter } from '@routes/api/api.route';
-import { IndexRouter } from '@routes/index.route';
+import { ApiRouter } from "@routes/api.route";
+import { IndexRouter } from "@routes/index.route";
 
 
 export class App {

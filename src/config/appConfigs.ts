@@ -1,6 +1,6 @@
-import { CorsOptions } from 'cors';
-import { CookieOptions } from 'express';
-import rateLimit from 'express-rate-limit'
+import { CorsOptions } from "cors";
+import { CookieOptions } from "express";
+import rateLimit from "express-rate-limit"
 
 export const whitelist: string[] = [
     'https://localhost:3000',

@@ -1,10 +1,10 @@
-import { Socket } from 'socket.io'
-import { io } from '@/index'
-import { logger } from '@utils/logger'
-import { Types } from 'mongoose'
-import Message from '@models/Message'
-import { IChatUserData, IMessageData, IncomingSocketData } from '@interfaces/message.interface';
-import { getDisconnectedUser } from '@utils/lib';
+import { Socket } from "socket.io"
+import { Types } from "mongoose"
+import { ioInstance } from "@/index"
+import { Message } from "@message/models/message.model"
+import { IChatUserData, IMessageData, IncomingSocketData } from "@message/interfaces/message.interface";
+import { getDisconnectedUser } from "@utils/lib";
+import { logger } from "@utils/logger"
 
 const onlineUsers: Map<string, IChatUserData> = new Map<string, IChatUserData>();
 
@@ -32,7 +32,7 @@ export const onConnection = (client: Socket) => {
                 };
 
                 onlineUsers.set(_id, userData)
-                io.emit('setOnlineUsers', [...onlineUsers.values()])
+                ioInstance.emit('setOnlineUsers', [...onlineUsers.values()])
 
             } else {
                 client.emit('errorOccured', 'Something went wrong')

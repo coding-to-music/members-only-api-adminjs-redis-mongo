@@ -1,13 +1,13 @@
-import { App } from '@/app';
-import request from 'supertest';
-import mongoose from 'mongoose'
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import User from '@models/User'
+import { App } from "@/app";
+import request from "supertest";
+import mongoose from "mongoose"
+import { MongoMemoryServer } from "mongodb-memory-server";
+import { User } from "@user/models/user.model"
 
 beforeAll(async () => {
 
     const mongoServer = await MongoMemoryServer.create();
-
+    mongoose.set('strictQuery', false);
     await mongoose.connect(mongoServer.getUri())
 })
 
@@ -23,25 +23,25 @@ describe('authentication routes', () => {
     describe('POST /auth/login', () => {
 
         it('should successfully login the user', async () => {
-            
+
             const user = new User({
                 name: 'test user',
                 email: 'test@test.com',
                 password: 'password',
                 avatar: ''
             });
-        
+
             await user.save();
-            
+
             const response = await request(app).post('/v1/auth/login').send({ email: 'test@test.com', password: 'password' }).retry(2);
 
             expect(response.status).toEqual(200);
-            expect(response.body).toEqual({ 
-                data: expect.any(Object), 
+            expect(response.body).toEqual({
+                data: expect.any(Object),
                 message: expect.any(String),
                 status: 'success',
                 statusCode: 200
-             });
+            });
             expect(response.body).toHaveProperty('data');
         });
 
