@@ -25,17 +25,18 @@
         "baseUrl": ".",
         "paths": {
             "@*": ["*"],
-            "@config/*": ["src/config/*"],
-            "@controllers/*": ["src/controllers/*"],
-            "@decorators/*": ["src/decorators/*"],
-            "@docs/*": ["src/docs/*"],
-            "@exceptions/*": ["src/exceptions/*"],
-            "@interfaces/*": ["src/interfaces/*"],
-            "@middlewares/*": ["src/middlewares/*"],
-            "@models/*": ["src/models/*"],
-            "@routes/*": ["src/routes/*"],
-            "@services/*": ["src/services/*"],
             "@/*": ["src/*"],
+            "@admin/*": ["src/admin/*"],
+            "@auth/*": ["src/auth/*"],
+            "@config/*": ["src/config/*"],
+            "@docs/*": ["src/docs/*"],
+            "@media/*": ["src/media/*"],
+            "@message/*": ["src/message/*"],
+            "@post/*": ["src/post/*"],
+            "@profile/*": ["src/profile/*"],
+            "@routes/*": ["src/routes/*"],
+            "@shared/*": ["src/shared/*"],
+            "@user/*": ["src/user/*"],
             "@utils/*": ["src/utils/*"]
         }
     }

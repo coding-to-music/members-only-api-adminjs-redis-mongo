@@ -1,13 +1,13 @@
-import { App } from '@/app';
-import request from 'supertest';
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import User from '@models/User'
+import { App } from "@/app";
+import request from "supertest";
+import mongoose from "mongoose";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import { User } from "@user/models/user.model"
 
 beforeAll(async () => {
 
     const mongoServer = await MongoMemoryServer.create();
-
+    mongoose.set('strictQuery', false)
     await mongoose.connect(mongoServer.getUri());
 })
 

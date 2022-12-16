@@ -1,6 +1,6 @@
-import { createClient, RedisClientType } from 'redis';
-import { ENV } from '@utils/validateEnv';
-import { logger } from '@utils/logger';
+import { createClient, RedisClientType } from "redis";
+import { ENV } from "@utils/loadEnv";
+import { logger } from "@utils/logger";
 
 const redisClient: RedisClientType = createClient({
     url: ENV.REDIS_HOST,

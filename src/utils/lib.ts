@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import Post from '@models/Post';
-import { IPost } from '@interfaces/posts.interface';
-import { NotFoundException } from '@exceptions/common.exception';
-import { IChatUserData } from '@interfaces/message.interface';
+import { Request, Response, NextFunction } from "express";
+import { IChatUserData } from "@message/interfaces/message.interface";
+import { Post } from "@post/models/post.model";
+import { IPost } from "@post/interfaces/posts.interface";
+import { NotFoundException } from "@shared/exceptions/common.exception";
 
 export const formatPostCommentsAndLikes = (req: Request, res: Response, next: NextFunction): void => {
     switch (true) {
@@ -57,6 +57,6 @@ export const checkIfPostExists = async (id: string): Promise<IPost> => {
 }
 
 export const getDisconnectedUser = (map: Map<string, IChatUserData>, searchValue: string): string | false => {
-    const foundKey = [...map.entries()].find(([_key, value]) => value.clientID === searchValue);
+    const foundKey = [...map.entries()].find(([_, value]) => value.clientID === searchValue);
     return foundKey ? foundKey[0] : false;
 }

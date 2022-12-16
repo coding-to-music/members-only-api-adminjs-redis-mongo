@@ -1,6 +1,5 @@
-import { Request, Response } from 'express';
-import { BaseRouter } from './base.router';
-
+import { Request, Response } from "express";
+import { BaseRouter } from "@shared/routers/base.router";
 
 export class IndexRouter extends BaseRouter {
 
@@ -11,7 +10,9 @@ export class IndexRouter extends BaseRouter {
     }
 
     private index(req: Request, res: Response) {
-        res.redirect('/v1')
+        res.json({
+            message: `PLEASE VISIT '/api-docs' FOR FULL API DOCUMENTATION`
+        })
     }
 
     protected registerRoutes() {

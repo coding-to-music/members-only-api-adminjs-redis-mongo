@@ -1,14 +1,14 @@
-import AdminJS, { AdminJSOptions } from 'adminjs';
-import AdminJSExpress from '@adminjs/express';
-import AdminJSMongoose from '@adminjs/mongoose';
-import { compare } from 'bcrypt';
-import { ENV } from '@utils/validateEnv';
-import User from '@models/User';
-import Post from '@models/Post';
-import Profile from '@models/Profile';
-import { IUser, Role } from '@interfaces/users.interface'
-import { SessionOptions } from 'express-session';
-import { Router } from 'express';
+import { SessionOptions } from "express-session";
+import { Router } from "express";
+import AdminJS, { AdminJSOptions } from "adminjs";
+import AdminJSExpress from "@adminjs/express";
+import AdminJSMongoose from "@adminjs/mongoose";
+import { compare } from "bcrypt";
+import { ENV } from "@utils/loadEnv";
+import { Post } from "@post/models/post.model";
+import { Profile } from "@profile/models/profile.model";
+import { User } from "@user/models/user.model";
+import { IUser, Role } from "@user/interfaces/users.interface"
 
 const getActions = () => {
     return {
@@ -63,7 +63,7 @@ const sessionOptions: SessionOptions = {
     resave: true,
     saveUninitialized: false,
     secret: ENV.COOKIE_SECRET
-} 
+}
 
 export const adminJs = new AdminJS(adminJsOptions)
 

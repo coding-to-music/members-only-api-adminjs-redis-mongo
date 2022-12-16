@@ -1,7 +1,7 @@
-import { connect, connection, mongo } from 'mongoose';
-import { GridFSBucket } from 'mongodb';
-import { ENV } from '@utils/validateEnv';
-import { logger } from '@utils/logger';
+import { connect, connection, mongo, set } from "mongoose";
+import { GridFSBucket } from "mongodb";
+import { ENV } from "@utils/loadEnv";
+import { logger } from "@utils/logger";
 
 let bucket: GridFSBucket;
 
@@ -16,6 +16,7 @@ export const connectDB = async () => {
         ssl: true,
     };
 
+    set('strictQuery', false);
     connect(ENV.DB_URL, options);
 
     connection.on('connected', () => logger.info('Mongoose connected to DB cluster'));

@@ -1,7 +1,7 @@
-import { ValidationException, LoggerException } from '@exceptions/common.exception';
-import { Request, Response, NextFunction } from 'express';
-import { validationResult } from 'express-validator';
-import { logger } from './logger';
+import { Request, Response, NextFunction } from "express";
+import { validationResult } from "express-validator";
+import { ValidationException, LoggerException } from "@shared/exceptions/common.exception";
+import { logger } from "./logger";
 
 
 export const checkValidations = (req: Request, res: Response, next: NextFunction) => {
