@@ -13,7 +13,24 @@ https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs/lesson
 ## Environment variables:
 
 ```java
+MONGO_URI="mongodb+srv://<username>:<password>@cluster0.0skitfz.mongodb.net/members-only-api-adminjs-redis-mongo?retryWrites=true&w=majority"
+COOKIE_SECRET="abcdefgh"
+ACCESS_TOKEN_PRIVATE_KEY_BASE64="abcdefgh"
+ACCESS_TOKEN_PUBLIC_KEY_BASE64="abcdefgh"
+ACCESS_TOKEN_SECRET="abcdefgh"
+REFRESH_TOKEN_PRIVATE_KEY_BASE64="abcdefgh"
+REFRESH_TOKEN_PUBLIC_KEY_BASE64="abcdefgh"
+REFRESH_TOKEN_SECRET="abcdefgh"
+SENDER_IDENTITY="abcdefgh"
+SENDGRID_API_KEY="abcdefgh"
+REDIS_HOST="abcdefgh"
+REDIS_USERNAME="abcdefgh"
+REDIS_PASSWORD="abcdefgh"
+LOGTAIL_SOURCE_TOKEN="abcdefgh"
 
+# NODE_ENV='production'
+NODE_ENV='development'
+PORT=3000
 ```
 
 ## GitHub
